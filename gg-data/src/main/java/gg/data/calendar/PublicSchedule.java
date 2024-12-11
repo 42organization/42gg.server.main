@@ -18,7 +18,6 @@ import gg.data.BaseTimeEntity;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.ScheduleStatus;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -44,9 +43,6 @@ public class PublicSchedule extends BaseTimeEntity {
 	private String title;
 
 	private String content;
-  
-  @Column(nullable = false)
-	private String link;
 
 	@Column(nullable = false, columnDefinition = "DATETIME")
 	private LocalDateTime startTime;
@@ -57,12 +53,8 @@ public class PublicSchedule extends BaseTimeEntity {
 	@Column(nullable = false)
 	private ScheduleStatus status;
 
-	@Builder
-	public PublicSchedule(DetailClassification classification, Set<Tag> tags, String author, String title,
-		String content, String link, LocalDateTime startTime, LocalDateTime endTime) {
-		this.classification = classification;
-		this.tags = tags;
-		this.author = author;
+	@Column(nullable = false)
+	private String link;
 
 	public void update(DetailClassification classification, Set<Tag> tags, String author, String title,
 		String content, String link, LocalDateTime startTime, LocalDateTime endTime) {
@@ -79,6 +71,5 @@ public class PublicSchedule extends BaseTimeEntity {
 		this.link = link;
 		this.startTime = startTime;
 		this.endTime = endTime;
-		this.status = ScheduleStatus.ACTIVATE;
 	}
 }
