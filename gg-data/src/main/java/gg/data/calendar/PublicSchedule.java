@@ -44,13 +44,14 @@ public class PublicSchedule extends BaseTimeEntity {
 	private String title;
 
 	private String content;
-
+  
+  @Column(nullable = false)
 	private String link;
 
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "DATETIME")
 	private LocalDateTime startTime;
 
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "DATETIME")
 	private LocalDateTime endTime;
 
 	@Column(nullable = false)
@@ -62,6 +63,17 @@ public class PublicSchedule extends BaseTimeEntity {
 		this.classification = classification;
 		this.tags = tags;
 		this.author = author;
+
+	public void update(DetailClassification classification, Set<Tag> tags, String author, String title,
+		String content, String link, LocalDateTime startTime, LocalDateTime endTime) {
+
+	}
+
+	public void update(DetailClassification classification, Set<Tag> tags, String title, String content,
+		String link, LocalDateTime startTime, LocalDateTime endTime) {
+
+		this.classification = classification;
+		this.tags = tags;
 		this.title = title;
 		this.content = content;
 		this.link = link;
