@@ -2,9 +2,13 @@ package gg.calendar.api.schedule.privateschedule.service;
 
 import org.springframework.stereotype.Service;
 
+import gg.auth.UserDto;
+import gg.calendar.api.schedule.privateschedule.controller.request.PrivateScheduleCreateReqDto;
 import gg.calendar.api.schedule.privateschedule.controller.request.PrivateScheduleUpdateReqDto;
 import gg.data.calendar.PrivateSchedule;
+import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
+import gg.data.user.User;
 import gg.repo.calendar.PrivateScheduleRepository;
 import gg.repo.calendar.PublicScheduleRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,11 +16,21 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class PrivateScheduleService {
-
 	private final PrivateScheduleRepository privateScheduleRepository;
-
 	private final PublicScheduleRepository publicScheduleRepository;
+	private final UserRepository userRepository;
 
+	@Transactional
+	public void createPrivateSchedule(UserDto userDto, PrivateScheduleCreateReqDto privateScheduleCreateReqDto) {
+		PublicSchedule publicSchedule = PrivateScheduleCreateReqDto.of(userDto.getIntraId(),
+			privateScheduleCreateReqDto);
+		publicScheduleRepository.save(publicSchedule);
+		User user = userRepository.findById(userDto.getId()).orElseThrow(UserNotFoundException::new);
+		PrivateSchedule privateSchedule = PrivateSchedule.of(user, publicSchedule,
+			privateScheduleCreateReqDto.getColor());
+		privateScheduleRepository.save(privateSchedule);
+	}
+  
 	// Todo: 커스텀 에러 처리해야함
 	public PrivateSchedule updatePrivateSchedule(Long scheduleId, Long userId,
 		PrivateScheduleUpdateReqDto privateScheduleUpdateReqDto) {
@@ -35,12 +49,10 @@ public class PrivateScheduleService {
 		PrivateSchedule privateSchedule = privateScheduleRepository.findByUserIdAndScheduleId(userId, scheduleId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 일정이 없습니다."));
 		privateSchedule.update(privateScheduleUpdateReqDto.getDetailClassification(),
-			privateScheduleUpdateReqDto.getTags(),
-			privateScheduleUpdateReqDto.getTitle(), privateScheduleUpdateReqDto.getContent(),
-			privateScheduleUpdateReqDto.getLink(),
+			privateScheduleUpdateReqDto.getTags(), privateScheduleUpdateReqDto.getTitle(),
+			privateScheduleUpdateReqDto.getContent(), privateScheduleUpdateReqDto.getLink(),
 			privateScheduleUpdateReqDto.getStartTime(), privateScheduleUpdateReqDto.getEndTime(),
-			privateScheduleUpdateReqDto.isAlarm(),
-			privateScheduleUpdateReqDto.getColor());
+			privateScheduleUpdateReqDto.isAlarm(), privateScheduleUpdateReqDto.getColor());
 		privateScheduleRepository.save(privateSchedule);
 		publicScheduleRepository.save(privateSchedule.getPublicSchedule());
 		return privateSchedule;
