@@ -69,4 +69,21 @@ public class PublicSchedule extends BaseTimeEntity {
 		this.endTime = endTime;
 		this.status = ScheduleStatus.ACTIVATE;
 	}
+
+	public void update(DetailClassification classification, Set<Tag> tags, String author, String title, String content,
+		String link, LocalDateTime startTime, LocalDateTime endTime) {
+
+	}
+
+	public void update(DetailClassification classification, Set<Tag> tags, String title, String content, String link,
+		LocalDateTime startTime, LocalDateTime endTime) {
+
+		this.classification = classification;
+		this.tags = tags;
+		this.title = title;
+		this.content = content;
+		this.link = link;
+		this.startTime = startTime;
+		this.endTime = endTime;
+	}
 }
