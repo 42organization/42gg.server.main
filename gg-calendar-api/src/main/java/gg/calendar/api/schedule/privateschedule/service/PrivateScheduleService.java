@@ -1,7 +1,6 @@
 package gg.calendar.api.schedule.privateschedule.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import gg.auth.UserDto;
 import gg.calendar.api.schedule.privateschedule.controller.request.PrivateScheduleCreateReqDto;
@@ -12,12 +11,9 @@ import gg.data.calendar.type.DetailClassification;
 import gg.data.user.User;
 import gg.repo.calendar.PrivateScheduleRepository;
 import gg.repo.calendar.PublicScheduleRepository;
-import gg.repo.user.UserRepository;
-import gg.utils.exception.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PrivateScheduleService {
 	private final PrivateScheduleRepository privateScheduleRepository;
@@ -34,7 +30,7 @@ public class PrivateScheduleService {
 			privateScheduleCreateReqDto.getColor());
 		privateScheduleRepository.save(privateSchedule);
 	}
-
+  
 	// Todo: 커스텀 에러 처리해야함
 	public PrivateSchedule updatePrivateSchedule(Long scheduleId, Long userId,
 		PrivateScheduleUpdateReqDto privateScheduleUpdateReqDto) {
