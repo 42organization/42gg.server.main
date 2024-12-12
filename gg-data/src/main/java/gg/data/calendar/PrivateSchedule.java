@@ -67,4 +67,11 @@ public class PrivateSchedule extends BaseTimeEntity {
 		this.color = color;
 
 	}
+
+	// Todo: 색깔을 변경한다하면 로직 추가 필요
+	// 	알림을 끌것인가?
+	public void delete() {
+		this.status = ScheduleStatus.DELETE;
+		this.alarm = false;
+	}
 }

@@ -9,6 +9,7 @@ import gg.calendar.api.schedule.privateschedule.controller.request.PrivateSchedu
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
+import gg.data.calendar.type.ScheduleStatus;
 import gg.data.user.User;
 import gg.repo.calendar.PrivateScheduleRepository;
 import gg.repo.calendar.PublicScheduleRepository;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PrivateScheduleService {
 	private final PrivateScheduleRepository privateScheduleRepository;
 	private final PublicScheduleRepository publicScheduleRepository;
@@ -34,7 +36,8 @@ public class PrivateScheduleService {
 		privateScheduleRepository.save(privateSchedule);
 	}
 
-	// Todo: 커스텀 에러 처리해야함
+	// Todo: 커스텀 에러 처리
+	@Transactional
 	public PrivateSchedule updatePrivateSchedule(Long scheduleId, Long userId,
 		PrivateScheduleUpdateReqDto privateScheduleUpdateReqDto) {
 		if (privateScheduleUpdateReqDto.getStartTime().isAfter(privateScheduleUpdateReqDto.getEndTime())) {
@@ -59,5 +62,18 @@ public class PrivateScheduleService {
 		privateScheduleRepository.save(privateSchedule);
 		publicScheduleRepository.save(privateSchedule.getPublicSchedule());
 		return privateSchedule;
+	}
+
+	//Todo: 커스텀 에러 처리
+	@Transactional
+	public void deletePrivateSchedule(Long scheduleId, Long userId) {
+		PrivateSchedule privateSchedule = privateScheduleRepository.findByUserIdAndScheduleId(userId, scheduleId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 일정이 없습니다."));
+
+		if (privateSchedule.getStatus() == ScheduleStatus.DEACTIVATE) {
+			throw new IllegalArgumentException("이미 삭제된 일정입니다.");
+		}
+		privateSchedule.delete();
+		privateScheduleRepository.save(privateSchedule);
 	}
 }
