@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import gg.auth.UserDto;
 import gg.calendar.api.schedule.publicschedule.controller.request.PublicScheduleCreateReqDto;
 import gg.calendar.api.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
+import gg.calendar.api.schedule.publicschedule.controller.response.PublicScheduleUpdateResDto;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.ScheduleStatus;
 import gg.data.user.User;
@@ -33,13 +34,14 @@ public class PublicScheduleService {
 
 	//TODO: 에러처리하기!
 	@Transactional
-	public void updatePublicSchedule(Long scheduleId, Long userId, PublicScheduleUpdateReqDto publicScheduleUpdateReqDto){
+	public PublicScheduleUpdateResDto updatePublicSchedule(Long scheduleId, Long userId, PublicScheduleUpdateReqDto publicScheduleUpdateReqDto){
 		PublicSchedule publicSchedule = publicSchduleRepository.findByUserIdAndSchduleId(userId, scheduleId).orElseThrow(()-> new IllegalArgumentException("해당 일정이 없습니다."));
 		publicSchedule.update(publicScheduleUpdateReqDto.getClassification(), publicScheduleUpdateReqDto.getTags(),
 			publicScheduleUpdateReqDto.getTitle(), publicScheduleUpdateReqDto.getContent(),
 			publicScheduleUpdateReqDto.getLink(), publicScheduleUpdateReqDto.getStartTime(),
 			publicScheduleUpdateReqDto.getEndTime(), publicScheduleUpdateReqDto.isAlarm(),
 			publicScheduleUpdateReqDto.getColor());
+		return PublicScheduleUpdateResDto.from(publicSchedule);
 	}
 
 	// TODO: 에러처리하기
