@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,7 +38,7 @@ public class PublicScheduleController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
-	@PatchMapping("/{scheduleId}/update")
+	@PutMapping("/{scheduleId}/update")
 	public ResponseEntity<PublicScheduleUpdateResDto> updatePublicSchedule(@PathVariable @Valid Long scheduleId,
 		@Valid @ModelAttribute PublicScheduleUpdateReqDto publicScheduleUpdateReqDto,
 		@Login @Parameter(hidden = true) UserDto userDto) {
