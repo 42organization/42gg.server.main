@@ -5,6 +5,8 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -37,12 +39,13 @@ public class PrivateSchedule extends BaseTimeEntity {
 	@JoinColumn(name = "public_schedule_id", nullable = false)
 	private PublicSchedule publicSchedule;
 
-	@Column(columnDefinition = "boolean default true")
+	@Column(nullable = false)
 	private boolean alarm;
 
 	private String color;
 
-	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, columnDefinition = "VARCHAR(10)")
 	private ScheduleStatus status;
 
 	@Builder

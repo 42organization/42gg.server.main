@@ -34,7 +34,7 @@ public class PublicSchedule extends BaseTimeEntity {
 	@Column(nullable = false, length = 20, columnDefinition = "VARCHAR(10)")
 	private DetailClassification classification;
 
-	@OneToMany(mappedBy = "tag", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "publicSchedule", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Tag> tags = new HashSet<>();
 
 	@Column(nullable = false)
@@ -53,7 +53,8 @@ public class PublicSchedule extends BaseTimeEntity {
 	@Column(nullable = false)
 	private LocalDateTime endTime;
 
-	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, columnDefinition = "VARCHAR(10)")
 	private ScheduleStatus status;
 
 	@Builder

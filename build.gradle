@@ -326,3 +326,15 @@ project(':gg-utils') {
     dependencies {
     }
 }
+
+project(':gg-calendar-api') {
+    bootJar { enabled = false }
+    jar { enabled = true }
+    dependencies {
+        implementation project(':gg-data')
+        implementation project(':gg-repo')
+        implementation project(':gg-admin-repo')
+        implementation project(':gg-utils')
+        implementation project(':gg-auth')
+    }
+}
