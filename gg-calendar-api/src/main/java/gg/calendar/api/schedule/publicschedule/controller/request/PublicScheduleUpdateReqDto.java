@@ -47,5 +47,4 @@ public class PublicScheduleUpdateReqDto {
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
 	private LocalDateTime endTime;
 
-
 }
