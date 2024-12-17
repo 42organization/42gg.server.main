@@ -42,16 +42,16 @@ public class PublicScheduleController {
 	public ResponseEntity<PublicScheduleUpdateResDto> updatePublicSchedule(@PathVariable @Valid Long scheduleId,
 		@Valid @ModelAttribute PublicScheduleUpdateReqDto publicScheduleUpdateReqDto,
 		@Login @Parameter(hidden = true) UserDto userDto) {
-		Long userId = userDto.getId();
-		PublicScheduleUpdateResDto scheduleUpdate =   publicScheduleService.updatePublicSchedule(scheduleId, userId, publicScheduleUpdateReqDto);
+		String author = userDto.getIntraId();
+		publicScheduleService.updatePublicSchedule(scheduleId, author, publicScheduleUpdateReqDto);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	@PatchMapping("/{scheduleId}/delete")
 	public ResponseEntity<Void> deletePublicSchedule(@PathVariable @Valid Long scheduleId,
-		@Login @Parameter(hidden = true) UserDto uSerDto) {
-		Long userId = uSerDto.getId();
-		publicScheduleService.deletePublicSchedule(scheduleId, userId);
+		@Login @Parameter(hidden = true) UserDto userDto) {
+		String author = userDto.getIntraId();
+		publicScheduleService.deletePublicSchedule(scheduleId, author);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 }

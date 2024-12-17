@@ -57,11 +57,6 @@ public class PublicSchedule extends BaseTimeEntity {
 	@Column(nullable = false, columnDefinition = "VARCHAR(10)")
 	private ScheduleStatus status;
 
-	@Column(columnDefinition = "boolean default true")
-	private boolean alarm;
-
-	private String color;
-
 	@Builder
 	public PublicSchedule(DetailClassification classification, Set<Tag> tags, String author, String title,
 		String content, String link, LocalDateTime startTime, LocalDateTime endTime) {
@@ -81,22 +76,10 @@ public class PublicSchedule extends BaseTimeEntity {
 	//
 	// }
 	//
-	// public void update(DetailClassification classification, Set<Tag> tags, String title, String content, String link,
-	// 	LocalDateTime startTime, LocalDateTime endTime) {
-	//
-	// 	this.classification = classification;
-	// 	this.tags = tags;
-	// 	this.title = title;
-	// 	this.content = content;
-	// 	this.link = link;
-	// 	this.startTime = startTime;
-	// 	this.endTime = endTime;
-	// }
 
-	public void update(DetailClassification classification, Set<Tag> tags,
-		String title, String content, String link,
-		LocalDateTime startTime, LocalDateTime endTime,
-		boolean alarm, String color) {
+	public void update(DetailClassification classification, Set<Tag> tags, String title, String content, String link,
+		LocalDateTime startTime, LocalDateTime endTime) {
+
 		this.classification = classification;
 		this.tags = tags;
 		this.title = title;
@@ -104,13 +87,10 @@ public class PublicSchedule extends BaseTimeEntity {
 		this.link = link;
 		this.startTime = startTime;
 		this.endTime = endTime;
-		this.alarm = alarm;
-		this.color = color;
 	}
 
 	public void delete()
 	{
 		this.status = ScheduleStatus.DELETE;
-		this.alarm = false;
 	}
 }
