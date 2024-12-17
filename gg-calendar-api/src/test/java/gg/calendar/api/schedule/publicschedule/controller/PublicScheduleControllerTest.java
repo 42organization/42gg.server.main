@@ -11,7 +11,6 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
-import org.apache.catalina.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -40,37 +39,37 @@ import gg.data.user.User;
 @AutoConfigureMockMvc
 public class PublicScheduleControllerTest {
 
-	@Autowired
-	private ObjectMapper objectMapper;
-
-	@Autowired
-	private EntityManager em;
-
-	@Autowired
-	private PublicCalendarMockDate publicCalendarMockDate;
-
 	// @Autowired
-	// private PublicScheduleRepository publicScheduleRepository;
-
-	private User user;
-	private String accessToken;
-
-	@BeforeEach
-	void setUp() {
-		user = testDataUtils.createNewUser();
-		accessToken = testDataUtils.getLoginAccessTokenFromUser(user);
-	}
-
-
-	@Nested
-	@DisplayName("공개 일정 생성")
-	class CreatePublicSchedule {
-
-		@Test
-		@DisplayName("올바른 요청으로 공개 일정을 생성한다")
-		public void createPublicSchedule_Success() throws  Exception {
-
-
-		}
-	}
+	// private ObjectMapper objectMapper;
+	//
+	// @Autowired
+	// private EntityManager em;
+	//
+	// @Autowired
+	// private PublicCalendarMockDate publicCalendarMockDate;
+	//
+	// // @Autowired
+	// // private PublicScheduleRepository publicScheduleRepository;
+	//
+	// private User user;
+	// private String accessToken;
+	//
+	// @BeforeEach
+	// void setUp() {
+	// 	user = testDataUtils.createNewUser();
+	// 	accessToken = testDataUtils.getLoginAccessTokenFromUser(user);
+	// }
+	//
+	//
+	// @Nested
+	// @DisplayName("공개 일정 생성")
+	// class CreatePublicSchedule {
+	//
+	// 	@Test
+	// 	@DisplayName("올바른 요청으로 공개 일정을 생성한다")
+	// 	public void createPublicSchedule_Success() throws  Exception {
+	//
+	//
+	// 	}
+	// }
 }
