@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import gg.auth.UserDto;
 import gg.calendar.api.schedule.privateschedule.controller.request.PrivateScheduleCreateReqDto;
 import gg.calendar.api.schedule.privateschedule.controller.request.PrivateScheduleUpdateReqDto;
+import gg.calendar.api.schedule.privateschedule.controller.response.PrivateScheduleDetailResDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
@@ -76,4 +77,13 @@ public class PrivateScheduleService {
 		privateSchedule.delete();
 		privateScheduleRepository.save(privateSchedule);
 	}
+
+	//Todo: 커스텀 에러 처리
+	public PrivateScheduleDetailResDto detailPrivateSchedule(Long scheduleId, Long userId) {
+		PrivateSchedule privateSchedule = privateScheduleRepository.findByUserIdAndScheduleId(userId, scheduleId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 일정이 없습니다."));
+
+		return PrivateScheduleDetailResDto.of(privateSchedule);
+	}
+
 }
