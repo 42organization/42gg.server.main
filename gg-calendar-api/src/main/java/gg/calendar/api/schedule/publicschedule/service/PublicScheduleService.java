@@ -42,40 +42,28 @@ public class PublicScheduleService {
 	}
 
 	private void validateScheduleTime(LocalDateTime startTime, LocalDateTime endTime) {
-		if (startTime.isAfter(endTime))
-		{
+		if (startTime.isAfter(endTime)) {
 			throw new BusinessException(CALENDAR_AFTER_DATE);
 		}
-		if (startTime.isBefore(endTime))
-		{
+		if (startTime.isBefore(endTime)) {
 			throw new BusinessException(CALENDAR_BEFORE_DATE);
 		}
-		if (endTime.isEqual(startTime))
-		{
+		if (endTime.isEqual(startTime)) {
 			throw new BusinessException(CALENDAR_EQUAL_DATE);
 		}
-	private final PublicScheduleRepository publicSchduleRepository;
-	private final UserRepository userRepository;
-
-	@Transactional
-	public void createPublicSchedule(UserDto userDto, PublicScheduleCreateReqDto publicScheduleCreateReqDto)
-	{
-		PublicSchedule publicSchedule = PublicScheduleCreateReqDto.of(userDto.getIntraId(),
-			publicScheduleCreateReqDto);
-		publicSchduleRepository.save(publicSchedule);
 	}
 
 	//TODO: 에러처리하기!
+	// 1. findByIdAndAuthor로 에러처리를 뭉뚱그려서 한다
+	// 2. findById로 검사하고 if문을 분기해서 에러를 세세하게 처리한다.
 	@Transactional
-	public PublicScheduleUpdateResDto updatePublicSchedule(Long scheduleId, Long userId, PublicScheduleUpdateReqDto publicScheduleUpdateReqDto){
-		PublicSchedule publicSchedule = publicScheduleRepository.findByUserIdAndSchduleId(userId, scheduleId).orElseThrow(()-> new IllegalArgumentException("해당 일정이 없습니다."));
-		PublicSchedule publicSchedule = publicSchduleRepository.findByUserIdAndSchduleId(userId, scheduleId).orElseThrow(()-> new IllegalArgumentException("해당 일정이 없습니다."));
+	public PublicScheduleUpdateResDto updatePublicSchedule(Long scheduleId, String author, PublicScheduleUpdateReqDto publicScheduleUpdateReqDto){
+		PublicSchedule publicSchedule = publicScheduleRepository.findByIdAndAuthor(scheduleId, author).orElseThrow(()-> new IllegalArgumentException("해당 일정이 없습니다."));
 		validateScheduleUpdate(publicScheduleUpdateReqDto);
 		publicSchedule.update(publicScheduleUpdateReqDto.getClassification(), publicScheduleUpdateReqDto.getTags(),
 			publicScheduleUpdateReqDto.getTitle(), publicScheduleUpdateReqDto.getContent(),
 			publicScheduleUpdateReqDto.getLink(), publicScheduleUpdateReqDto.getStartTime(),
-			publicScheduleUpdateReqDto.getEndTime(), publicScheduleUpdateReqDto.isAlarm(),
-			publicScheduleUpdateReqDto.getColor());
+			publicScheduleUpdateReqDto.getEndTime());
 		return PublicScheduleUpdateResDto.from(publicSchedule);
 	}
 
@@ -100,9 +88,8 @@ public class PublicScheduleService {
 
 	// TODO: 에러처리하기
 	@Transactional
-	public void deletePublicSchedule(Long scheduleId, Long userId) {
-		PublicSchedule publicSchedule = publicScheduleRepository.findByUserIdAndSchduleId(userId, scheduleId).orElseThrow(()-> new IllegalArgumentException("해당 일정이 없습니다"));
-		PublicSchedule publicSchedule = publicSchduleRepository.findByUserIdAndSchduleId(userId, scheduleId).orElseThrow(()-> new IllegalArgumentException("해당 일정이 없습니다"));
+	public void deletePublicSchedule(Long scheduleId, String author) {
+		PublicSchedule publicSchedule = publicScheduleRepository.findByIdAndAuthor(scheduleId, author).orElseThrow(()-> new IllegalArgumentException("해당 일정이 없습니다"));
 		if (publicSchedule.getStatus() == ScheduleStatus.DELETE) {
 			throw new IllegalArgumentException("이미 삭제된 일정입니다.");
 		}

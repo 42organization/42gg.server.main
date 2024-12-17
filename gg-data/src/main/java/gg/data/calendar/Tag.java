@@ -1,10 +1,12 @@
 package gg.data.calendar;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,8 +20,9 @@ public class Tag {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@JoinColumn(name = "public_schedule_id")
-	private Long publicScheduleId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "public_schedule_id", nullable = false)
+	private PublicSchedule publicSchedule; // 객체 관계로 수정
 
 	private String value;
 }

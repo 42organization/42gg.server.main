@@ -52,8 +52,6 @@ public class PublicScheduleUpdateResDto {
 			.link(publicSchedule.getLink())
 			.startTime(publicSchedule.getStartTime())
 			.endTime(publicSchedule.getEndTime())
-			.alarm(publicSchedule.isAlarm())
-			.color(publicSchedule.getColor())
 			.build();
 	}
 }

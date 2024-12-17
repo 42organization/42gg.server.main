@@ -6,8 +6,10 @@ import java.util.Set;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import gg.data.calendar.PrivateSchedule;
+import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.Tag;
 import gg.data.calendar.type.DetailClassification;
+import gg.data.calendar.type.ScheduleStatus;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,13 +17,15 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PrivateScheduleUpdateResDto {
+public class PrivateScheduleDetailResDto {
 
 	private Long id;
 
 	private DetailClassification detailClassification;
 
 	private Set<Tag> tags;
+
+	private String author;
 
 	private String title;
 
@@ -39,12 +43,17 @@ public class PrivateScheduleUpdateResDto {
 
 	private String color;
 
+	private ScheduleStatus status;
+
+
 	@Builder
-	public PrivateScheduleUpdateResDto(Long id, DetailClassification detailClassification, Set<Tag> tags, String title,
-		String content, String link, LocalDateTime startTime, LocalDateTime endTime, boolean alarm, String color) {
+	public PrivateScheduleDetailResDto(Long id, DetailClassification detailClassification, Set<Tag> tags, String author,
+		String title, String content, String link, LocalDateTime startTime, LocalDateTime endTime,
+		boolean alarm, String color, ScheduleStatus status) {
 		this.id = id;
 		this.detailClassification = detailClassification;
 		this.tags = tags;
+		this.author = author;
 		this.title = title;
 		this.content = content;
 		this.link = link;
@@ -52,14 +61,15 @@ public class PrivateScheduleUpdateResDto {
 		this.endTime = endTime;
 		this.alarm = alarm;
 		this.color = color;
+		this.status = status;
 	}
 
-	public static PrivateScheduleUpdateResDto of(PrivateSchedule privateSchedule) {
-
-		return PrivateScheduleUpdateResDto.builder()
+	public static PrivateScheduleDetailResDto of(PrivateSchedule privateSchedule) {
+		return PrivateScheduleDetailResDto.builder()
 			.id(privateSchedule.getId())
 			.detailClassification(privateSchedule.getPublicSchedule().getClassification())
 			.tags(privateSchedule.getPublicSchedule().getTags())
+			.author(privateSchedule.getPublicSchedule().getAuthor())
 			.title(privateSchedule.getPublicSchedule().getTitle())
 			.content(privateSchedule.getPublicSchedule().getContent())
 			.link(privateSchedule.getPublicSchedule().getLink())
@@ -67,6 +77,7 @@ public class PrivateScheduleUpdateResDto {
 			.endTime(privateSchedule.getPublicSchedule().getEndTime())
 			.alarm(privateSchedule.isAlarm())
 			.color(privateSchedule.getColor())
-			.build();
+			.status(privateSchedule.getStatus()).build();
 	}
+
 }

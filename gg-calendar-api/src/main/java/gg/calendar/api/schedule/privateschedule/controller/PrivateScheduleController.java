@@ -4,6 +4,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import gg.auth.UserDto;
 import gg.auth.argumentresolver.Login;
 import gg.calendar.api.schedule.privateschedule.controller.request.PrivateScheduleCreateReqDto;
 import gg.calendar.api.schedule.privateschedule.controller.request.PrivateScheduleUpdateReqDto;
+import gg.calendar.api.schedule.privateschedule.controller.response.PrivateScheduleDetailResDto;
 import gg.calendar.api.schedule.privateschedule.controller.response.PrivateScheduleUpdateResDto;
 import gg.calendar.api.schedule.privateschedule.service.PrivateScheduleService;
 import gg.data.calendar.PrivateSchedule;
@@ -54,4 +56,14 @@ public class PrivateScheduleController {
 		privateScheduleService.deletePrivateSchedule(scheduleId, userId);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
+
+	@GetMapping("/{scheduleId}/detail")
+	public ResponseEntity<PrivateScheduleDetailResDto> detailPrivateSchedule(@PathVariable @Valid Long scheduleId,
+		@Login @Parameter(hidden = true) UserDto userDto) {
+		Long userId = userDto.getId();
+
+		PrivateScheduleDetailResDto responseDto = privateScheduleService.detailPrivateSchedule(scheduleId, userId);
+		return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+	}
+
 }

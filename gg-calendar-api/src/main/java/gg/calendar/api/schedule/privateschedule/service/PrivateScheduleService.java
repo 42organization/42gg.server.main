@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import gg.auth.UserDto;
 import gg.calendar.api.schedule.privateschedule.controller.request.PrivateScheduleCreateReqDto;
 import gg.calendar.api.schedule.privateschedule.controller.request.PrivateScheduleUpdateReqDto;
+import gg.calendar.api.schedule.privateschedule.controller.response.PrivateScheduleDetailResDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
@@ -52,7 +53,7 @@ public class PrivateScheduleService {
 		if (privateScheduleUpdateReqDto.getDetailClassification() != DetailClassification.NONE) {
 			throw new IllegalArgumentException("개인 일정이 아닙니다.");
 		}
-		PrivateSchedule privateSchedule = privateScheduleRepository.findByUserIdAndScheduleId(userId, scheduleId)
+		PrivateSchedule privateSchedule = privateScheduleRepository.findByUserIdAndPublicScheduleId(userId, scheduleId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 일정이 없습니다."));
 		privateSchedule.update(privateScheduleUpdateReqDto.getDetailClassification(),
 			privateScheduleUpdateReqDto.getTags(), privateScheduleUpdateReqDto.getTitle(),
@@ -67,7 +68,7 @@ public class PrivateScheduleService {
 	//Todo: 커스텀 에러 처리
 	@Transactional
 	public void deletePrivateSchedule(Long scheduleId, Long userId) {
-		PrivateSchedule privateSchedule = privateScheduleRepository.findByUserIdAndScheduleId(userId, scheduleId)
+		PrivateSchedule privateSchedule = privateScheduleRepository.findByUserIdAndPublicScheduleId(userId, scheduleId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 일정이 없습니다."));
 
 		if (privateSchedule.getStatus() == ScheduleStatus.DEACTIVATE) {
@@ -76,4 +77,13 @@ public class PrivateScheduleService {
 		privateSchedule.delete();
 		privateScheduleRepository.save(privateSchedule);
 	}
+
+	//Todo: 커스텀 에러 처리
+	public PrivateScheduleDetailResDto detailPrivateSchedule(Long scheduleId, Long userId) {
+		PrivateSchedule privateSchedule = privateScheduleRepository.findByUserIdAndPublicScheduleId(userId, scheduleId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 일정이 없습니다."));
+
+		return PrivateScheduleDetailResDto.of(privateSchedule);
+	}
+
 }
