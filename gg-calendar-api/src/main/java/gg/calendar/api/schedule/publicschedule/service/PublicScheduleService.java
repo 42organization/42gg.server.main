@@ -3,9 +3,7 @@ package gg.calendar.api.schedule.publicschedule.service;
 
 
 import static gg.utils.exception.ErrorCode.*;
-
 import java.time.LocalDateTime;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,13 +54,22 @@ public class PublicScheduleService {
 		{
 			throw new BusinessException(CALENDAR_EQUAL_DATE);
 		}
+	private final PublicScheduleRepository publicSchduleRepository;
+	private final UserRepository userRepository;
+
+	@Transactional
+	public void createPublicSchedule(UserDto userDto, PublicScheduleCreateReqDto publicScheduleCreateReqDto)
+	{
+		PublicSchedule publicSchedule = PublicScheduleCreateReqDto.of(userDto.getIntraId(),
+			publicScheduleCreateReqDto);
+		publicSchduleRepository.save(publicSchedule);
 	}
 
 	//TODO: 에러처리하기!
 	@Transactional
 	public PublicScheduleUpdateResDto updatePublicSchedule(Long scheduleId, Long userId, PublicScheduleUpdateReqDto publicScheduleUpdateReqDto){
 		PublicSchedule publicSchedule = publicScheduleRepository.findByUserIdAndSchduleId(userId, scheduleId).orElseThrow(()-> new IllegalArgumentException("해당 일정이 없습니다."));
-
+		PublicSchedule publicSchedule = publicSchduleRepository.findByUserIdAndSchduleId(userId, scheduleId).orElseThrow(()-> new IllegalArgumentException("해당 일정이 없습니다."));
 		validateScheduleUpdate(publicScheduleUpdateReqDto);
 		publicSchedule.update(publicScheduleUpdateReqDto.getClassification(), publicScheduleUpdateReqDto.getTags(),
 			publicScheduleUpdateReqDto.getTitle(), publicScheduleUpdateReqDto.getContent(),
@@ -95,7 +102,7 @@ public class PublicScheduleService {
 	@Transactional
 	public void deletePublicSchedule(Long scheduleId, Long userId) {
 		PublicSchedule publicSchedule = publicScheduleRepository.findByUserIdAndSchduleId(userId, scheduleId).orElseThrow(()-> new IllegalArgumentException("해당 일정이 없습니다"));
-
+		PublicSchedule publicSchedule = publicSchduleRepository.findByUserIdAndSchduleId(userId, scheduleId).orElseThrow(()-> new IllegalArgumentException("해당 일정이 없습니다"));
 		if (publicSchedule.getStatus() == ScheduleStatus.DELETE) {
 			throw new IllegalArgumentException("이미 삭제된 일정입니다.");
 		}
