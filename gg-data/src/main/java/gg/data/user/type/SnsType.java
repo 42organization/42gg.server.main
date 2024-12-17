@@ -23,4 +23,5 @@ public enum SnsType {
 			.findAny()
 			.orElse(SLACK);
 	}
+
 }
