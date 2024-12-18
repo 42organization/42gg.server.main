@@ -3,8 +3,6 @@ package gg.calendar.api.schedule.privateschedule.controller.response;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
-
 import org.springframework.format.annotation.DateTimeFormat;
 
 import gg.data.calendar.PrivateSchedule;
