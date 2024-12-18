@@ -93,4 +93,8 @@ public class PublicSchedule extends BaseTimeEntity {
 	{
 		this.status = ScheduleStatus.DELETE;
 	}
+
+	public void addTag(Tag tag) {
+		this.tags.add(tag);
+	}
 }

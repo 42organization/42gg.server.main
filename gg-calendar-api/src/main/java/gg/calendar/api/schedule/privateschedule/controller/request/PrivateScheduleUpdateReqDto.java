@@ -9,6 +9,7 @@ import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.Tag;
 import gg.data.calendar.type.DetailClassification;
 import lombok.Getter;
@@ -51,5 +52,4 @@ public class PrivateScheduleUpdateReqDto {
 	private boolean alarm;
 
 	private String color;
-
 }

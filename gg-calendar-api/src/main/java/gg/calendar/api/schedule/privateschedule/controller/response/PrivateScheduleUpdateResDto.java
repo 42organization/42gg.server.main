@@ -3,6 +3,8 @@ package gg.calendar.api.schedule.privateschedule.controller.response;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.format.annotation.DateTimeFormat;
 
 import gg.data.calendar.PrivateSchedule;
@@ -69,4 +71,9 @@ public class PrivateScheduleUpdateResDto {
 			.color(privateSchedule.getColor())
 			.build();
 	}
+
+	public void addTag(Tag tag) {
+		this.tags.add(tag);
+	}
+
 }

@@ -25,4 +25,9 @@ public class Tag {
 	private PublicSchedule publicSchedule; // 객체 관계로 수정
 
 	private String value;
+
+	public Tag(PublicSchedule publicSchedule, String value) {
+		this.publicSchedule = publicSchedule;
+		this.value = value;
+	}
 }
