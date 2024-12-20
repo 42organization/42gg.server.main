@@ -20,6 +20,7 @@ flags:
       - gg-utils/src/main/java/gg/utils
       - gg-recruit-api/src/main/java/gg/recruit/api
       - gg-agenda-api/src/main/java/gg/agenda/api
+      - gg-calendar-api/src/main/java/gg/calendar/api
   integrationTest:
     paths:
       - gg-pingpong-api/src/main/java/gg/pingpong/api
@@ -30,3 +31,4 @@ flags:
       - gg-utils/src/main/java/gg/utils
       - gg-recruit-api/src/main/java/gg/recruit/api
       - gg-agenda-api/src/main/java/gg/agenda/api
+      - gg-calendar-api/src/main/java/gg/calendar/api

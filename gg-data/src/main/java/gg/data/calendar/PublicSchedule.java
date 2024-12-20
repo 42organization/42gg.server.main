@@ -13,10 +13,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import gg.data.BaseTimeEntity;
 import gg.data.calendar.type.DetailClassification;
+import gg.data.calendar.type.EventTag;
+import gg.data.calendar.type.JobTag;
 import gg.data.calendar.type.ScheduleStatus;
+import gg.data.calendar.type.TechTag;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,8 +39,17 @@ public class PublicSchedule extends BaseTimeEntity {
 	@Column(nullable = false, length = 20, columnDefinition = "VARCHAR(10)")
 	private DetailClassification classification;
 
-	@OneToMany(mappedBy = "publicSchedule", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<Tag> tags = new HashSet<>();
+	@Enumerated(EnumType.STRING)
+	@Column(length = 20, columnDefinition = "VARCHAR(10)")
+	private EventTag eventTag;
+
+	@Enumerated(EnumType.STRING)
+	@Column(length = 20, columnDefinition = "VARCHAR(10)")
+	private JobTag jobTag;
+
+	@Enumerated(EnumType.STRING)
+	@Column(length = 20, columnDefinition = "VARCHAR(10)")
+	private TechTag techTag;
 
 	@Column(nullable = false)
 	private String author;
@@ -47,50 +61,16 @@ public class PublicSchedule extends BaseTimeEntity {
 
 	private String link;
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, columnDefinition = "VARCHAR(10)")
+	private ScheduleStatus status;
+
+	@Column(nullable = false)
+	private Integer sharedCount;
+
 	@Column(nullable = false)
 	private LocalDateTime startTime;
 
 	@Column(nullable = false)
 	private LocalDateTime endTime;
-
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, columnDefinition = "VARCHAR(10)")
-	private ScheduleStatus status;
-
-	@Builder
-	public PublicSchedule(DetailClassification classification, Set<Tag> tags, String author, String title,
-		String content, String link, LocalDateTime startTime, LocalDateTime endTime) {
-		this.classification = classification;
-		this.tags = tags;
-		this.author = author;
-		this.title = title;
-		this.content = content;
-		this.link = link;
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.status = ScheduleStatus.ACTIVATE;
-	}
-
-	// public void update(DetailClassification classification, Set<Tag> tags, String author, String title, String content,
-	// 	String link, LocalDateTime startTime, LocalDateTime endTime) {
-	//
-	// }
-	//
-
-	public void update(DetailClassification classification, Set<Tag> tags, String title, String content, String link,
-		LocalDateTime startTime, LocalDateTime endTime) {
-
-		this.classification = classification;
-		this.tags = tags;
-		this.title = title;
-		this.content = content;
-		this.link = link;
-		this.startTime = startTime;
-		this.endTime = endTime;
-	}
-
-	public void delete()
-	{
-		this.status = ScheduleStatus.DELETE;
-	}
 }

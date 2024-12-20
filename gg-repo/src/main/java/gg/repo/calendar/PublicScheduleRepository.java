@@ -11,5 +11,4 @@ import gg.data.calendar.PublicSchedule;
 @Repository
 public interface PublicScheduleRepository extends JpaRepository<PublicSchedule, Long> {
 
-	Optional<PublicSchedule> findByIdAndAuthor(Long scheduleId, String author);
 }

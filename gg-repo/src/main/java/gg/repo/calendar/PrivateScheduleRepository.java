@@ -10,6 +10,5 @@ import gg.data.calendar.PrivateSchedule;
 @Repository
 public interface PrivateScheduleRepository extends JpaRepository<PrivateSchedule, Long> {
 
-	Optional<PrivateSchedule> findByUserIdAndPublicScheduleId(Long userId, Long publicScheduleId);
 
 }
