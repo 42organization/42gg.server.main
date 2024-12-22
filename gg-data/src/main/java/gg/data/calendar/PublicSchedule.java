@@ -23,12 +23,15 @@ import gg.data.calendar.type.JobTag;
 import gg.data.calendar.type.ScheduleStatus;
 import gg.data.calendar.type.TechTag;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PublicSchedule extends BaseTimeEntity {
 	@Id
