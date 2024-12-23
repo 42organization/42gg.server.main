@@ -32,14 +32,14 @@ public class PublicScheduleCreateReqDtoTest {
 			.author(user.getIntraId())
 			.content("Test Content")
 			.link("http://test.com")
-			.sharedCount(0)
+			// .sharedCount(0) => sharedCount는 0으로 고정되기에 dto에서 제외
 			.startTime(LocalDateTime.now().plusDays(1))
 			.endTime(LocalDateTime.now().plusDays(2))
 			.build();
 
 
 		// when : dto를 엔티티로 변환
-		PublicSchedule schedule = dto.of(user.getIntraId());
+		PublicSchedule schedule = dto.toEntity(user.getIntraId(), dto);
 
 		// then : dto와 엔티티가 같은지 검증
 		assertAll(
@@ -50,7 +50,7 @@ public class PublicScheduleCreateReqDtoTest {
 			() -> assertEquals(user.getIntraId(), schedule.getAuthor()),
 			() -> assertEquals(dto.getContent(), schedule.getContent()),
 			() -> assertEquals(dto.getLink(), schedule.getLink()),
-			() -> assertEquals(dto.getSharedCount(), schedule.getSharedCount()),
+			// () -> assertEquals(dto.getSharedCount(), schedule.getSharedCount()),
 			() -> assertEquals(dto.getStartTime(), schedule.getStartTime()),
 			() -> assertEquals(dto.getEndTime(), schedule.getEndTime())
 		);

@@ -6,22 +6,24 @@ import gg.data.calendar.PublicSchedule;
 import gg.data.user.User;
 import gg.repo.calendar.PublicScheduleRepository;
 import gg.repo.user.UserRepository;
+import gg.utils.exception.ErrorCode;
+import gg.utils.exception.custom.CustomRuntimeException;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class PublicScheduleService {
 	private final PublicScheduleRepository publicScheduleRepository;
 	private final UserRepository userRepository;
 
 	@Transactional
-	public PublicSchedule createPublicSchedule(PublicScheduleCreateReqDto req, String userId){
-		User user = userRepository.findByIntraId(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-		if (!userId.equals(req.getAuthor())) {
-			throw new IllegalArgumentException("작성자가 일치하지 않습니다.");
+	public PublicSchedule createPublicSchedule(PublicScheduleCreateReqDto req, Long userId){
+		User user = userRepository.getById(userId);
+		if (!user.getIntraId().equals(req.getAuthor())) {
+			throw new CustomRuntimeException(ErrorCode.CALENDAR_AUTHOR_NOT_MATCH);
 		}
-		PublicSchedule publicSchedule = req.of(userId);
+
+		PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(), req);
 		return publicScheduleRepository.save(publicSchedule);
 	}
 }

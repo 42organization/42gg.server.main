@@ -8,6 +8,7 @@ import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
+import gg.data.calendar.type.ScheduleStatus;
 import gg.data.calendar.type.TechTag;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -32,25 +33,24 @@ public class PublicScheduleCreateReqDto {
 	private String content;
 	private String link;
 	@NotNull
-	private Integer sharedCount;
-	@NotNull
 	private LocalDateTime startTime;
 	@NotNull
 	private LocalDateTime endTime;
 
-	public PublicSchedule of(String userID) {
+	public static PublicSchedule toEntity(String intraId, PublicScheduleCreateReqDto dto) {
 		return PublicSchedule.builder()
-			.classification(classification)
-			.eventTag(eventTag)
-			.jobTag(jobTag)
-			.techTag(techTag)
-			.author(userID)
-			.title(title)
-			.content(content)
-			.link(link)
-			.sharedCount(sharedCount)
-			.startTime(startTime)
-			.endTime(endTime)
+			.classification(dto.classification)
+			.eventTag(dto.eventTag)
+			.jobTag(dto.jobTag)
+			.techTag(dto.techTag)
+			.author(intraId)
+			.title(dto.title)
+			.content(dto.content)
+			.link(dto.link)
+			.status(ScheduleStatus.ACTIVATE)
+			.sharedCount(0)
+			.startTime(dto.startTime)
+			.endTime(dto.endTime)
 			.build();
 	}
 }

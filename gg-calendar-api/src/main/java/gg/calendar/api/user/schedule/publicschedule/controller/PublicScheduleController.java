@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/public")
+@RequestMapping("/calendar/public")
 public class PublicScheduleController {
 	private final PublicScheduleService publicScheduleService;
 
@@ -28,8 +28,7 @@ public class PublicScheduleController {
 	public ResponseEntity<Void> createPublicSchedule(@RequestBody @Valid PublicScheduleCreateReqDto req,
 		@Login @Parameter(hidden = true) UserDto userDto)
 	{
-		String userId = userDto.getIntraId();
-		publicScheduleService.createPublicSchedule(req, userId);
+		publicScheduleService.createPublicSchedule(req, userDto.getId());
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 }

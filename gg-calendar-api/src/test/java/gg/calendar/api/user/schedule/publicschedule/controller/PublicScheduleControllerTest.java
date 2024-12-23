@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 import java.util.List;
 
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,11 +33,12 @@ import gg.utils.TestDataUtils;
 import gg.utils.annotation.IntegrationTest;
 import lombok.extern.slf4j.Slf4j;
 
+import gg.calendar.api.user.schedule.publicschedule.PublicScheduleMockData;
+
 @Slf4j
 @IntegrationTest
 @Transactional
 @AutoConfigureMockMvc
-@SpringBootTest
 public class PublicScheduleControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
@@ -50,10 +52,17 @@ public class PublicScheduleControllerTest {
 	@Autowired
 	private PublicScheduleRepository publicScheduleRepository;
 
+	@Autowired
+	private PublicScheduleMockData PublicScheduleMockData;
+
 	private User user;
 	private String accssToken;
 	@Autowired
 	private TestDataUtils testDataUtils;
+
+	@Autowired
+	EntityManager em;
+
 
 	@BeforeEach
 	void setUp() {
@@ -68,29 +77,18 @@ public class PublicScheduleControllerTest {
 		@DisplayName("공개일정 생성 성공")
 		void createPublicScheduleSuccess()  throws Exception {
 			// given : reqDto를 생성
-			PublicScheduleCreateReqDto reqDto = PublicScheduleCreateReqDto.builder()
-				.classification(DetailClassification.JOB_NOTICE)
-				.eventTag(EventTag.INSTRUCTION)
-				.title("Test Schedule")
-				.author(user.getIntraId())
-				.content("Test Content")
-				.link("http://test.com")
-				.sharedCount(0)
-				.startTime(LocalDateTime.now().plusDays(1))
-				.endTime(LocalDateTime.now().plusDays(2))
-				.build();
-
+			PublicSchedule publicSchedule = PublicScheduleMockData.createPublicSchedule(user.getIntraId());
 			// when : reqDto로 요청
-			mockMvc.perform(post("/public")
+			mockMvc.perform(post("/calendar/public")
 				.header("Authorization", "Bearer " + accssToken)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(reqDto)))
+				.content(objectMapper.writeValueAsString(publicSchedule)))
 				.andExpect(status().isCreated());
 
 			// then : 생성된 일정이 반환
 			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
-			assertThat(schedules).hasSize(1);
-			assertThat(schedules.get(0).getTitle()).isEqualTo(reqDto.getTitle());
+			assertThat(schedules).hasSize(2);
+			assertThat(schedules.get(0).getTitle()).isEqualTo(publicSchedule.getTitle());
 			}
 	}
 }
