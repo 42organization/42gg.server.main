@@ -38,13 +38,13 @@ public class PublicScheduleCreateReqDto {
 	@NotNull
 	private LocalDateTime endTime;
 
-	public PublicSchedule of() {
+	public PublicSchedule of(String userID) {
 		return PublicSchedule.builder()
 			.classification(classification)
 			.eventTag(eventTag)
 			.jobTag(jobTag)
 			.techTag(techTag)
-			.author(author)
+			.author(userID)
 			.title(title)
 			.content(content)
 			.link(link)
