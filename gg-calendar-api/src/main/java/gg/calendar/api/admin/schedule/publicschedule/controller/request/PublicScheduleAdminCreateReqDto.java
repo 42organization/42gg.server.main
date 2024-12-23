@@ -21,37 +21,4 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class PublicScheduleAdminCreateReqDto {
-	@NotNull
-	private DetailClassification classification;
-	private EventTag eventTag;
-	private JobTag jobTag;
-	private TechTag techTag;
-	@NotNull
-	private String author;
-	@NotNull
-	private String title;
-	private String content;
-	private String link;
-	@NotNull
-	private Integer sharedCount;
-	@NotNull
-	private LocalDateTime startTime;
-	@NotNull
-	private LocalDateTime endTime;
-
-	public PublicSchedule of() {
-		return PublicSchedule.builder()
-			.classification(classification)
-			.eventTag(eventTag)
-			.jobTag(jobTag)
-			.techTag(techTag)
-			.author(author)
-			.title(title)
-			.content(content)
-			.link(link)
-			.sharedCount(sharedCount)
-			.startTime(startTime)
-			.endTime(endTime)
-			.build();
-	}
 }
