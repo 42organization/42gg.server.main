@@ -1,5 +1,26 @@
 package gg.pingpong.api.global.security.service;
 
+import static gg.data.agenda.type.Coalition.*;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import gg.data.agenda.AgendaProfile;
 import gg.data.agenda.type.Coalition;
 import gg.data.pingpong.rank.Rank;
@@ -23,26 +44,6 @@ import gg.utils.RedisKeyManager;
 import gg.utils.exception.tier.TierNotFoundException;
 import gg.utils.external.ApiUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-
-import static gg.data.agenda.type.Coalition.OTHER;
 
 @Service
 @RequiredArgsConstructor
@@ -157,7 +158,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
 		if (response != null && !response.isEmpty()) {
 			Map<String, Object> coalition = response.get(0);
-			String coalitionName = (String) coalition.get("name");
+			String coalitionName = (String)coalition.get("name");
 			return Coalition.valueOfCoalition(coalitionName);
 		} else {
 			return OTHER;
