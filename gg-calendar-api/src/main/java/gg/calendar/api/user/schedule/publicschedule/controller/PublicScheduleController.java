@@ -33,3 +33,4 @@ public class PublicScheduleController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 }
+
