@@ -73,4 +73,20 @@ public class PublicSchedule extends BaseTimeEntity {
 
 	@Column(nullable = false)
 	private LocalDateTime endTime;
+
+	@Builder
+	private PublicSchedule(DetailClassification classification, EventTag eventTag, JobTag jobTag, TechTag techTag, String author, String title, String content, String link, Integer sharedCount, LocalDateTime startTime, LocalDateTime endTime) {
+		this.classification = classification;
+		this.eventTag = eventTag;
+		this.jobTag = jobTag;
+		this.techTag = techTag;
+		this.author = author;
+		this.title = title;
+		this.content = content;
+		this.link = link;
+		this.status = ScheduleStatus.ACTIVATE;
+		this.sharedCount = sharedCount;
+		this.startTime = startTime;
+		this.endTime = endTime;
+	}
 }
