@@ -85,7 +85,7 @@ public class PublicSchedule extends BaseTimeEntity {
 		this.content = content;
 		this.link = link;
 		this.status = ScheduleStatus.ACTIVATE;
-		this.sharedCount = sharedCount;
+		this.sharedCount = 0;
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}

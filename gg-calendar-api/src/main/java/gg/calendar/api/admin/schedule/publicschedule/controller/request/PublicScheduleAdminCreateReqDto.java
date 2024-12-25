@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 public class PublicScheduleAdminCreateReqDto {
 
 	@NotNull
-	private String detailClassification;
+	private String classification;
 
 	private String eventTag;
 
@@ -59,7 +59,7 @@ public class PublicScheduleAdminCreateReqDto {
 			throw new CustomRuntimeException(ErrorCode.BAD_ARGU);
 		}
 
-		this.detailClassification = detailClassification;
+		this.classification = detailClassification;
 		this.eventTag = eventTag;
 		this.jobTag = jobTag;
 		this.techTag = techTag;
@@ -73,13 +73,13 @@ public class PublicScheduleAdminCreateReqDto {
 
 	public static PublicSchedule toEntity(PublicScheduleAdminCreateReqDto publicScheduleAdminCreateReqDto){
 
-		if (!DetailClassification.isValid(publicScheduleAdminCreateReqDto.detailClassification) || !EventTag.isValid(publicScheduleAdminCreateReqDto.eventTag)
+		if (!DetailClassification.isValid(publicScheduleAdminCreateReqDto.classification) || !EventTag.isValid(publicScheduleAdminCreateReqDto.eventTag)
 			|| !JobTag.isValid(publicScheduleAdminCreateReqDto.jobTag) || !TechTag.isValid(publicScheduleAdminCreateReqDto.techTag)) {
 			throw new CustomRuntimeException(ErrorCode.BAD_ARGU);
 		}
 
 		return PublicSchedule.builder()
-			.classification(DetailClassification.getDetailClassificationTag(publicScheduleAdminCreateReqDto.detailClassification))
+			.classification(DetailClassification.getDetailClassificationTag(publicScheduleAdminCreateReqDto.classification))
 			.eventTag(EventTag.getEventTag(publicScheduleAdminCreateReqDto.eventTag))
 			.jobTag(JobTag.getJobTag(publicScheduleAdminCreateReqDto.jobTag))
 			.techTag(TechTag.getTechTag(publicScheduleAdminCreateReqDto.techTag))

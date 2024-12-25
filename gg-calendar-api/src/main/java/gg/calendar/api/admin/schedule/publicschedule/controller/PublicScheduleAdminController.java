@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,8 +27,8 @@ public class PublicScheduleAdminController {
 
 	private final PublicScheduleAdminService publicScheduleAdminService;
 
-	@PostMapping()
-	public ResponseEntity<Void> createPublicSchedule(@ModelAttribute @Valid PublicScheduleAdminCreateReqDto publicScheduleAdminCreateReqDto,
+	@PostMapping
+	public ResponseEntity<Void> createPublicSchedule(@RequestBody @Valid PublicScheduleAdminCreateReqDto publicScheduleAdminCreateReqDto,
 		@Login @Parameter(hidden = true) UserDto userDto) {
 		String intraId = userDto.getIntraId();
 		publicScheduleAdminService.createPublicSchedule(publicScheduleAdminCreateReqDto);
