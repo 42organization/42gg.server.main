@@ -14,7 +14,32 @@ public enum EventTag {
 
 	INSTRUCTION("강연"),
 
-	NONE("기타");
+	ETC("기타"),
+
+	NONE(null);
 
 	private final String value;
+
+	public static boolean isValid(String input) {
+		if (input == null)
+			return true;
+		for (EventTag tag : EventTag.values()) {
+			if (tag.getValue() != null && tag.getValue().equals(input)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static EventTag getEventTag(String input) {
+		if (input == null) {
+			return NONE;
+		}
+		for (EventTag tag : EventTag.values()) {
+			if (input.equals(tag.getValue())) {
+				return tag;
+			}
+		}
+		return NONE;
+	}
 }
