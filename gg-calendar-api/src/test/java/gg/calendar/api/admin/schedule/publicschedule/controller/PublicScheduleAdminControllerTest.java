@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
-import gg.calendar.api.admin.PublicScheduleMockData;
+import gg.calendar.api.admin.PublicScheduleAdminMockData;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.service.PublicScheduleAdminService;
 import gg.data.calendar.PublicSchedule;
@@ -46,7 +46,7 @@ public class PublicScheduleAdminControllerTest {
 	EntityManager em;
 
 	@Autowired
-	private PublicScheduleMockData publicScheduleMockData;
+	private PublicScheduleAdminMockData publicScheduleAdminMockData;
 
 	@Autowired
 	private PublicScheduleAdminRepository publicScheduleAdminRepository;
@@ -79,7 +79,15 @@ public class PublicScheduleAdminControllerTest {
 		@DisplayName("Admin PublicSchedule 등록 테스트 - 성공")
 		void createPublicScheduleTestSuccess() throws Exception {
 			// given
-			PublicScheduleAdminCreateReqDto publicScheduleAdminReqDto = publicScheduleMockData.createPublicScheduleAdminCreateReqDto();
+			PublicScheduleAdminCreateReqDto publicScheduleAdminReqDto = PublicScheduleAdminCreateReqDto.builder()
+				.detailClassification(DetailClassification.EVENT)
+				.eventTag(EventTag.JOB_FORUM)
+				.title("취업설명회")
+				.content("취업설명회입니다.")
+				.link("https://gg.42seoul.kr")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(10))
+				.build();
 
 			// when
 			mockMvc.perform(post("/admin/calendar/public")
