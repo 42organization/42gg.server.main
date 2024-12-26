@@ -48,7 +48,6 @@ public class PublicScheduleCreateReqDto {
 			.content(dto.content)
 			.link(dto.link)
 			.status(ScheduleStatus.ACTIVATE)
-			.sharedCount(0)
 			.startTime(dto.startTime)
 			.endTime(dto.endTime)
 			.build();
