@@ -73,7 +73,7 @@ public class PublicScheduleAdminControllerTest {
 	@Nested
 	@DisplayName("Admin PublicSchedule 등록 테스트")
 		// mockMvc.perform()로 테스트 -> 실제 API 호출
-	class createPublicScheduleTest {
+	class CreatePublicScheduleTest {
 
 		@Autowired
 		private PublicScheduleAdminService publicScheduleAdminService;
