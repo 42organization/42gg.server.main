@@ -1,6 +1,7 @@
 package gg.calendar.api.user.schedule.publicschedule.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import javax.validation.Valid;
 
@@ -32,4 +33,3 @@ public class PublicScheduleController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 }
-

@@ -6,6 +6,7 @@ import javax.persistence.EntityManager;
 
 import org.springframework.stereotype.Component;
 
+import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateReqDto;
 import gg.data.BaseTimeEntity;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
@@ -22,22 +23,23 @@ public class PublicScheduleMockData {
 	private final PublicScheduleRepository publicScheduleRepository;
 	private final TestDataUtils testDataUtils;
 
-
-	public PublicSchedule createPublicSchedule(String author) {
-		PublicSchedule publicSchedule = PublicSchedule.builder()
+	public PublicScheduleCreateReqDto createPublicScheduleCreateReqDto(String author) {
+		PublicScheduleCreateReqDto publicScheduleCreateReqDto = PublicScheduleCreateReqDto.builder()
 			.classification(DetailClassification.EVENT)
 			.eventTag(EventTag.NONE)
-			.jobTag(null)
-			.techTag(null)
-			.title("Test Schedule")
-			.status(ScheduleStatus.ACTIVATE)
 			.author(author)
+			.title("Test Schedule")
 			.content("Test Content")
 			.link("http://test.com")
-			.sharedCount(0)
 			.startTime(LocalDateTime.now())
 			.endTime(LocalDateTime.now().plusDays(1))
 			.build();
+		return publicScheduleCreateReqDto;
+	}
+
+	public PublicSchedule createPublicSchedule(String author) {
+		PublicScheduleCreateReqDto publicScheduleCreateReqDto = createPublicScheduleCreateReqDto(author);
+		PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(author, publicScheduleCreateReqDto);
 		return publicScheduleRepository.save(publicSchedule);
 	}
 }
