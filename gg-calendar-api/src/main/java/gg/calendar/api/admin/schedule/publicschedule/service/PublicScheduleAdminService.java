@@ -1,7 +1,5 @@
 package gg.calendar.api.admin.schedule.publicschedule.service;
 
-
-
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
@@ -27,7 +25,8 @@ public class PublicScheduleAdminService {
 	@Transactional
 	public void createPublicSchedule(PublicScheduleAdminCreateReqDto publicScheduleAdminCreateReqDto) {
 
-		dateTimeErrorCheck(publicScheduleAdminCreateReqDto.getStartTime(), publicScheduleAdminCreateReqDto.getEndTime());
+		dateTimeErrorCheck(publicScheduleAdminCreateReqDto.getStartTime(),
+			publicScheduleAdminCreateReqDto.getEndTime());
 
 		PublicSchedule publicSchedule = PublicScheduleAdminCreateReqDto.toEntity(publicScheduleAdminCreateReqDto);
 		publicScheduleAdminRepository.save(publicSchedule);
@@ -38,6 +37,5 @@ public class PublicScheduleAdminService {
 			throw new CustomRuntimeException(ErrorCode.CALENDAR_BEFORE_DATE);
 		}
 	}
-
 
 }

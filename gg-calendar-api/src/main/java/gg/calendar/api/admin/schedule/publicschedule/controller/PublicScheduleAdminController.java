@@ -28,7 +28,8 @@ public class PublicScheduleAdminController {
 	private final PublicScheduleAdminService publicScheduleAdminService;
 
 	@PostMapping
-	public ResponseEntity<Void> createPublicSchedule(@RequestBody @Valid PublicScheduleAdminCreateReqDto publicScheduleAdminCreateReqDto,
+	public ResponseEntity<Void> createPublicSchedule(
+		@RequestBody @Valid PublicScheduleAdminCreateReqDto publicScheduleAdminCreateReqDto,
 		@Login @Parameter(hidden = true) UserDto userDto) {
 		String intraId = userDto.getIntraId();
 		publicScheduleAdminService.createPublicSchedule(publicScheduleAdminCreateReqDto);

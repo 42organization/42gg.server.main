@@ -13,8 +13,8 @@ import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;import org.junit.jupiter.api.Test;
-
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,16 +81,16 @@ public class AgendaAnnouncementControllerTest {
 			// given
 			Agenda agenda = agendaMockData.createAgenda(user.getIntraId());
 			AgendaAnnouncementCreateReqDto dto = AgendaAnnouncementCreateReqDto.builder()
-				.title("title").content("content").build();
+				.title("title")
+				.content("content")
+				.build();
 			String request = objectMapper.writeValueAsString(dto);
 
 			// when
-			mockMvc.perform(post("/agenda/announcement")
-					.header("Authorization", "Bearer " + accessToken)
-					.param("agenda_key", agenda.getAgendaKey().toString())
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(request))
-				.andExpect(status().isCreated());
+			mockMvc.perform(post("/agenda/announcement").header("Authorization", "Bearer " + accessToken)
+				.param("agenda_key", agenda.getAgendaKey().toString())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request)).andExpect(status().isCreated());
 			Optional<AgendaAnnouncement> latestAnnounce = agendaAnnouncementRepository.findLatestByAgenda(agenda);
 
 			// then
@@ -105,16 +105,15 @@ public class AgendaAnnouncementControllerTest {
 			// given
 			Agenda agenda = agendaMockData.createAgenda(user.getIntraId());
 			AgendaAnnouncementCreateReqDto dto = AgendaAnnouncementCreateReqDto.builder()
-				.content("content").build();    // title이 null인 경우
+				.content("content")
+				.build();    // title이 null인 경우
 			String request = objectMapper.writeValueAsString(dto);
 
 			// expected
-			mockMvc.perform(post("/agenda/announcement")
-					.header("Authorization", "Bearer " + accessToken)
-					.param("agenda_key", agenda.getAgendaKey().toString())
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(request))
-				.andExpect(status().isBadRequest());
+			mockMvc.perform(post("/agenda/announcement").header("Authorization", "Bearer " + accessToken)
+				.param("agenda_key", agenda.getAgendaKey().toString())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request)).andExpect(status().isBadRequest());
 		}
 
 		@Test
@@ -123,16 +122,16 @@ public class AgendaAnnouncementControllerTest {
 			// given
 			Agenda agenda = agendaMockData.createAgenda(user.getIntraId());
 			AgendaAnnouncementCreateReqDto dto = AgendaAnnouncementCreateReqDto.builder()
-				.title("").content("content").build();    // title이 empty인 경우
+				.title("")
+				.content("content")
+				.build();    // title이 empty인 경우
 			String request = objectMapper.writeValueAsString(dto);
 
 			// expected
-			mockMvc.perform(post("/agenda/announcement")
-					.header("Authorization", "Bearer " + accessToken)
-					.param("agenda_key", agenda.getAgendaKey().toString())
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(request))
-				.andExpect(status().isBadRequest());
+			mockMvc.perform(post("/agenda/announcement").header("Authorization", "Bearer " + accessToken)
+				.param("agenda_key", agenda.getAgendaKey().toString())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request)).andExpect(status().isBadRequest());
 		}
 
 		@Test
@@ -141,16 +140,15 @@ public class AgendaAnnouncementControllerTest {
 			// given
 			Agenda agenda = agendaMockData.createAgenda(user.getIntraId());
 			AgendaAnnouncementCreateReqDto dto = AgendaAnnouncementCreateReqDto.builder()
-				.title("title").build();    // content가 null인 경우
+				.title("title")
+				.build();    // content가 null인 경우
 			String request = objectMapper.writeValueAsString(dto);
 
 			// expected
-			mockMvc.perform(post("/agenda/announcement")
-					.header("Authorization", "Bearer " + accessToken)
-					.param("agenda_key", agenda.getAgendaKey().toString())
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(request))
-				.andExpect(status().isBadRequest());
+			mockMvc.perform(post("/agenda/announcement").header("Authorization", "Bearer " + accessToken)
+				.param("agenda_key", agenda.getAgendaKey().toString())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request)).andExpect(status().isBadRequest());
 		}
 
 		@Test
@@ -159,16 +157,16 @@ public class AgendaAnnouncementControllerTest {
 			// given
 			Agenda agenda = agendaMockData.createAgenda(user.getIntraId());
 			AgendaAnnouncementCreateReqDto dto = AgendaAnnouncementCreateReqDto.builder()
-				.title("title").content("").build();    // content가 empty인 경우
+				.title("title")
+				.content("")
+				.build();    // content가 empty인 경우
 			String request = objectMapper.writeValueAsString(dto);
 
 			// expected
-			mockMvc.perform(post("/agenda/announcement")
-					.header("Authorization", "Bearer " + accessToken)
-					.param("agenda_key", agenda.getAgendaKey().toString())
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(request))
-				.andExpect(status().isBadRequest());
+			mockMvc.perform(post("/agenda/announcement").header("Authorization", "Bearer " + accessToken)
+				.param("agenda_key", agenda.getAgendaKey().toString())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request)).andExpect(status().isBadRequest());
 		}
 
 		@Test
@@ -176,16 +174,16 @@ public class AgendaAnnouncementControllerTest {
 		void createAgendaAnnouncementFailedWithNoAgenda() throws Exception {
 			// given
 			AgendaAnnouncementCreateReqDto dto = AgendaAnnouncementCreateReqDto.builder()
-				.title("title").content("content").build();
+				.title("title")
+				.content("content")
+				.build();
 			String request = objectMapper.writeValueAsString(dto);
 
 			// expected
-			mockMvc.perform(post("/agenda/announcement")
-					.header("Authorization", "Bearer " + accessToken)
-					.param("agenda_key", UUID.randomUUID().toString())
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(request))
-				.andExpect(status().isNotFound());
+			mockMvc.perform(post("/agenda/announcement").header("Authorization", "Bearer " + accessToken)
+				.param("agenda_key", UUID.randomUUID().toString())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request)).andExpect(status().isNotFound());
 		}
 
 		@Test
@@ -194,16 +192,16 @@ public class AgendaAnnouncementControllerTest {
 			// given
 			Agenda agenda = agendaMockData.createAgenda("another");    // 다른 사용자가 생성한 Agenda
 			AgendaAnnouncementCreateReqDto dto = AgendaAnnouncementCreateReqDto.builder()
-				.title("title").content("content").build();
+				.title("title")
+				.content("content")
+				.build();
 			String request = objectMapper.writeValueAsString(dto);
 
 			// expected
-			mockMvc.perform(post("/agenda/announcement")
-					.header("Authorization", "Bearer " + accessToken)
-					.param("agenda_key", agenda.getAgendaKey().toString())
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(request))
-				.andExpect(status().isForbidden());
+			mockMvc.perform(post("/agenda/announcement").header("Authorization", "Bearer " + accessToken)
+				.param("agenda_key", agenda.getAgendaKey().toString())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request)).andExpect(status().isForbidden());
 		}
 	}
 
@@ -220,18 +218,20 @@ public class AgendaAnnouncementControllerTest {
 			int size = 10;
 			Agenda agenda = agendaMockData.createAgenda(user.getIntraId());
 			agendaMockData.createAgendaAnnouncementList(agenda, 30, false);
-			List<AgendaAnnouncement> announcements = agendaMockData
-				.createAgendaAnnouncementList(agenda, total, true);
+			List<AgendaAnnouncement> announcements = agendaMockData.createAgendaAnnouncementList(agenda, total, true);
 
 			// when
-			String response = mockMvc.perform(get("/agenda/announcement")
-					.param("agenda_key", agenda.getAgendaKey().toString())
-					.header("Authorization", "Bearer " + accessToken)
-					.param("page", String.valueOf(page))
-					.param("size", String.valueOf(size)))
-				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-			PageResponseDto<AgendaAnnouncementResDto> pageResponseDto = objectMapper
-				.readValue(response, new TypeReference<>() {
+			String response = mockMvc.perform(
+					get("/agenda/announcement").param("agenda_key", agenda.getAgendaKey().toString())
+						.header("Authorization", "Bearer " + accessToken)
+						.param("page", String.valueOf(page))
+						.param("size", String.valueOf(size)))
+				.andExpect(status().isOk())
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
+			PageResponseDto<AgendaAnnouncementResDto> pageResponseDto = objectMapper.readValue(response,
+				new TypeReference<>() {
 				});
 			List<AgendaAnnouncementResDto> result = pageResponseDto.getContent();
 
@@ -259,14 +259,17 @@ public class AgendaAnnouncementControllerTest {
 			agendaMockData.createAgendaAnnouncementList(agenda, 30, false);
 
 			// when
-			String response = mockMvc.perform(get("/agenda/announcement")
-					.param("agenda_key", agenda.getAgendaKey().toString())
-					.header("Authorization", "Bearer " + accessToken)
-					.param("page", String.valueOf(page))
-					.param("size", String.valueOf(size)))
-				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-			PageResponseDto<AgendaAnnouncementResDto> pageResponseDto = objectMapper
-				.readValue(response, new TypeReference<>() {
+			String response = mockMvc.perform(
+					get("/agenda/announcement").param("agenda_key", agenda.getAgendaKey().toString())
+						.header("Authorization", "Bearer " + accessToken)
+						.param("page", String.valueOf(page))
+						.param("size", String.valueOf(size)))
+				.andExpect(status().isOk())
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
+			PageResponseDto<AgendaAnnouncementResDto> pageResponseDto = objectMapper.readValue(response,
+				new TypeReference<>() {
 				});
 			List<AgendaAnnouncementResDto> result = pageResponseDto.getContent();
 			// then
@@ -284,12 +287,10 @@ public class AgendaAnnouncementControllerTest {
 			agendaMockData.createAgendaAnnouncementList(agenda, 30, true);
 
 			// when
-			mockMvc.perform(get("/agenda/announcement")
-					.param("agenda_key", UUID.randomUUID().toString())
-					.header("Authorization", "Bearer " + accessToken)
-					.param("page", String.valueOf(page))
-					.param("size", String.valueOf(size)))
-				.andExpect(status().isNotFound());
+			mockMvc.perform(get("/agenda/announcement").param("agenda_key", UUID.randomUUID().toString())
+				.header("Authorization", "Bearer " + accessToken)
+				.param("page", String.valueOf(page))
+				.param("size", String.valueOf(size))).andExpect(status().isNotFound());
 		}
 	}
 }

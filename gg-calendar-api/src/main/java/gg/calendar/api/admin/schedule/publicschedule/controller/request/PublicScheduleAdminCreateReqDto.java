@@ -1,16 +1,17 @@
 package gg.calendar.api.admin.schedule.publicschedule.controller.request;
+
 import java.time.LocalDateTime;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
 import org.springframework.format.annotation.DateTimeFormat;
+
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
-import gg.data.calendar.type.TechTag;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import gg.data.calendar.type.ScheduleStatus;
 import gg.data.calendar.type.TechTag;
 import lombok.AccessLevel;
@@ -50,7 +51,9 @@ public class PublicScheduleAdminCreateReqDto {
 	private LocalDateTime endTime;
 
 	@Builder
-	public PublicScheduleAdminCreateReqDto(DetailClassification detailClassification, EventTag eventTag, JobTag jobTag, TechTag techTag, String title, String content, String link, ScheduleStatus status,LocalDateTime startTime, LocalDateTime endTime) {
+	public PublicScheduleAdminCreateReqDto(DetailClassification detailClassification, EventTag eventTag, JobTag jobTag,
+		TechTag techTag, String title, String content, String link, ScheduleStatus status, LocalDateTime startTime,
+		LocalDateTime endTime) {
 
 		this.classification = detailClassification;
 		this.eventTag = eventTag;
@@ -64,7 +67,7 @@ public class PublicScheduleAdminCreateReqDto {
 		this.endTime = endTime;
 	}
 
-	public static PublicSchedule toEntity(PublicScheduleAdminCreateReqDto publicScheduleAdminCreateReqDto){
+	public static PublicSchedule toEntity(PublicScheduleAdminCreateReqDto publicScheduleAdminCreateReqDto) {
 
 		return PublicSchedule.builder()
 			.classification(publicScheduleAdminCreateReqDto.classification)

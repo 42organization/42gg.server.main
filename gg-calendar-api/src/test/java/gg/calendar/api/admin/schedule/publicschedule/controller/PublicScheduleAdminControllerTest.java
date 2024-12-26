@@ -10,15 +10,17 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.test.web.servlet.MockMvc;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
 import gg.calendar.api.admin.PublicScheduleAdminMockData;
@@ -70,7 +72,7 @@ public class PublicScheduleAdminControllerTest {
 
 	@Nested
 	@DisplayName("Admin PublicSchedule 등록 테스트")
-	// mockMvc.perform()로 테스트 -> 실제 API 호출
+		// mockMvc.perform()로 테스트 -> 실제 API 호출
 	class createPublicScheduleTest {
 
 		@Autowired
@@ -92,10 +94,9 @@ public class PublicScheduleAdminControllerTest {
 				.build();
 
 			// when
-			mockMvc.perform(post("/admin/calendar/public")
-				.header("Authorization", "Bearer " + accessToken)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(publicScheduleAdminReqDto)))
+			mockMvc.perform(post("/admin/calendar/public").header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(publicScheduleAdminReqDto)))
 				.andDo(print())
 				.andExpect(status().isCreated());
 
@@ -110,10 +111,15 @@ public class PublicScheduleAdminControllerTest {
 		public void createPublicScheduleWrongDateTime() throws Exception {
 			try {
 				PublicScheduleAdminCreateReqDto requestDto = PublicScheduleAdminCreateReqDto.builder()
-					.detailClassification(DetailClassification.EVENT).eventTag(EventTag.JOB_FORUM).title("취업설명회")
-					.content("취업설명회입니다.").status(ScheduleStatus.ACTIVATE)
-					.link("https://gg.42seoul.kr").startTime(LocalDateTime.now().plusDays(10))
-					.endTime(LocalDateTime.now()).build();
+					.detailClassification(DetailClassification.EVENT)
+					.eventTag(EventTag.JOB_FORUM)
+					.title("취업설명회")
+					.content("취업설명회입니다.")
+					.status(ScheduleStatus.ACTIVATE)
+					.link("https://gg.42seoul.kr")
+					.startTime(LocalDateTime.now().plusDays(10))
+					.endTime(LocalDateTime.now())
+					.build();
 				publicScheduleAdminService.createPublicSchedule(requestDto);
 			} catch (Exception e) {
 				assertThat(e.getMessage()).isEqualTo("종료 시간이 시작 시간보다 빠를 수 없습니다.");
@@ -125,13 +131,17 @@ public class PublicScheduleAdminControllerTest {
 		public void createPublicScheduleTitleMax() throws Exception {
 
 			PublicScheduleAdminCreateReqDto requestDto = PublicScheduleAdminCreateReqDto.builder()
-				.detailClassification(DetailClassification.JOB_NOTICE).jobTag(JobTag.SHORTS_INTERN)
-				.title("TEST".repeat(13)).content("취업설명회입니다.").status(ScheduleStatus.ACTIVATE)
-				.link("https://gg.42seoul.kr").startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now().plusDays(10)).build();
+				.detailClassification(DetailClassification.JOB_NOTICE)
+				.jobTag(JobTag.SHORTS_INTERN)
+				.title("TEST".repeat(13))
+				.content("취업설명회입니다.")
+				.status(ScheduleStatus.ACTIVATE)
+				.link("https://gg.42seoul.kr")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(10))
+				.build();
 
-			mockMvc.perform(post("/admin/calendar/public")
-					.header("Authorization", "Bearer " + accessToken)
+			mockMvc.perform(post("/admin/calendar/public").header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(requestDto)))
 				.andDo(print())
@@ -143,13 +153,17 @@ public class PublicScheduleAdminControllerTest {
 		public void createPublicScheduleContentMax() throws Exception {
 
 			PublicScheduleAdminCreateReqDto requestDto = PublicScheduleAdminCreateReqDto.builder()
-				.detailClassification(DetailClassification.JOB_NOTICE).jobTag(JobTag.SHORTS_INTERN)
-				.title("취업설명회").content("취업설명회".repeat(401)).status(ScheduleStatus.ACTIVATE)
-				.link("https://gg.42seoul.kr").startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now().plusDays(10)).build();
+				.detailClassification(DetailClassification.JOB_NOTICE)
+				.jobTag(JobTag.SHORTS_INTERN)
+				.title("취업설명회")
+				.content("취업설명회".repeat(401))
+				.status(ScheduleStatus.ACTIVATE)
+				.link("https://gg.42seoul.kr")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(10))
+				.build();
 
-			mockMvc.perform(post("/admin/calendar/public")
-					.header("Authorization", "Bearer " + accessToken)
+			mockMvc.perform(post("/admin/calendar/public").header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(requestDto)))
 				.andDo(print())
