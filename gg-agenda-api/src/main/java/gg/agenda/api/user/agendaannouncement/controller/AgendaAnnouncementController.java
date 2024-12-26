@@ -47,8 +47,8 @@ public class AgendaAnnouncementController {
 		@RequestBody @Valid AgendaAnnouncementCreateReqDto agendaAnnouncementCreateReqDto) {
 		Agenda agenda = agendaService.findAgendaByAgendaKey(agendaKey);
 		agenda.mustModifiedByHost(user.getIntraId());
-		AgendaAnnouncement newAnnounce = agendaAnnouncementService
-			.addAgendaAnnouncement(agendaAnnouncementCreateReqDto, agenda);
+		AgendaAnnouncement newAnnounce = agendaAnnouncementService.addAgendaAnnouncement(agendaAnnouncementCreateReqDto,
+			agenda);
 		agendaSlackService.slackAddAgendaAnnouncement(agenda, newAnnounce);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
@@ -61,8 +61,8 @@ public class AgendaAnnouncementController {
 		int size = pageRequest.getSize();
 		Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
 
-		Page<AgendaAnnouncement> announcementList = agendaAnnouncementService
-			.findAnnouncementListByAgenda(pageable, agenda);
+		Page<AgendaAnnouncement> announcementList = agendaAnnouncementService.findAnnouncementListByAgenda(pageable,
+			agenda);
 
 		List<AgendaAnnouncementResDto> announceDto = announcementList.stream()
 			.map(AgendaAnnouncementResDto.MapStruct.INSTANCE::toDto)
