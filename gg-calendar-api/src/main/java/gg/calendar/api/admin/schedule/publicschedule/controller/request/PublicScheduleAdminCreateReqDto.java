@@ -27,13 +27,13 @@ import lombok.NoArgsConstructor;
 public class PublicScheduleAdminCreateReqDto {
 
 	@NotNull
-	private String classification;
+	private DetailClassification classification;
 
-	private String eventTag;
+	private EventTag eventTag;
 
-	private String jobTag;
+	private JobTag jobTag;
 
-	private String techTag;
+	private TechTag techTag;
 
 	@NotBlank
 	@Size(max = 50, message = "제목은 50자이하로 입력해주세요.")
@@ -53,11 +53,7 @@ public class PublicScheduleAdminCreateReqDto {
 	private LocalDateTime endTime;
 
 	@Builder
-	public PublicScheduleAdminCreateReqDto(String detailClassification, String eventTag, String jobTag, String techTag, String title, String content, String link, LocalDateTime startTime, LocalDateTime endTime) {
-
-		if (!EventTag.isValid(eventTag) || !JobTag.isValid(jobTag) || !TechTag.isValid(techTag)) {
-			throw new CustomRuntimeException(ErrorCode.BAD_ARGU);
-		}
+	public PublicScheduleAdminCreateReqDto(DetailClassification detailClassification, EventTag eventTag, JobTag jobTag, TechTag techTag, String title, String content, String link, LocalDateTime startTime, LocalDateTime endTime) {
 
 		this.classification = detailClassification;
 		this.eventTag = eventTag;
@@ -73,16 +69,11 @@ public class PublicScheduleAdminCreateReqDto {
 
 	public static PublicSchedule toEntity(PublicScheduleAdminCreateReqDto publicScheduleAdminCreateReqDto){
 
-		if (!DetailClassification.isValid(publicScheduleAdminCreateReqDto.classification) || !EventTag.isValid(publicScheduleAdminCreateReqDto.eventTag)
-			|| !JobTag.isValid(publicScheduleAdminCreateReqDto.jobTag) || !TechTag.isValid(publicScheduleAdminCreateReqDto.techTag)) {
-			throw new CustomRuntimeException(ErrorCode.BAD_ARGU);
-		}
-
 		return PublicSchedule.builder()
-			.classification(DetailClassification.getDetailClassificationTag(publicScheduleAdminCreateReqDto.classification))
-			.eventTag(EventTag.getEventTag(publicScheduleAdminCreateReqDto.eventTag))
-			.jobTag(JobTag.getJobTag(publicScheduleAdminCreateReqDto.jobTag))
-			.techTag(TechTag.getTechTag(publicScheduleAdminCreateReqDto.techTag))
+			.classification(publicScheduleAdminCreateReqDto.classification)
+			.eventTag(publicScheduleAdminCreateReqDto.eventTag)
+			.jobTag(publicScheduleAdminCreateReqDto.jobTag)
+			.techTag(publicScheduleAdminCreateReqDto.techTag)
 			.author("42GG")
 			.title(publicScheduleAdminCreateReqDto.title)
 			.content(publicScheduleAdminCreateReqDto.content)

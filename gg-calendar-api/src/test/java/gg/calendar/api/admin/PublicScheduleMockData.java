@@ -41,8 +41,8 @@ public class PublicScheduleMockData {
 
 	public PublicScheduleAdminCreateReqDto createPublicScheduleAdminCreateReqDto() {
 		return PublicScheduleAdminCreateReqDto.builder()
-			.detailClassification(DetailClassification.EVENT.getValue())
-			.eventTag(EventTag.JOB_FORUM.getValue())
+			.detailClassification(DetailClassification.EVENT)
+			.eventTag(EventTag.JOB_FORUM)
 			.title("취업설명회")
 			.content("취업설명회입니다.")
 			.link("https://gg.42seoul.kr")
@@ -51,5 +51,17 @@ public class PublicScheduleMockData {
 			.build();
 	}
 
+	//
+	// public PublicScheduleAdminCreateReqDto createPublicScheduleAdminCreateReqDtoFail() {
+	// 	return PublicScheduleAdminCreateReqDto.builder()
+	// 		.detailClassification(DetailClassification.TEST)
+	// 		.eventTag(EventTag.JOB_FORUM)
+	// 		.title("취업설명회")
+	// 		.content("취업설명회입니다.")
+	// 		.link("https://gg.42seoul.kr")
+	// 		.startTime(LocalDateTime.now())
+	// 		.endTime(LocalDateTime.now().plusDays(10))
+	// 		.build();
+	// }
 
 }
