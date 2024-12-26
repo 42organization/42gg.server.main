@@ -1,5 +1,7 @@
 package gg.data.calendar;
 
+import static gg.data.calendar.type.ScheduleStatus.*;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,6 +25,7 @@ import gg.data.calendar.type.JobTag;
 import gg.data.calendar.type.ScheduleStatus;
 import gg.data.calendar.type.TechTag;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,19 +39,19 @@ public class PublicSchedule extends BaseTimeEntity {
 	private Long id;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 20, columnDefinition = "VARCHAR(10)")
+	@Column(nullable = false, columnDefinition = "VARCHAR(10)")
 	private DetailClassification classification;
 
 	@Enumerated(EnumType.STRING)
-	@Column(length = 20, columnDefinition = "VARCHAR(10)")
+	@Column(columnDefinition = "VARCHAR(20)")
 	private EventTag eventTag;
 
 	@Enumerated(EnumType.STRING)
-	@Column(length = 20, columnDefinition = "VARCHAR(10)")
+	@Column(columnDefinition = "VARCHAR(20)")
 	private JobTag jobTag;
 
 	@Enumerated(EnumType.STRING)
-	@Column(length = 20, columnDefinition = "VARCHAR(10)")
+	@Column(columnDefinition = "VARCHAR(20)")
 	private TechTag techTag;
 
 	@Column(nullable = false)
@@ -76,6 +79,7 @@ public class PublicSchedule extends BaseTimeEntity {
 
 	@Builder
 	private PublicSchedule(DetailClassification classification, EventTag eventTag, JobTag jobTag, TechTag techTag, String author, String title, String content, String link, Integer sharedCount, LocalDateTime startTime, LocalDateTime endTime) {
+
 		this.classification = classification;
 		this.eventTag = eventTag;
 		this.jobTag = jobTag;
@@ -84,8 +88,8 @@ public class PublicSchedule extends BaseTimeEntity {
 		this.title = title;
 		this.content = content;
 		this.link = link;
-		this.status = ScheduleStatus.ACTIVATE;
 		this.sharedCount = 0;
+		this.status = status;
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}

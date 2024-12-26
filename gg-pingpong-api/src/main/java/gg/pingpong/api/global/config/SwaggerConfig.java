@@ -23,12 +23,22 @@ public class SwaggerConfig {
 			.build();
 	}
 
+
 	@Bean
 	public GroupedOpenApi agendaAdminGroup() {
 		return GroupedOpenApi.builder()
 			.group("agenda admin")
 			.pathsToMatch("/agenda/admin/**")
 			.packagesToScan("gg.agenda.api.admin")
+			.build();
+	}
+
+	@Bean
+	public GroupedOpenApi calendar() {
+		return GroupedOpenApi.builder()
+			.group("calendar")
+			.pathsToMatch("/calendar/**")
+			.packagesToScan("gg.calendar.api.user")
 			.build();
 	}
 
