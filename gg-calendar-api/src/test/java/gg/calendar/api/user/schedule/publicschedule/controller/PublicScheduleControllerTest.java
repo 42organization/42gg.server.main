@@ -131,5 +131,18 @@ public class PublicScheduleControllerTest {
 			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
 			assertThat(schedules).isEmpty();
 		}
+			PublicSchedule publicSchedule = PublicScheduleMockData.createPublicSchedule(user.getIntraId());
+			// when : reqDto로 요청
+			mockMvc.perform(post("/calendar/public")
+				.header("Authorization", "Bearer " + accssToken)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(publicSchedule)))
+				.andExpect(status().isCreated());
+
+			// then : 생성된 일정이 반환
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).hasSize(2);
+			assertThat(schedules.get(0).getTitle()).isEqualTo(publicSchedule.getTitle());
+			}
 	}
 }

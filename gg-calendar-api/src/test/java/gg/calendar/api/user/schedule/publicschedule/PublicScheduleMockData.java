@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import javax.persistence.EntityManager;
 
 import org.springframework.stereotype.Component;
-
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateReqDto;
 import gg.data.BaseTimeEntity;
 import gg.data.calendar.PublicSchedule;
@@ -29,6 +28,16 @@ public class PublicScheduleMockData {
 			.eventTag(EventTag.NONE)
 			.author(author)
 			.title("Test Schedule")
+
+	public PublicSchedule createPublicSchedule(String author) {
+		PublicSchedule publicSchedule = PublicSchedule.builder()
+			.classification(DetailClassification.EVENT)
+			.eventTag(EventTag.NONE)
+			.jobTag(null)
+			.techTag(null)
+			.title("Test Schedule")
+			.status(ScheduleStatus.ACTIVATE)
+			.author(author)
 			.content("Test Content")
 			.link("http://test.com")
 			.startTime(LocalDateTime.now())

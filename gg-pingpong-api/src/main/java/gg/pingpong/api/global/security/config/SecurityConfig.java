@@ -48,7 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.antMatchers(HttpMethod.POST, "/pingpong/tournaments/{tournamentId}/users").hasAnyRole("USER", "ADMIN")
 			.antMatchers("/login", "/oauth2/authorization/**", "/", "/pingpong/users/oauth/**",
 				"/pingpong/users/accesstoken", "/actuator/**",
-				"/swagger-ui/**", "/swagger-ui**", "/v3/api-docs/**", "/v3/api-docs**", "/api-docs").permitAll()
+				"/swagger-ui/**", "/swagger-ui**", "/v3/api-docs/**", "/v3/api-docs**", "/api-docs", "/admin/calendar/**").permitAll()
 			.anyRequest().authenticated()
 			.and()
 			.csrf().disable()
