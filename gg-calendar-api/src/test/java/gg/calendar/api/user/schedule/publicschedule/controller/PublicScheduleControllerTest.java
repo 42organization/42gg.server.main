@@ -2,6 +2,7 @@ package gg.calendar.api.user.schedule.publicschedule.controller;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
@@ -31,6 +32,7 @@ import gg.repo.calendar.PublicScheduleRepository;
 import gg.repo.user.UserRepository;
 import gg.utils.TestDataUtils;
 import gg.utils.annotation.IntegrationTest;
+import gg.utils.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 
 import gg.calendar.api.user.schedule.publicschedule.PublicScheduleMockData;
@@ -77,6 +79,58 @@ public class PublicScheduleControllerTest {
 		@DisplayName("공개일정 생성 성공")
 		void createPublicScheduleSuccess()  throws Exception {
 			// given : reqDto를 생성
+			PublicScheduleCreateReqDto publicScheduleDto = PublicScheduleCreateReqDto.builder()
+				.classification(DetailClassification.EVENT)
+				.eventTag(EventTag.NONE)
+				.author(user.getIntraId())
+				.title("Test Schedule")
+				.content("Test Content")
+				.link("http://test.com")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(1))
+				.build();
+
+			// when : reqDto로 요청
+			log.info("After mock data creation: {}", publicScheduleRepository.findByAuthor(user.getIntraId()).size());
+			mockMvc.perform(post("/calendar/public")
+				.header("Authorization", "Bearer " + accssToken)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(publicScheduleDto)))
+				.andExpect(status().isCreated());
+			// then : 생성된 일정이 반환
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).hasSize(1);
+			assertThat(schedules.get(0).getTitle()).isEqualTo(publicScheduleDto.getTitle());
+			}
+
+		@Test
+		@DisplayName("공개일정-작성자가 다를 때")
+		void createPublicScheduleFail() throws Exception {
+			// given : reqDto를 생성
+			PublicScheduleCreateReqDto publicScheduleDto = PublicScheduleCreateReqDto.builder()
+				.classification(DetailClassification.EVENT)
+				.eventTag(EventTag.NONE)
+				.author("another")
+				.title("Test Schedule")
+				.content("Test Content")
+				.link("http://test.com")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(1))
+				.build();
+			// when : reqDto로 요청
+			mockMvc.perform(post("/calendar/public")
+					.header("Authorization", "Bearer " + accssToken)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(publicScheduleDto)))
+				.andExpect(status().isBadRequest())
+				.andExpect(result -> {
+					status().isBadRequest(); // 처음에 errorcode로 잡았는데, status로 잡음
+				})
+				.andDo(print());
+			// then : 예외가 발생
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).isEmpty();
+		}
 			PublicSchedule publicSchedule = PublicScheduleMockData.createPublicSchedule(user.getIntraId());
 			// when : reqDto로 요청
 			mockMvc.perform(post("/calendar/public")

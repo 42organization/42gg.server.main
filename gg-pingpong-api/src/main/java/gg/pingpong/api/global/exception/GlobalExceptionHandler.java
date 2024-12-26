@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 import gg.utils.exception.ErrorCode;
 import gg.utils.exception.ErrorResponse;
@@ -127,6 +128,12 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	protected ResponseEntity handleException(HttpMessageNotReadableException exception) {
+		Throwable cause = exception.getCause();
+		if (cause instanceof InvalidFormatException) {
+			log.error("[HttpMessage]InvalidFormatException: ", cause.getMessage());
+			return ResponseEntity.badRequest().body(ErrorCode.BAD_ARGU.getMessage());
+		}
+		log.error("[HttpMessage]HttpMessageNotReadableException: ", exception.getMessage());
 		return ResponseEntity.badRequest().body(ErrorCode.UNREADABLE_HTTP_MESSAGE.getMessage());
 	}
 
