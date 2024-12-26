@@ -34,7 +34,6 @@ public class PublicScheduleMockData {
 			.author(author)
 			.content("Test Content")
 			.link("http://test.com")
-			.sharedCount(0)
 			.startTime(LocalDateTime.now())
 			.endTime(LocalDateTime.now().plusDays(1))
 			.build();

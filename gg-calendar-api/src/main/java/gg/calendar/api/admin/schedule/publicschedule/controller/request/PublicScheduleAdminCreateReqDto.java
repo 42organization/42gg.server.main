@@ -2,22 +2,18 @@ package gg.calendar.api.admin.schedule.publicschedule.controller.request;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateReqDto;
-
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
+import gg.data.calendar.type.ScheduleStatus;
 import gg.data.calendar.type.TechTag;
-import gg.utils.exception.ErrorCode;
-import gg.utils.exception.custom.CustomRuntimeException;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,6 +41,8 @@ public class PublicScheduleAdminCreateReqDto {
 
 	private String link;
 
+	private ScheduleStatus status;
+
 	@NotNull
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
 	private LocalDateTime startTime;
@@ -54,7 +52,7 @@ public class PublicScheduleAdminCreateReqDto {
 	private LocalDateTime endTime;
 
 	@Builder
-	public PublicScheduleAdminCreateReqDto(DetailClassification detailClassification, EventTag eventTag, JobTag jobTag, TechTag techTag, String title, String content, String link, LocalDateTime startTime, LocalDateTime endTime) {
+	public PublicScheduleAdminCreateReqDto(DetailClassification detailClassification, EventTag eventTag, JobTag jobTag, TechTag techTag, String title, String content, String link, ScheduleStatus status,LocalDateTime startTime, LocalDateTime endTime) {
 
 		this.classification = detailClassification;
 		this.eventTag = eventTag;
@@ -63,6 +61,7 @@ public class PublicScheduleAdminCreateReqDto {
 		this.title = title;
 		this.content = content;
 		this.link = link;
+		this.status = status;
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}
@@ -79,6 +78,7 @@ public class PublicScheduleAdminCreateReqDto {
 			.title(publicScheduleAdminCreateReqDto.title)
 			.content(publicScheduleAdminCreateReqDto.content)
 			.link(publicScheduleAdminCreateReqDto.link)
+			.status(publicScheduleAdminCreateReqDto.status)
 			.startTime(publicScheduleAdminCreateReqDto.startTime)
 			.endTime(publicScheduleAdminCreateReqDto.endTime)
 			.build();

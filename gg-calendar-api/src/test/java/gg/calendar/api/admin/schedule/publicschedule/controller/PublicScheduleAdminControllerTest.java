@@ -28,6 +28,7 @@ import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
+import gg.data.calendar.type.ScheduleStatus;
 import gg.data.user.User;
 import gg.utils.TestDataUtils;
 import gg.utils.annotation.IntegrationTest;
@@ -85,6 +86,7 @@ public class PublicScheduleAdminControllerTest {
 				.title("취업설명회")
 				.content("취업설명회입니다.")
 				.link("https://gg.42seoul.kr")
+				.status(ScheduleStatus.ACTIVATE)
 				.startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().plusDays(10))
 				.build();
@@ -109,7 +111,8 @@ public class PublicScheduleAdminControllerTest {
 			try {
 				PublicScheduleAdminCreateReqDto requestDto = PublicScheduleAdminCreateReqDto.builder()
 					.detailClassification(DetailClassification.EVENT).eventTag(EventTag.JOB_FORUM).title("취업설명회")
-					.content("취업설명회입니다.").link("https://gg.42seoul.kr").startTime(LocalDateTime.now().plusDays(10))
+					.content("취업설명회입니다.").status(ScheduleStatus.ACTIVATE)
+					.link("https://gg.42seoul.kr").startTime(LocalDateTime.now().plusDays(10))
 					.endTime(LocalDateTime.now()).build();
 				publicScheduleAdminService.createPublicSchedule(requestDto);
 			} catch (Exception e) {
@@ -123,8 +126,8 @@ public class PublicScheduleAdminControllerTest {
 
 			PublicScheduleAdminCreateReqDto requestDto = PublicScheduleAdminCreateReqDto.builder()
 				.detailClassification(DetailClassification.JOB_NOTICE).jobTag(JobTag.SHORTS_INTERN)
-				.title("TEST".repeat(13)).
-				content("취업설명회입니다.").link("https://gg.42seoul.kr").startTime(LocalDateTime.now())
+				.title("TEST".repeat(13)).content("취업설명회입니다.").status(ScheduleStatus.ACTIVATE)
+				.link("https://gg.42seoul.kr").startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().plusDays(10)).build();
 
 			mockMvc.perform(post("/admin/calendar/public")
@@ -141,8 +144,8 @@ public class PublicScheduleAdminControllerTest {
 
 			PublicScheduleAdminCreateReqDto requestDto = PublicScheduleAdminCreateReqDto.builder()
 				.detailClassification(DetailClassification.JOB_NOTICE).jobTag(JobTag.SHORTS_INTERN)
-				.title("취업설명회")
-				.content("취업설명회".repeat(401)).link("https://gg.42seoul.kr").startTime(LocalDateTime.now())
+				.title("취업설명회").content("취업설명회".repeat(401)).status(ScheduleStatus.ACTIVATE)
+				.link("https://gg.42seoul.kr").startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().plusDays(10)).build();
 
 			mockMvc.perform(post("/admin/calendar/public")
