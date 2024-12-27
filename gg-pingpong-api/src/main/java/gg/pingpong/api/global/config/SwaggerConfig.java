@@ -13,6 +13,14 @@ import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
 public class SwaggerConfig {
+	@Bean
+	public GroupedOpenApi calendarGroup() {
+		return GroupedOpenApi.builder()
+			.group("calendar")
+			.pathsToMatch("/calendar/**")
+			.packagesToScan("gg.calendar.api.user")
+			.build();
+	}
 
 	@Bean
 	public GroupedOpenApi agendaGroup() {

@@ -1,10 +1,7 @@
 package gg.data.calendar;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -12,9 +9,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 
 import gg.data.BaseTimeEntity;
 import gg.data.calendar.type.DetailClassification;
@@ -36,19 +30,19 @@ public class PublicSchedule extends BaseTimeEntity {
 	private Long id;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 20, columnDefinition = "VARCHAR(10)")
+	@Column(nullable = false, length = 50, columnDefinition = "VARCHAR(50)")
 	private DetailClassification classification;
 
 	@Enumerated(EnumType.STRING)
-	@Column(length = 20, columnDefinition = "VARCHAR(10)")
+	@Column(length = 50, columnDefinition = "VARCHAR(50)")
 	private EventTag eventTag;
 
 	@Enumerated(EnumType.STRING)
-	@Column(length = 20, columnDefinition = "VARCHAR(10)")
+	@Column(length = 50, columnDefinition = "VARCHAR(50)")
 	private JobTag jobTag;
 
 	@Enumerated(EnumType.STRING)
-	@Column(length = 20, columnDefinition = "VARCHAR(10)")
+	@Column(length = 50, columnDefinition = "VARCHAR(50)")
 	private TechTag techTag;
 
 	@Column(nullable = false)
@@ -73,4 +67,21 @@ public class PublicSchedule extends BaseTimeEntity {
 
 	@Column(nullable = false)
 	private LocalDateTime endTime;
+
+	@Builder
+	private PublicSchedule(DetailClassification classification, EventTag eventTag, JobTag jobTag, TechTag techTag,
+		String author, String title, String content, String link, LocalDateTime startTime, LocalDateTime endTime) {
+		this.classification = classification;
+		this.eventTag = eventTag;
+		this.jobTag = jobTag;
+		this.techTag = techTag;
+		this.author = author;
+		this.title = title;
+		this.content = content;
+		this.link = link;
+		this.status = ScheduleStatus.ACTIVATE;
+		this.sharedCount = 0;
+		this.startTime = startTime;
+		this.endTime = endTime;
+	}
 }

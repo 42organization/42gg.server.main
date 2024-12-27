@@ -10,7 +10,7 @@ public enum DetailClassification {
 
 	JOB_NOTICE("취업공고"),
 
-	NONE("개인일정");
+	PRIVATE_SCHEDULE("개인일정");
 
 	private final String value;
 }
