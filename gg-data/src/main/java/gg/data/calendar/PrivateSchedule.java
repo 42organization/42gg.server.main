@@ -1,8 +1,5 @@
 package gg.data.calendar;
 
-import java.time.LocalDateTime;
-import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,14 +10,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotNull;
 
 import gg.data.BaseTimeEntity;
-import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.ScheduleStatus;
 import gg.data.user.User;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -47,6 +41,14 @@ public class PrivateSchedule extends BaseTimeEntity {
 	private Long groupId;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, columnDefinition = "VARCHAR(10)")
+	@Column(nullable = false, columnDefinition = "VARCHAR(50)")
 	private ScheduleStatus status;
+
+	public PrivateSchedule(User user, PublicSchedule publicSchedule, boolean alarm, Long groupId) {
+		this.user = user;
+		this.publicSchedule = publicSchedule;
+		this.alarm = alarm;
+		this.groupId = groupId;
+		this.status = ScheduleStatus.ACTIVATE;
+	}
 }

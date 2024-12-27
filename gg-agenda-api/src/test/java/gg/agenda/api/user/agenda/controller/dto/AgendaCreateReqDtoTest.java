@@ -6,14 +6,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import gg.agenda.api.user.agenda.controller.request.AgendaCreateReqDto;
 import gg.auth.UserDto;
 import gg.data.agenda.Agenda;
 import gg.utils.annotation.UnitTest;
-import gg.utils.exception.custom.InvalidParameterException;
 
 @UnitTest
 class AgendaCreateReqDtoTest {

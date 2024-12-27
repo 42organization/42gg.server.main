@@ -17,12 +17,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
-import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
+import org.springframework.test.web.servlet.MockMvc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import gg.calendar.api.user.schedule.publicschedule.PublicScheduleMockData;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateReqDto;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
@@ -34,8 +34,6 @@ import gg.utils.TestDataUtils;
 import gg.utils.annotation.IntegrationTest;
 import gg.utils.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
-
-import gg.calendar.api.user.schedule.publicschedule.PublicScheduleMockData;
 
 @Slf4j
 @IntegrationTest
@@ -55,7 +53,7 @@ public class PublicScheduleControllerTest {
 	private PublicScheduleRepository publicScheduleRepository;
 
 	@Autowired
-	private PublicScheduleMockData PublicScheduleMockData;
+	private PublicScheduleMockData publicScheduleMockData;
 
 	private User user;
 	private String accssToken;
@@ -155,16 +153,41 @@ public class PublicScheduleControllerTest {
 		}
 			PublicSchedule publicSchedule = PublicScheduleMockData.createPublicSchedule(user.getIntraId());
 			// when : reqDto로 요청
-			mockMvc.perform(post("/calendar/public")
-				.header("Authorization", "Bearer " + accssToken)
+			log.info("After mock data creation: {}", publicScheduleRepository.findByAuthor(user.getIntraId()).size());
+			mockMvc.perform(post("/calendar/public").header("Authorization", "Bearer " + accssToken)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(publicSchedule)))
-				.andExpect(status().isCreated());
-
+				.content(objectMapper.writeValueAsString(publicScheduleDto))).andExpect(status().isCreated());
 			// then : 생성된 일정이 반환
 			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
-			assertThat(schedules).hasSize(2);
-			assertThat(schedules.get(0).getTitle()).isEqualTo(publicSchedule.getTitle());
-			}
+			assertThat(schedules).hasSize(1);
+			assertThat(schedules.get(0).getTitle()).isEqualTo(publicScheduleDto.getTitle());
+		}
+
+		@Test
+		@DisplayName("공개일정-작성자가 다를 때")
+		void createPublicScheduleFail() throws Exception {
+			// given : reqDto를 생성
+			PublicScheduleCreateReqDto publicScheduleDto = PublicScheduleCreateReqDto.builder()
+				.classification(DetailClassification.EVENT)
+				.author("another")
+				.title("Test Schedule")
+				.content("Test Content")
+				.link("http://test.com")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(1))
+				.build();
+			// when : reqDto로 요청
+			mockMvc.perform(post("/calendar/public").header("Authorization", "Bearer " + accssToken)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(publicScheduleDto)))
+				.andExpect(status().isBadRequest())
+				.andExpect(result -> {
+					status().isBadRequest(); // 처음에 errorcode로 잡았는데, status로 잡음
+				})
+				.andDo(print());
+			// then : 예외가 발생
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).isEmpty();
+		}
 	}
 }

@@ -1,17 +1,11 @@
-package gg.calendar.api.admin.schedule.publicschedule.Service;
+package gg.calendar.api.admin.schedule.publicschedule.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
-import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,13 +15,10 @@ import org.mockito.Mock;
 
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateReqDto;
-import gg.calendar.api.admin.schedule.publicschedule.service.PublicScheduleAdminService;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
-import gg.data.calendar.type.JobTag;
 import gg.utils.annotation.UnitTest;
-import gg.utils.exception.custom.CustomRuntimeException;
 
 @UnitTest
 public class PublicScheduleAdminServiceTest {
@@ -40,13 +31,14 @@ public class PublicScheduleAdminServiceTest {
 
 	@Nested
 	@DisplayName("Admin PublicSchedule 등록 테스트")
-	class createAdminPublicScheduleTest {
+	class CreateAdminPublicScheduleTest {
 
 		@Test
 		@DisplayName("Admin PublicSchedule 등록 테스트 - 성공")
 		public void createPublicScheduleTest() {
 			// Given
-			PublicSchedule publicSchedule = PublicSchedule.builder().classification(DetailClassification.EVENT)
+			PublicSchedule publicSchedule = PublicSchedule.builder()
+				.classification(DetailClassification.EVENT)
 				.eventTag(EventTag.JOB_FORUM)
 				.author("42GG")
 				.title("취업설명회")
@@ -58,9 +50,14 @@ public class PublicScheduleAdminServiceTest {
 			when(publicScheduleAdminRepository.save(any())).thenReturn(publicSchedule);
 			// When
 			PublicScheduleAdminCreateReqDto requestDto = PublicScheduleAdminCreateReqDto.builder()
-				.detailClassification(DetailClassification.EVENT).eventTag(EventTag.JOB_FORUM).title("취업설명회")
-				.content("취업설명회입니다.").link("https://gg.42seoul.kr").startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now().plusDays(10)).build();
+				.detailClassification(DetailClassification.EVENT)
+				.eventTag(EventTag.JOB_FORUM)
+				.title("취업설명회")
+				.content("취업설명회입니다.")
+				.link("https://gg.42seoul.kr")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(10))
+				.build();
 			publicScheduleAdminService.createPublicSchedule(requestDto);
 			// Then
 			verify(publicScheduleAdminRepository, times(1)).save(any(PublicSchedule.class));

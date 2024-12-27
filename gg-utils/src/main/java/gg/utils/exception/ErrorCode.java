@@ -237,11 +237,13 @@ public enum ErrorCode {
 	AGENDA_TEAM_CAPACITY_CONFLICT(409, "AG408", "팀 인원 제한을 변경할 수 없습니다."),
 
 	// calendar
-	CALENDAR_BEFORE_DATE(400, "DT201", "종료 시간이 시작 시간보다 빠를 수 없습니다."),
-	CALENDAR_AFTER_DATE(400, "DT202", "시작 시간이 종료 시간보다 늦을 수 없습니다."),
-	CALENDAR_EQUAL_DATE(400, "DT203", "시작 시간과 종료 시간이 같을 수 없습니다."),
-	CALENDAR_USER_NOT_EXIST(400, "DT204", "존재하지 않는 사용자입니다."),
-	CALENDAR_AUTHOR_NOT_MATCH(400, "DT205", "작성자가 일치하지 않습니다.");
+	CALENDAR_BEFORE_DATE(400, "CA201", "종료 시간이 시작 시간보다 빠를 수 없습니다."),
+	CALENDAR_AFTER_DATE(400, "CA202", "시작 시간이 종료 시간보다 늦을 수 없습니다."),
+	CALENDAR_EQUAL_DATE(400, "CA203", "시작 시간과 종료 시간이 같을 수 없습니다."),
+	CALENDAR_AUTHOR_NOT_MATCH(400, "CA205", "전제하지 않는 사용자입니다."),
+	PRIVATE_SCHEDULE_NOT_FOUND(404, "CA101", "개인 일정을 찾을 수 없습니다."),
+	PUBLIC_SCHEDULE_NOT_FOUND(404, "CA102", "공유 일정을 찾을 수 없습니다."),
+	SCHEDULE_GROUP_NOT_FOUND(404, "CA103", "스캐줄 그룹을 찾을 수 없습니다.");
 
 	private final int status;
 	private final String errCode;
