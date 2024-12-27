@@ -22,7 +22,6 @@ import gg.calendar.api.user.schedule.privateschedule.PrivateScheduleMockData;
 import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleCreateReqDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.ScheduleGroup;
-import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.ScheduleStatus;
 import gg.data.user.User;
@@ -67,7 +66,6 @@ public class PrivateScheduleControllerTest {
 			//given
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
 			PrivateScheduleCreateReqDto reqDto = PrivateScheduleCreateReqDto.builder()
-				.classification(DetailClassification.PRIVATE_SCHEDULE)
 				.eventTag(EventTag.ETC)
 				.jobTag(null)
 				.techTag(null)
@@ -97,7 +95,6 @@ public class PrivateScheduleControllerTest {
 		void noGroup() throws Exception {
 			//given
 			PrivateScheduleCreateReqDto reqDto = PrivateScheduleCreateReqDto.builder()
-				.classification(DetailClassification.PRIVATE_SCHEDULE)
 				.eventTag(EventTag.ETC)
 				.jobTag(null)
 				.techTag(null)
@@ -123,7 +120,6 @@ public class PrivateScheduleControllerTest {
 		void endTimeBeforeStartTime() throws Exception {
 			//given
 			PrivateScheduleCreateReqDto reqDto = PrivateScheduleCreateReqDto.builder()
-				.classification(DetailClassification.PRIVATE_SCHEDULE)
 				.eventTag(EventTag.ETC)
 				.jobTag(null)
 				.techTag(null)

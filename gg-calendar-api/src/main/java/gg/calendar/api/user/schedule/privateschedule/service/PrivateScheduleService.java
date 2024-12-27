@@ -43,6 +43,11 @@ public class PrivateScheduleService {
 		privateScheduleRepository.save(privateSchedule);
 	}
 
+	@Transactional
+	public void updatePrivateSchedule() {
+
+	}
+
 	public void validateTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
 		if (endTime.isBefore(startTime)) {
 			throw new InvalidParameterException(ErrorCode.CALENDAR_BEFORE_DATE);

@@ -21,9 +21,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PrivateScheduleCreateReqDto {
 
-	@NotNull
-	private DetailClassification classification;
-
 	private EventTag eventTag;
 
 	private JobTag jobTag;
@@ -54,11 +51,9 @@ public class PrivateScheduleCreateReqDto {
 	private Long groupId;
 
 	@Builder
-	private PrivateScheduleCreateReqDto(DetailClassification classification, EventTag eventTag, JobTag jobTag,
-		TechTag techTag, String title, String content, String link,
-		LocalDateTime startTime, LocalDateTime endTime, boolean alarm, Long groupId,
+	private PrivateScheduleCreateReqDto(EventTag eventTag, JobTag jobTag, TechTag techTag, String title, String content,
+		String link, LocalDateTime startTime, LocalDateTime endTime, boolean alarm, Long groupId,
 		ScheduleStatus status) {
-		this.classification = classification;
 		this.eventTag = eventTag;
 		this.jobTag = jobTag;
 		this.techTag = techTag;
@@ -74,11 +69,12 @@ public class PrivateScheduleCreateReqDto {
 
 	public static PublicSchedule toEntity(String intraId, PrivateScheduleCreateReqDto privateScheduleCreateReqDto) {
 		return PublicSchedule.builder()
-			.classification(privateScheduleCreateReqDto.classification)
+			.classification(DetailClassification.PRIVATE_SCHEDULE)
 			.eventTag(privateScheduleCreateReqDto.eventTag)
 			.jobTag(privateScheduleCreateReqDto.jobTag)
 			.techTag(privateScheduleCreateReqDto.techTag)
-			.author(intraId).title(privateScheduleCreateReqDto.title)
+			.author(intraId)
+			.title(privateScheduleCreateReqDto.title)
 			.content(privateScheduleCreateReqDto.content)
 			.link(privateScheduleCreateReqDto.link)
 			.startTime(privateScheduleCreateReqDto.startTime)
