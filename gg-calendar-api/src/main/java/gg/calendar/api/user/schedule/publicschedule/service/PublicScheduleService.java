@@ -25,6 +25,9 @@ public class PublicScheduleService {
 		if (!user.getIntraId().equals(req.getAuthor())) {
 			throw new CustomRuntimeException(ErrorCode.CALENDAR_AUTHOR_NOT_MATCH);
 		}
+		if (req.getStartTime().isAfter(req.getEndTime())) {
+			throw new CustomRuntimeException(ErrorCode.CALENDAR_BEFORE_DATE);
+		}
 		PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(), req);
 		publicScheduleRepository.save(publicSchedule);
 	}

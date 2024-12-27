@@ -245,7 +245,6 @@ public enum ErrorCode {
 	PUBLIC_SCHEDULE_NOT_FOUND(404, "CA102", "공유 일정을 찾을 수 없습니다."),
 	SCHEDULE_GROUP_NOT_FOUND(404, "CA103", "스캐줄 그룹을 찾을 수 없습니다.");
 
-
 	private final int status;
 	private final String errCode;
 	private String message;
