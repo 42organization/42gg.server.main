@@ -62,6 +62,7 @@ public class PrivateScheduleControllerTest {
 	@DisplayName("PrivateSchedule 생성하기")
 	class CreatePrivateSchedule {
 		@Test
+		@DisplayName("성공")
 		void success() throws Exception {
 			//given
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
@@ -92,7 +93,8 @@ public class PrivateScheduleControllerTest {
 		}
 
 		@Test
-		void noScheduleGroup() throws Exception {
+		@DisplayName("일정 그룹이 없는 경우 404")
+		void noGroup() throws Exception {
 			//given
 			PrivateScheduleCreateReqDto reqDto = PrivateScheduleCreateReqDto.builder()
 				.classification(DetailClassification.PRIVATE_SCHEDULE)
@@ -117,7 +119,8 @@ public class PrivateScheduleControllerTest {
 		}
 
 		@Test
-		void endDateBeforeStartDate() throws Exception {
+		@DisplayName("시작 날짜보다 끝나는 날짜가 빠른 경우 400")
+		void endTimeBeforeStartTime() throws Exception {
 			//given
 			PrivateScheduleCreateReqDto reqDto = PrivateScheduleCreateReqDto.builder()
 				.classification(DetailClassification.PRIVATE_SCHEDULE)
