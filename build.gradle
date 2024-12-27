@@ -257,6 +257,7 @@ project(':gg-pingpong-api') {
         implementation project(':gg-auth')
         implementation project(':gg-recruit-api')
         implementation project(':gg-agenda-api')
+        implementation project(':gg-calendar-api')
     }
 }
 
@@ -324,5 +325,17 @@ project(':gg-utils') {
     bootJar { enabled = false }
     jar { enabled = true }
     dependencies {
+    }
+}
+
+project(':gg-calendar-api') {
+    bootJar { enabled = false }
+    jar { enabled = true }
+    dependencies {
+        implementation project(':gg-data')
+        implementation project(':gg-repo')
+        implementation project(':gg-admin-repo')
+        implementation project(':gg-utils')
+        implementation project(':gg-auth')
     }
 }

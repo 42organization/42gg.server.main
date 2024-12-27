@@ -234,7 +234,16 @@ public enum ErrorCode {
 	AGENDA_ALREADY_CANCELED(409, "AG405", "이미 취소된 일정입니다."),
 	AGENDA_ALREADY_CONFIRMED(409, "AG406", "이미 확정된 일정입니다."),
 	AGENDA_CAPACITY_CONFLICT(409, "AG407", "팀 제한을 변경할 수 없습니다."),
-	AGENDA_TEAM_CAPACITY_CONFLICT(409, "AG408", "팀 인원 제한을 변경할 수 없습니다.");
+	AGENDA_TEAM_CAPACITY_CONFLICT(409, "AG408", "팀 인원 제한을 변경할 수 없습니다."),
+
+	// calendar
+	CALENDAR_BEFORE_DATE(400, "DT201", "종료 시간이 시작 시간보다 빠를 수 없습니다."),
+	CALENDAR_AFTER_DATE(400, "DT202", "시작 시간이 종료 시간보다 늦을 수 없습니다."),
+	CALENDAR_EQUAL_DATE(400, "DT203", "시작 시간과 종료 시간이 같을 수 없습니다."),
+
+	CALENDAR_USER_NOT_EXIST(400, "DT204", "존재하지 않는 사용자입니다."),
+	CALENDAR_AUTHOR_NOT_MATCH(400, "DT205", "작성자가 일치하지 않습니다.");
+
 
 	private final int status;
 	private final String errCode;
