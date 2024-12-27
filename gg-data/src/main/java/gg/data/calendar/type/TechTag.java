@@ -21,7 +21,9 @@ public enum TechTag {
 
 	NETWORK("NETWORK"),
 
-	ETC("기타");
+	ETC("기타"),
+
+	NONE(null);
 
 	private final String value;
 }
