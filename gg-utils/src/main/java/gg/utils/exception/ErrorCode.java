@@ -240,10 +240,8 @@ public enum ErrorCode {
 	CALENDAR_BEFORE_DATE(400, "DT201", "종료 시간이 시작 시간보다 빠를 수 없습니다."),
 	CALENDAR_AFTER_DATE(400, "DT202", "시작 시간이 종료 시간보다 늦을 수 없습니다."),
 	CALENDAR_EQUAL_DATE(400, "DT203", "시작 시간과 종료 시간이 같을 수 없습니다."),
-
 	CALENDAR_USER_NOT_EXIST(400, "DT204", "존재하지 않는 사용자입니다."),
 	CALENDAR_AUTHOR_NOT_MATCH(400, "DT205", "작성자가 일치하지 않습니다.");
-
 
 	private final int status;
 	private final String errCode;

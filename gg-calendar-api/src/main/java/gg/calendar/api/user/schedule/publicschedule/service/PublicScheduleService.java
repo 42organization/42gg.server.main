@@ -17,10 +17,13 @@ public class PublicScheduleService {
 	private final UserRepository userRepository;
 
 	@Transactional
-	public PublicSchedule createPublicSchedule(PublicScheduleCreateReqDto req, Long userId){
+	public PublicSchedule createPublicSchedule(PublicScheduleCreateReqDto req, Long userId) {
 		User user = userRepository.getById(userId);
 		if (!user.getIntraId().equals(req.getAuthor())) {
 			throw new CustomRuntimeException(ErrorCode.CALENDAR_AUTHOR_NOT_MATCH);
+		}
+		if (req.getStartTime().isAfter(req.getEndTime())) {
+			throw new CustomRuntimeException(ErrorCode.CALENDAR_BEFORE_DATE);
 		}
 
 		PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(), req);

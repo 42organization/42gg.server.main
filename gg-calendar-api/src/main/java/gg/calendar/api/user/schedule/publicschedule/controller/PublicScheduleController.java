@@ -3,6 +3,7 @@ package gg.calendar.api.user.schedule.publicschedule.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -27,8 +28,7 @@ public class PublicScheduleController {
 
 	@PostMapping
 	public ResponseEntity<Void> createPublicSchedule(@RequestBody @Valid PublicScheduleCreateReqDto req,
-		@Login @Parameter(hidden = true) UserDto userDto)
-	{
+		@Login @Parameter(hidden = true) UserDto userDto) {
 		publicScheduleService.createPublicSchedule(req, userDto.getId());
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
