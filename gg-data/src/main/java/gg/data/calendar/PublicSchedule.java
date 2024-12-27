@@ -43,7 +43,6 @@ public class PublicSchedule extends BaseTimeEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(length = 50, columnDefinition = "VARCHAR(50)")
-
 	private TechTag techTag;
 
 	@Column(nullable = false)
@@ -81,8 +80,8 @@ public class PublicSchedule extends BaseTimeEntity {
 		this.title = title;
 		this.content = content;
 		this.link = link;
-		this.sharedCount = 0;
 		this.status = status;
+		this.sharedCount = 0;
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}

@@ -14,9 +14,7 @@ public enum EventTag {
 
 	INSTRUCTION("강연"),
 
-	ETC("기타"),
-
-	NONE(null);
+	ETC("기타");
 
 	private final String value;
 }

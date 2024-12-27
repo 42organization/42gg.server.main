@@ -24,6 +24,7 @@ import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.ScheduleGroup;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
+import gg.data.calendar.type.ScheduleStatus;
 import gg.data.user.User;
 import gg.repo.calendar.PrivateScheduleRepository;
 import gg.utils.TestDataUtils;
@@ -76,6 +77,7 @@ public class PrivateScheduleControllerTest {
 				.endTime(LocalDateTime.now().plusDays(1))
 				.alarm(true)
 				.groupId(1L)
+				.status(ScheduleStatus.ACTIVATE)
 				.build();
 			//when
 			mockMvc.perform(post("/calendar/private")
@@ -104,6 +106,7 @@ public class PrivateScheduleControllerTest {
 				.endTime(LocalDateTime.now().plusDays(1))
 				.alarm(true)
 				.groupId(2L)
+				.status(ScheduleStatus.ACTIVATE)
 				.build();
 			//when&then
 			mockMvc.perform(post("/calendar/private")
@@ -128,6 +131,7 @@ public class PrivateScheduleControllerTest {
 				.endTime(LocalDateTime.now())
 				.alarm(true)
 				.groupId(2L)
+				.status(ScheduleStatus.ACTIVATE)
 				.build();
 			//when&then
 			mockMvc.perform(post("/calendar/private")

@@ -41,7 +41,7 @@ public class PrivateSchedule extends BaseTimeEntity {
 	private Long groupId;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, columnDefinition = "VARCHAR(10)")
+	@Column(nullable = false, columnDefinition = "VARCHAR(50)")
 	private ScheduleStatus status;
 
 	public PrivateSchedule(User user, PublicSchedule publicSchedule, boolean alarm, Long groupId) {

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.ScheduleGroup;
 import gg.data.calendar.type.DetailClassification;
+import gg.data.calendar.type.ScheduleStatus;
 import gg.data.user.User;
 import gg.repo.calendar.PublicScheduleRepository;
 import gg.repo.calendar.ScheduleGroupRepository;
@@ -28,6 +29,7 @@ public class PrivateScheduleMockData {
 			.author("author")
 			.content("Test Content")
 			.link("http://test.com")
+			.status(ScheduleStatus.ACTIVATE)
 			.startTime(LocalDateTime.now())
 			.endTime(LocalDateTime.now().plusDays(1))
 			.build();

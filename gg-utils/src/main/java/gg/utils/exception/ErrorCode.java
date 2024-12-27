@@ -240,6 +240,7 @@ public enum ErrorCode {
 	CALENDAR_BEFORE_DATE(400, "CA201", "종료 시간이 시작 시간보다 빠를 수 없습니다."),
 	CALENDAR_AFTER_DATE(400, "CA202", "시작 시간이 종료 시간보다 늦을 수 없습니다."),
 	CALENDAR_EQUAL_DATE(400, "CA203", "시작 시간과 종료 시간이 같을 수 없습니다."),
+	CALENDAR_AUTHOR_NOT_MATCH(400, "CA205", "전제하지 않는 사용자입니다."),
 	PRIVATE_SCHEDULE_NOT_FOUND(404, "CA101", "개인 일정을 찾을 수 없습니다."),
 	PUBLIC_SCHEDULE_NOT_FOUND(404, "CA102", "공유 일정을 찾을 수 없습니다."),
 	SCHEDULE_GROUP_NOT_FOUND(404, "CA103", "스캐줄 그룹을 찾을 수 없습니다.");

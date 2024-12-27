@@ -1,7 +1,7 @@
 -- PublicSchedule 테이블
 CREATE TABLE public_schedule (
                                  id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                                 classification VARCHAR(10) NOT NULL,
+                                 classification VARCHAR(50) NOT NULL,
                                  event_tag VARCHAR(50),
                                  job_tag VARCHAR(50),
                                  tech_tag VARCHAR(50),
@@ -24,7 +24,7 @@ CREATE TABLE private_schedule (
                                   public_schedule_id BIGINT NOT NULL,
                                   alarm BOOLEAN NOT NULL,
                                   group_id BIGINT NOT NULL,
-                                  status VARCHAR(10) NOT NULL,
+                                  status VARCHAR(50) NOT NULL,
                                   created_at DATETIME NOT NULL,
                                   modified_at DATETIME,
                                   CONSTRAINT fk_private_schedule_user FOREIGN KEY (user_id) REFERENCES user(id),
