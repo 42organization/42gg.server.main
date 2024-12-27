@@ -14,18 +14,18 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PublicScheduleService {
 	private final PublicScheduleRepository publicScheduleRepository;
 	private final UserRepository userRepository;
 
 	@Transactional
-	public PublicSchedule createPublicSchedule(PublicScheduleCreateReqDto req, Long userId) {
+	public void createPublicSchedule(PublicScheduleCreateReqDto req, Long userId) {
 		User user = userRepository.getById(userId);
 		if (!user.getIntraId().equals(req.getAuthor())) {
 			throw new CustomRuntimeException(ErrorCode.CALENDAR_AUTHOR_NOT_MATCH);
 		}
-
 		PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(), req);
-		return publicScheduleRepository.save(publicSchedule);
+		publicScheduleRepository.save(publicSchedule);
 	}
 }

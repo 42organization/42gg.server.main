@@ -93,14 +93,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			savedUser = createUser(userInfo);
 			if (providerType.equals(ProviderType.FORTYTWO)) {
 				createUserRank(savedUser);
+				if (agendaProfileRepository.findByUserId(savedUser.getId()).isEmpty()) {
+					String token = userRequest.getAccessToken().getTokenValue();
+					createProfile(userInfo, savedUser, token);
+				}
 			}
 			if (userInfo.getImageUrl().startsWith("https://cdn.intra.42.fr/")) {
 				asyncNewUserImageUploader.upload(userInfo.getIntraId(), userInfo.getImageUrl());
 			}
-		}
-		if (agendaProfileRepository.findByUserId(savedUser.getId()).isEmpty()) {
-			String token = userRequest.getAccessToken().getTokenValue();
-			createProfile(userInfo, savedUser, token);
 		}
 
 		return UserPrincipal.create(savedUser, user.getAttributes());

@@ -30,19 +30,19 @@ public class PublicSchedule extends BaseTimeEntity {
 	private Long id;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, columnDefinition = "VARCHAR(10)")
+	@Column(nullable = false, length = 50, columnDefinition = "VARCHAR(50)")
 	private DetailClassification classification;
 
 	@Enumerated(EnumType.STRING)
-	@Column(columnDefinition = "VARCHAR(20)")
+	@Column(length = 50, columnDefinition = "VARCHAR(50)")
 	private EventTag eventTag;
 
 	@Enumerated(EnumType.STRING)
-	@Column(columnDefinition = "VARCHAR(20)")
+	@Column(length = 50, columnDefinition = "VARCHAR(50)")
 	private JobTag jobTag;
 
 	@Enumerated(EnumType.STRING)
-	@Column(columnDefinition = "VARCHAR(20)")
+	@Column(length = 50, columnDefinition = "VARCHAR(50)")
 	private TechTag techTag;
 
 	@Column(nullable = false)
@@ -80,8 +80,8 @@ public class PublicSchedule extends BaseTimeEntity {
 		this.title = title;
 		this.content = content;
 		this.link = link;
-		this.sharedCount = 0;
 		this.status = status;
+		this.sharedCount = 0;
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}

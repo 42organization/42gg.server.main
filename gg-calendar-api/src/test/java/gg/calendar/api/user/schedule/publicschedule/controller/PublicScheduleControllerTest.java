@@ -77,7 +77,6 @@ public class PublicScheduleControllerTest {
 			// given : reqDto를 생성
 			PublicScheduleCreateReqDto publicScheduleDto = PublicScheduleCreateReqDto.builder()
 				.classification(DetailClassification.EVENT)
-				.eventTag(EventTag.NONE)
 				.author(user.getIntraId())
 				.title("Test Schedule")
 				.content("Test Content")
@@ -103,7 +102,6 @@ public class PublicScheduleControllerTest {
 			// given : reqDto를 생성
 			PublicScheduleCreateReqDto publicScheduleDto = PublicScheduleCreateReqDto.builder()
 				.classification(DetailClassification.EVENT)
-				.eventTag(EventTag.NONE)
 				.author("another")
 				.title("Test Schedule")
 				.content("Test Content")
