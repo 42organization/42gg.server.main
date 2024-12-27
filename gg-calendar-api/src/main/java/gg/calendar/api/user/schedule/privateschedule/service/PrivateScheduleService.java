@@ -2,6 +2,9 @@ package gg.calendar.api.user.schedule.privateschedule.service;
 
 import java.time.LocalDateTime;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import gg.auth.UserDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleCreateReqDto;
 import gg.data.calendar.PrivateSchedule;
@@ -11,10 +14,6 @@ import gg.data.user.User;
 import gg.repo.calendar.PrivateScheduleRepository;
 import gg.repo.calendar.PublicScheduleRepository;
 import gg.repo.calendar.ScheduleGroupRepository;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import gg.repo.user.UserRepository;
 import gg.utils.exception.ErrorCode;
 import gg.utils.exception.custom.InvalidParameterException;

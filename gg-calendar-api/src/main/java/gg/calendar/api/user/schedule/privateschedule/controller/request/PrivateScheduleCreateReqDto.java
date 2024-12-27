@@ -1,15 +1,17 @@
 package gg.calendar.api.user.schedule.privateschedule.controller.request;
 
+import java.time.LocalDateTime;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
 import gg.data.calendar.type.ScheduleStatus;
 import gg.data.calendar.type.TechTag;
-import java.time.LocalDateTime;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -53,9 +55,9 @@ public class PrivateScheduleCreateReqDto {
 
 	@Builder
 	private PrivateScheduleCreateReqDto(DetailClassification classification, EventTag eventTag, JobTag jobTag,
-										TechTag techTag, String title, String content, String link,
-										LocalDateTime startTime, LocalDateTime endTime, boolean alarm, Long groupId,
-										ScheduleStatus status) {
+		TechTag techTag, String title, String content, String link,
+		LocalDateTime startTime, LocalDateTime endTime, boolean alarm, Long groupId,
+		ScheduleStatus status) {
 		this.classification = classification;
 		this.eventTag = eventTag;
 		this.jobTag = jobTag;
