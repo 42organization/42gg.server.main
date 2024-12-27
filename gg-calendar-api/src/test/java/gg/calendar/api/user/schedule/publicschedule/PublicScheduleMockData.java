@@ -26,7 +26,6 @@ public class PublicScheduleMockData {
 	public PublicSchedule createPublicSchedule(String author) {
 		return PublicSchedule.builder()
 			.classification(DetailClassification.EVENT)
-			.eventTag(EventTag.NONE)
 			.jobTag(null)
 			.techTag(null)
 			.title("Test Schedule")

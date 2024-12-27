@@ -36,5 +36,4 @@ class AgendaSimpleResDtoTest {
 			assertThat(dto.getIsOfficial()).isEqualTo(value);
 		}
 	}
-
 }

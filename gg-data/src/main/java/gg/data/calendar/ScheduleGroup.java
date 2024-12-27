@@ -1,7 +1,5 @@
 package gg.data.calendar;
 
-import java.awt.*;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -15,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import gg.data.BaseTimeEntity;
 import gg.data.user.User;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -39,4 +38,10 @@ public class ScheduleGroup extends BaseTimeEntity {
 	@Column(nullable = false)
 	private String backgroundColor;
 
+	@Builder
+	private ScheduleGroup(User user, String title, String backgroundColor) {
+		this.user = user;
+		this.title = title;
+		this.backgroundColor = backgroundColor;
+	}
 }

@@ -13,11 +13,7 @@ public enum JobTag {
 
 	NEW_COMER("신입"),
 
-	EXPERIENCED("경력"),
-
-	ETC("기타"),
-
-	NONE(null);
+	EXPERIENCED("경력");
 
 	private final String value;
 }
