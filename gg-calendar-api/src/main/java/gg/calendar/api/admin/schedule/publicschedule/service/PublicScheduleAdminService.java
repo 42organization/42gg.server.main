@@ -2,6 +2,7 @@ package gg.calendar.api.admin.schedule.publicschedule.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,7 +38,7 @@ public class PublicScheduleAdminService {
 		publicScheduleAdminRepository.save(publicSchedule);
 	}
 
-	public PageResponseDto<PublicScheduleAdminResDto> findPublicScheduleByDetailClassification(
+	public PageResponseDto<PublicScheduleAdminResDto> findAllByClassification(
 		DetailClassification detailClassification, int page, int size) {
 
 		Pageable pageable = PageRequest.of(page - 1, size,
@@ -48,7 +49,7 @@ public class PublicScheduleAdminService {
 
 		List<PublicScheduleAdminResDto> publicScheduleList = publicSchedules.stream()
 			.map(PublicScheduleAdminResDto::new)
-			.toList();
+			.collect(Collectors.toList());
 		return PageResponseDto.of(publicSchedules.getTotalElements(), publicScheduleList);
 	}
 

@@ -40,7 +40,7 @@ public class PublicScheduleAdminController {
 		int page = pageRequestDto.getPage();
 		int size = pageRequestDto.getSize();
 
-		PageResponseDto<PublicScheduleAdminResDto> pageResponseDto = publicScheduleAdminService.findPublicScheduleByDetailClassification(
+		PageResponseDto<PublicScheduleAdminResDto> pageResponseDto = publicScheduleAdminService.findAllByClassification(
 			detailClassification, page, size);
 
 		return ResponseEntity.ok(pageResponseDto);
