@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gg.calendar.api.user.schedule.publicschedule.PublicScheduleMockData;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
@@ -69,10 +70,10 @@ public class PublicScheduleControllerTest {
 	}
 
 	@Nested
-	@DisplayName("공개일정생성")
+	@DisplayName("공개일정생성 성공시")
 	class CreatePublicSchedule {
 		@Test
-		@DisplayName("공개일정 생성 성공")
+		@DisplayName("공개일정생성성공")
 		void createPublicScheduleSuccess() throws Exception {
 			// given : reqDto를 생성
 			PublicScheduleCreateReqDto publicScheduleDto = PublicScheduleCreateReqDto.builder()
@@ -97,8 +98,8 @@ public class PublicScheduleControllerTest {
 		}
 
 		@Test
-		@DisplayName("공개일정-작성자가 다를 때")
-		void createPublicScheduleFail() throws Exception {
+		@DisplayName("공개일정생성실패-작성자가 다를 때")
+		void createPublicScheduleFailNotMatchAuthor() throws Exception {
 			// given : reqDto를 생성
 			PublicScheduleCreateReqDto publicScheduleDto = PublicScheduleCreateReqDto.builder()
 				.classification(DetailClassification.EVENT)
@@ -124,8 +125,8 @@ public class PublicScheduleControllerTest {
 		}
 
 		@Test
-		@DisplayName("공개일정- 기간이 잘못되었을 때/ 종료닐짜가 시작날짜보다 빠를때")
-		void createPublicScheduleFail2() throws Exception {
+		@DisplayName("공개일정생성실패- 기간이 잘못되었을 때(종료닐짜가 시작날짜보다 빠를때)")
+		void createPublicScheduleFailFalutPeriod() throws Exception {
 			// given : reqDto를 생성
 			PublicScheduleCreateReqDto publicScheduleDto = PublicScheduleCreateReqDto.builder()
 				.classification(DetailClassification.EVENT)
@@ -150,5 +151,51 @@ public class PublicScheduleControllerTest {
 			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
 			assertThat(schedules).isEmpty();
 		}
+
+		@Test
+		@DisplayName("공개일정업데이트성공시")
+		void updatePublicScheduleSuccess() throws Exception {
+			// given
+			// 1. 먼저 수정할 일정을 생성
+			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(
+				user.getIntraId(),
+				PublicScheduleCreateReqDto.builder()
+					.classification(DetailClassification.EVENT)
+					.author(user.getIntraId())
+					.title("Original Title")
+					.content("Original Content")
+					.link("http://original.com")
+					.startTime(LocalDateTime.now())
+					.endTime(LocalDateTime.now().plusDays(1))
+					.build()
+			);
+			publicScheduleRepository.save(publicSchedule);
+
+			// 2. 수정할 내용의 DTO 생성
+			PublicScheduleUpdateReqDto updateDto = PublicScheduleUpdateReqDto.builder()
+				.classification(DetailClassification.EVENT)
+				.author(user.getIntraId())
+				.title("Updated Title")
+				.content("Updated Content")
+				.link("http://updated.com")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(2))
+				.build();
+
+			// when
+			mockMvc.perform(
+					put("/calendar/public/" + publicSchedule.getId())
+						.header("Authorization", "Bearer " + accssToken)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(updateDto)))
+				.andExpect(status().isOk());
+
+			// then
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).hasSize(1);
+			assertThat(schedules.get(0).getTitle()).isEqualTo("Updated Title");
+			assertThat(schedules.get(0).getContent()).isEqualTo("Updated Content");
+		}
+
 	}
 }
