@@ -184,6 +184,11 @@ public class PublicScheduleAdminControllerTest {
 	@DisplayName("Admin PublicSchedule 태그 조회 테스트")
 	class GetPublicScheduleAdminClassificationListTest {
 
+		private static Stream<Arguments> inputParams() {
+			return Stream.of(Arguments.of("EVENT", 2, 10), Arguments.of("JOB_NOTICE", 1, 10),
+				Arguments.of("PRIVATE_SCHEDULE", 1, 2));
+		}
+
 		@ParameterizedTest
 		@MethodSource("inputParams")
 		@DisplayName("Admin PublicSchedule 태그 조회 테스트 - 성공")
@@ -222,11 +227,6 @@ public class PublicScheduleAdminControllerTest {
 			for (PublicScheduleAdminResDto dto : result) {
 				System.out.println(dto.toString());
 			}
-		}
-
-		private static Stream<Arguments> inputParams() {
-			return Stream.of(Arguments.of("EVENT", 2, 10), Arguments.of("JOB_NOTICE", 1, 10),
-				Arguments.of("PRIVATE_SCHEDULE", 1, 2));
 		}
 	}
 }
