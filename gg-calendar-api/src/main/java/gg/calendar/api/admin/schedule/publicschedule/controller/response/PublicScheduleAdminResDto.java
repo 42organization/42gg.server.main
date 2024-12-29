@@ -8,10 +8,14 @@ import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
 import gg.data.calendar.type.ScheduleStatus;
 import gg.data.calendar.type.TechTag;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class PublicScheduleAdminSimpleResDto {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class PublicScheduleAdminResDto {
 	private Long id;
 
 	private DetailClassification classification;
@@ -36,7 +40,8 @@ public class PublicScheduleAdminSimpleResDto {
 
 	private ScheduleStatus status;
 
-	public PublicScheduleAdminSimpleResDto(PublicSchedule publicSchedule) {
+	@Builder
+	public PublicScheduleAdminResDto(PublicSchedule publicSchedule) {
 		this.id = publicSchedule.getId();
 		this.classification = publicSchedule.getClassification();
 		this.eventTag = publicSchedule.getEventTag();
@@ -49,6 +54,13 @@ public class PublicScheduleAdminSimpleResDto {
 		this.link = publicSchedule.getLink();
 		this.sharedCount = publicSchedule.getSharedCount();
 		this.status = publicSchedule.getStatus();
+	}
 
+	@Override
+	public String toString() {
+		return "PublicScheduleAdminResDto{" + "id=" + id + ", classification=" + classification + ", eventTag="
+			+ eventTag + ", jobTag=" + jobTag + ", techTag=" + techTag + ", author='" + author + '\'' + ", title='"
+			+ title + '\'' + ", startTime=" + startTime + ", endTime=" + endTime + ", link='" + link + '\''
+			+ ", sharedCount=" + sharedCount + ", status=" + status + '}';
 	}
 }

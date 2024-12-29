@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateReqDto;
-import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminSimpleResDto;
+import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminResDto;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.utils.dto.PageResponseDto;
@@ -37,7 +37,7 @@ public class PublicScheduleAdminService {
 		publicScheduleAdminRepository.save(publicSchedule);
 	}
 
-	public PageResponseDto<PublicScheduleAdminSimpleResDto> findPublicScheduleByDetailClassification(
+	public PageResponseDto<PublicScheduleAdminResDto> findPublicScheduleByDetailClassification(
 		DetailClassification detailClassification, int page, int size) {
 
 		Pageable pageable = PageRequest.of(page - 1, size,
@@ -46,11 +46,8 @@ public class PublicScheduleAdminService {
 		Page<PublicSchedule> publicSchedules = publicScheduleAdminRepository.findAllByClassification(
 			detailClassification, pageable);
 
-		// PublicSchedule의 생성자가 필요한데 지금 private으로 막혀있어서 어떻게 할 것인가에 대한 논의
-		// 여기서 sharedcount는 있는 그대로를 들고와야함
-
-		List<PublicScheduleAdminSimpleResDto> publicScheduleList = publicSchedules.stream()
-			.map(PublicScheduleAdminSimpleResDto::new)
+		List<PublicScheduleAdminResDto> publicScheduleList = publicSchedules.stream()
+			.map(PublicScheduleAdminResDto::new)
 			.toList();
 		return PageResponseDto.of(publicSchedules.getTotalElements(), publicScheduleList);
 	}

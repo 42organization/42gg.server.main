@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateReqDto;
-import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminSimpleResDto;
+import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminResDto;
 import gg.calendar.api.admin.schedule.publicschedule.service.PublicScheduleAdminService;
 import gg.data.calendar.type.DetailClassification;
 import gg.utils.dto.PageRequestDto;
@@ -35,12 +35,12 @@ public class PublicScheduleAdminController {
 	}
 
 	@GetMapping("/list/{detailClassification}")
-	public ResponseEntity<PageResponseDto<PublicScheduleAdminSimpleResDto>> publicScheduleAdminClassificationList(
+	public ResponseEntity<PageResponseDto<PublicScheduleAdminResDto>> publicScheduleAdminClassificationList(
 		@PathVariable DetailClassification detailClassification, @ModelAttribute PageRequestDto pageRequestDto) {
 		int page = pageRequestDto.getPage();
 		int size = pageRequestDto.getSize();
 
-		PageResponseDto<PublicScheduleAdminSimpleResDto> pageResponseDto = publicScheduleAdminService.findPublicScheduleByDetailClassification(
+		PageResponseDto<PublicScheduleAdminResDto> pageResponseDto = publicScheduleAdminService.findPublicScheduleByDetailClassification(
 			detailClassification, page, size);
 
 		return ResponseEntity.ok(pageResponseDto);
