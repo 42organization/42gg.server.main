@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -180,11 +181,12 @@ public class PublicScheduleAdminControllerTest {
 		}
 	}
 
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	@Nested
 	@DisplayName("Admin PublicSchedule 태그 조회 테스트")
 	class GetPublicScheduleAdminClassificationListTest {
 
-		private static Stream<Arguments> inputParams() {
+		private Stream<Arguments> inputParams() {
 			return Stream.of(Arguments.of("EVENT", 2, 10), Arguments.of("JOB_NOTICE", 1, 10),
 				Arguments.of("PRIVATE_SCHEDULE", 1, 2));
 		}
