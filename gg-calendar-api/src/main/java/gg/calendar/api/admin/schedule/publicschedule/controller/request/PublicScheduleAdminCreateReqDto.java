@@ -40,6 +40,7 @@ public class PublicScheduleAdminCreateReqDto {
 
 	private String link;
 
+	@NotNull
 	private ScheduleStatus status;
 
 	@NotNull

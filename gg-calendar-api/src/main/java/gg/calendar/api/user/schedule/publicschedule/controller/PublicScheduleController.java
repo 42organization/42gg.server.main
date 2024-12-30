@@ -1,11 +1,12 @@
 package gg.calendar.api.user.schedule.publicschedule.controller;
 
-
 import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,7 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 import gg.auth.UserDto;
 import gg.auth.argumentresolver.Login;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicScheduleUpdateResDto;
 import gg.calendar.api.user.schedule.publicschedule.service.PublicScheduleService;
+import gg.data.calendar.PublicSchedule;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +32,14 @@ public class PublicScheduleController {
 		@Login @Parameter(hidden = true) UserDto userDto) {
 		publicScheduleService.createPublicSchedule(req, userDto.getId());
 		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<PublicScheduleUpdateResDto> publicScheduleUpdate(@PathVariable Long id,
+		@RequestBody @Valid PublicScheduleUpdateReqDto req,
+		@Login @Parameter(hidden = true) UserDto userDto) {
+		PublicSchedule updateSchedule = publicScheduleService.updatePublicSchedule(id, req, userDto.getId());
+		return ResponseEntity.ok(PublicScheduleUpdateResDto.toDto(updateSchedule));
 	}
 }
 
