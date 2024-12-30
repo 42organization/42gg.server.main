@@ -50,7 +50,7 @@ public class PublicScheduleService {
 
 	private static void checkAuthor(String author, User user) {
 		if (!user.getIntraId().equals(author)) {
-			throw new InvalidParameterException(ErrorCode.CALENDAR_AUTHOR_NOT_MATCH);
+			throw new ForbiddenException(ErrorCode.CALENDAR_AUTHOR_NOT_MATCH);
 		}
 	}
 

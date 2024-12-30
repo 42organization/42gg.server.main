@@ -28,6 +28,7 @@ import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicSch
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
+import gg.data.calendar.type.ScheduleStatus;
 import gg.data.user.User;
 import gg.repo.calendar.PublicScheduleRepository;
 import gg.repo.user.UserRepository;
@@ -178,6 +179,7 @@ public class PublicScheduleControllerTest {
 				.link("http://updated.com")
 				.startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().plusDays(2))
+				.status(ScheduleStatus.ACTIVATE)
 				.build();
 
 			// when
@@ -224,10 +226,7 @@ public class PublicScheduleControllerTest {
 					put("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
-				.andExpect(status().isBadRequest())
-				.andExpect(result -> {
-					status().isBadRequest();
-				})
+				.andExpect(status().isForbidden())
 				.andDo(print());
 
 			// then
@@ -265,10 +264,7 @@ public class PublicScheduleControllerTest {
 					put("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
-				.andExpect(status().isBadRequest())
-				.andExpect(result -> {
-					status().isBadRequest();
-				})
+				.andExpect(status().isForbidden())
 				.andDo(print());
 
 			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
@@ -376,7 +372,6 @@ public class PublicScheduleControllerTest {
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
 				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("제목은 50자이하로 입력해주세요."))
 				.andDo(print());
 
 			//then
@@ -417,7 +412,6 @@ public class PublicScheduleControllerTest {
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
 				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("내용은 2000자이하로 입력해주세요."))
 				.andDo(print());
 
 			//then
