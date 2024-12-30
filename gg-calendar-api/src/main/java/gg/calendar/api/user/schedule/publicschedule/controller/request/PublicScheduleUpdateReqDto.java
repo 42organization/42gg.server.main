@@ -29,7 +29,7 @@ public class PublicScheduleUpdateReqDto {
 	private EventTag eventTag;
 	private JobTag jobTag;
 	private TechTag techTag;
-	@NotNull
+	@NotBlank
 	private String author;
 
 	@NotBlank

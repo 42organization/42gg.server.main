@@ -6,15 +6,12 @@ import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
 import gg.data.calendar.type.TechTag;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class PublicScheduleUpdateResDto {
 	private Long id;
 	private DetailClassification classification;
@@ -28,6 +25,24 @@ public class PublicScheduleUpdateResDto {
 	private String startTime;
 	private String endTime;
 	private String status;
+
+	@Builder
+	private PublicScheduleUpdateResDto(Long id, DetailClassification classification, EventTag eventTag, JobTag jobTag,
+		TechTag techTag, String author, String title, String content, String link, String startTime, String endTime,
+		String status) {
+		this.id = id;
+		this.classification = classification;
+		this.eventTag = eventTag;
+		this.jobTag = jobTag;
+		this.techTag = techTag;
+		this.author = author;
+		this.title = title;
+		this.content = content;
+		this.link = link;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.status = status;
+	}
 
 	public static PublicScheduleUpdateResDto toDto(PublicSchedule publicSchedule) {
 		return PublicScheduleUpdateResDto.builder()
