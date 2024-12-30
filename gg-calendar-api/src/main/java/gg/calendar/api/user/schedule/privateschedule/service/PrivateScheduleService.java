@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import gg.auth.UserDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleCreateReqDto;
+import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleUpdateReqDto;
+import gg.calendar.api.user.schedule.privateschedule.controller.response.PrivateScheduleUpdateResDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.ScheduleGroup;
@@ -44,8 +46,21 @@ public class PrivateScheduleService {
 	}
 
 	@Transactional
-	public void updatePrivateSchedule() {
-
+	public PrivateScheduleUpdateResDto updatePrivateSchedule(UserDto userDto,
+		PrivateScheduleUpdateReqDto privateScheduleUpdateReqDto, Long privateScheduleId) {
+		validateTimeRange(privateScheduleUpdateReqDto.getStartTime(), privateScheduleUpdateReqDto.getEndTime());
+		User user = userRepository.getById(userDto.getId());
+		PrivateSchedule privateSchedule = privateScheduleRepository.findById(privateScheduleId)
+			.orElseThrow(() -> new NotExistException(ErrorCode.PRIVATE_SCHEDULE_NOT_FOUND));
+		scheduleGroupRepository.findById(privateScheduleUpdateReqDto.getGroupId())
+			.orElseThrow(() -> new NotExistException(ErrorCode.SCHEDULE_GROUP_NOT_FOUND));
+		privateSchedule.update(privateScheduleUpdateReqDto.getEventTag(), privateScheduleUpdateReqDto.getJobTag(),
+			privateScheduleUpdateReqDto.getTechTag(), privateScheduleUpdateReqDto.getTitle(),
+			privateScheduleUpdateReqDto.getContent(), privateScheduleUpdateReqDto.getLink(),
+			privateScheduleUpdateReqDto.getStatus(), privateScheduleUpdateReqDto.getStartTime(),
+			privateScheduleUpdateReqDto.getEndTime(), privateScheduleUpdateReqDto.isAlarm(),
+			privateScheduleUpdateReqDto.getGroupId());
+		return PrivateScheduleUpdateResDto.toDto(privateSchedule);
 	}
 
 	public void validateTimeRange(LocalDateTime startTime, LocalDateTime endTime) {

@@ -36,6 +36,7 @@ public class PrivateScheduleCreateReqDto {
 
 	private String link;
 
+	@NotNull
 	private ScheduleStatus status;
 
 	@NotNull
