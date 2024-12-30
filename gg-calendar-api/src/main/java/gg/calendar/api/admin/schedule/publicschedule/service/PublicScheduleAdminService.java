@@ -13,12 +13,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateReqDto;
+import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminUpdateReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminResDto;
+import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminUpdateResDto;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.utils.dto.PageResponseDto;
 import gg.utils.exception.ErrorCode;
-import gg.utils.exception.custom.CustomRuntimeException;
+import gg.utils.exception.custom.InvalidParameterException;
+import gg.utils.exception.custom.NotExistException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -38,8 +41,8 @@ public class PublicScheduleAdminService {
 		publicScheduleAdminRepository.save(publicSchedule);
 	}
 
-	public PageResponseDto<PublicScheduleAdminResDto> findAllByClassification(
-		DetailClassification detailClassification, int page, int size) {
+	public PageResponseDto<PublicScheduleAdminResDto> findAllByClassification(DetailClassification detailClassification,
+		int page, int size) {
 
 		Pageable pageable = PageRequest.of(page - 1, size,
 			Sort.by(Sort.Order.asc("status"), Sort.Order.asc("startTime")));
@@ -53,9 +56,28 @@ public class PublicScheduleAdminService {
 		return PageResponseDto.of(publicSchedules.getTotalElements(), publicScheduleList);
 	}
 
+	@Transactional
+	public PublicScheduleAdminUpdateResDto updatePublicSchedule(
+		PublicScheduleAdminUpdateReqDto publicScheduleAdminUpdateReqDto, Long id) {
+		dateTimeErrorCheck(publicScheduleAdminUpdateReqDto.getStartTime(),
+			publicScheduleAdminUpdateReqDto.getEndTime());
+
+		PublicSchedule publicSchedule = publicScheduleAdminRepository.findById(id)
+			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
+
+		publicSchedule.update(publicScheduleAdminUpdateReqDto.getClassification(),
+			publicScheduleAdminUpdateReqDto.getEventTag(), publicScheduleAdminUpdateReqDto.getJobTag(),
+			publicScheduleAdminUpdateReqDto.getTechTag(), publicScheduleAdminUpdateReqDto.getTitle(),
+			publicScheduleAdminUpdateReqDto.getContent(), publicScheduleAdminUpdateReqDto.getLink(),
+			publicScheduleAdminUpdateReqDto.getStartTime(), publicScheduleAdminUpdateReqDto.getEndTime(),
+			publicScheduleAdminUpdateReqDto.getStatus());
+
+		return PublicScheduleAdminUpdateResDto.toDto(publicSchedule);
+	}
+
 	private void dateTimeErrorCheck(LocalDateTime startTime, LocalDateTime endTime) {
 		if (startTime.isAfter(endTime)) {
-			throw new CustomRuntimeException(ErrorCode.CALENDAR_BEFORE_DATE);
+			throw new InvalidParameterException(ErrorCode.CALENDAR_BEFORE_DATE);
 		}
 	}
 

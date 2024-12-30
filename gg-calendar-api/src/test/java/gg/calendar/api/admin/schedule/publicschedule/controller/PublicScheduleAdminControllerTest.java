@@ -33,13 +33,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
 import gg.calendar.api.admin.PublicScheduleAdminMockData;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateReqDto;
+import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminUpdateReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminResDto;
+import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminUpdateResDto;
 import gg.calendar.api.admin.schedule.publicschedule.service.PublicScheduleAdminService;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
 import gg.data.calendar.type.ScheduleStatus;
+import gg.data.calendar.type.TechTag;
 import gg.data.user.User;
 import gg.utils.TestDataUtils;
 import gg.utils.annotation.IntegrationTest;
@@ -229,6 +232,251 @@ public class PublicScheduleAdminControllerTest {
 			for (PublicScheduleAdminResDto dto : result) {
 				System.out.println(dto.toString());
 			}
+		}
+	}
+
+	@Nested
+	@DisplayName("Admin PublicSchedule 수정 테스트")
+	class UpdatePublicScheduleAdminTest {
+
+		@Test
+		@DisplayName("Admin PublicSchedule 수정 테스트 - 성공")
+		void updatePublicScheduleAdminTestSuccess() throws Exception {
+			// given
+			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
+			PublicScheduleAdminUpdateReqDto publicScheduleAdminUpdateReqDto = PublicScheduleAdminUpdateReqDto.builder()
+				.classification(DetailClassification.JOB_NOTICE)
+				.jobTag(JobTag.SHORTS_INTERN)
+				.techTag(TechTag.BACK_END)
+				.title("Job Notice")
+				.content("Job Notice")
+				.link("https://gg.42seoul.kr")
+				.status(ScheduleStatus.ACTIVATE)
+				.startTime(LocalDateTime.now().plusDays(1))
+				.endTime(LocalDateTime.now().plusDays(15))
+				.build();
+
+			// when
+			String response = mockMvc.perform(
+					put("/admin/calendar/public/{id}", publicSchedule.getId())
+						.header("Authorization", "Bearer " + accessToken)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(publicScheduleAdminUpdateReqDto)))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andReturn().getResponse().getContentAsString();
+
+			PublicScheduleAdminUpdateResDto result = objectMapper.readValue(response,
+				PublicScheduleAdminUpdateResDto.class);
+
+			List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll();
+
+			// then
+			assertThat(schedules.size()).isEqualTo(1);
+			assertThat(result.getClassification()).isEqualTo(
+				publicScheduleAdminUpdateReqDto.getClassification().name());
+			assertThat(result.getJobTag()).isEqualTo(publicScheduleAdminUpdateReqDto.getJobTag());
+			assertThat(result.getTechTag()).isEqualTo(publicScheduleAdminUpdateReqDto.getTechTag());
+			assertThat(result.getTitle()).isEqualTo(publicScheduleAdminUpdateReqDto.getTitle());
+			assertThat(result.getContent()).isEqualTo(publicScheduleAdminUpdateReqDto.getContent());
+			assertThat(result.getLink()).isEqualTo(publicScheduleAdminUpdateReqDto.getLink());
+			assertThat(result.getStartTime()).isEqualTo(publicScheduleAdminUpdateReqDto.getStartTime());
+			assertThat(result.getEndTime()).isEqualTo(publicScheduleAdminUpdateReqDto.getEndTime());
+		}
+
+		@Test
+		@DisplayName("Admin PublicSchedule 수정 테스트 - 실패 : 종료날짜가 시작날짜보다 빠른경우")
+		void updatePublicScheduleAdminTestFailEndBeforeStart() throws Exception {
+			// given
+			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
+			PublicScheduleAdminUpdateReqDto publicScheduleAdminUpdateReqDto = PublicScheduleAdminUpdateReqDto.builder()
+				.classification(DetailClassification.JOB_NOTICE)
+				.jobTag(JobTag.SHORTS_INTERN)
+				.techTag(TechTag.BACK_END)
+				.title("Job Notice")
+				.content("Job Notice")
+				.link("https://gg.42seoul.kr")
+				.status(ScheduleStatus.ACTIVATE)
+				.startTime(LocalDateTime.now().plusDays(15))
+				.endTime(LocalDateTime.now().plusDays(1))
+				.build();
+
+			// when
+			String response = mockMvc.perform(
+					put("/admin/calendar/public/{id}", publicSchedule.getId())
+						.header("Authorization", "Bearer " + accessToken)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(publicScheduleAdminUpdateReqDto)))
+				.andDo(print())
+				.andExpect(status().isBadRequest())
+				.andReturn().getResponse().getContentAsString();
+
+			List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll();
+			PublicSchedule result = schedules.get(0);
+			assertThat(schedules.size()).isEqualTo(1);
+			assertThat(result.getClassification()).isEqualTo(publicSchedule.getClassification());
+			assertThat(result.getEventTag()).isEqualTo(publicSchedule.getEventTag());
+			assertThat(result.getTitle()).isEqualTo(publicSchedule.getTitle());
+			assertThat(result.getContent()).isEqualTo(publicSchedule.getContent());
+			assertThat(result.getLink()).isEqualTo(publicSchedule.getLink());
+			assertThat(result.getStartTime()).isEqualTo(publicSchedule.getStartTime());
+			assertThat(result.getEndTime()).isEqualTo(publicSchedule.getEndTime());
+		}
+
+		@Test
+		@DisplayName("Admin PublicSchedule 수정 테스트 - 실패 : 제목이 50자가 넘는 경우")
+		void updatePublicScheduleAdminTestFailTitleMax() throws Exception {
+			// given
+			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
+			PublicScheduleAdminUpdateReqDto publicScheduleAdminUpdateReqDto = PublicScheduleAdminUpdateReqDto.builder()
+				.classification(DetailClassification.JOB_NOTICE)
+				.jobTag(JobTag.SHORTS_INTERN)
+				.techTag(TechTag.BACK_END)
+				.title("Job Notice".repeat(10))
+				.content("Job Notice")
+				.link("https://gg.42seoul.kr")
+				.status(ScheduleStatus.ACTIVATE)
+				.startTime(LocalDateTime.now().plusDays(1))
+				.endTime(LocalDateTime.now().plusDays(15))
+				.build();
+
+			// when
+			String response = mockMvc.perform(
+					put("/admin/calendar/public/{id}", publicSchedule.getId())
+						.header("Authorization", "Bearer " + accessToken)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(publicScheduleAdminUpdateReqDto)))
+				.andDo(print())
+				.andExpect(status().isBadRequest())
+				.andReturn().getResponse().getContentAsString();
+
+			List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll();
+			PublicSchedule result = schedules.get(0);
+			assertThat(schedules.size()).isEqualTo(1);
+			assertThat(result.getClassification()).isEqualTo(publicSchedule.getClassification());
+			assertThat(result.getEventTag()).isEqualTo(publicSchedule.getEventTag());
+			assertThat(result.getTitle()).isEqualTo(publicSchedule.getTitle());
+			assertThat(result.getContent()).isEqualTo(publicSchedule.getContent());
+			assertThat(result.getLink()).isEqualTo(publicSchedule.getLink());
+			assertThat(result.getStartTime()).isEqualTo(publicSchedule.getStartTime());
+			assertThat(result.getEndTime()).isEqualTo(publicSchedule.getEndTime());
+		}
+
+		@Test
+		@DisplayName("Admin PublicSchedule 수정 테스트 - 실패 : 내용이 2000자가 넘는 경우")
+		void updatePublicScheduleAdminTestFailContentMax() throws Exception {
+			// given
+			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
+			PublicScheduleAdminUpdateReqDto publicScheduleAdminUpdateReqDto = PublicScheduleAdminUpdateReqDto.builder()
+				.classification(DetailClassification.JOB_NOTICE)
+				.jobTag(JobTag.SHORTS_INTERN)
+				.techTag(TechTag.BACK_END)
+				.title("Job Notice")
+				.content("Job Notice".repeat(500))
+				.link("https://gg.42seoul.kr")
+				.status(ScheduleStatus.ACTIVATE)
+				.startTime(LocalDateTime.now().plusDays(1))
+				.endTime(LocalDateTime.now().plusDays(15))
+				.build();
+
+			// when
+			String response = mockMvc.perform(
+					put("/admin/calendar/public/{id}", publicSchedule.getId())
+						.header("Authorization", "Bearer " + accessToken)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(publicScheduleAdminUpdateReqDto)))
+				.andDo(print())
+				.andExpect(status().isBadRequest())
+				.andReturn().getResponse().getContentAsString();
+
+			List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll();
+			PublicSchedule result = schedules.get(0);
+			assertThat(schedules.size()).isEqualTo(1);
+			assertThat(result.getClassification()).isEqualTo(publicSchedule.getClassification());
+			assertThat(result.getEventTag()).isEqualTo(publicSchedule.getEventTag());
+			assertThat(result.getTitle()).isEqualTo(publicSchedule.getTitle());
+			assertThat(result.getContent()).isEqualTo(publicSchedule.getContent());
+			assertThat(result.getLink()).isEqualTo(publicSchedule.getLink());
+			assertThat(result.getStartTime()).isEqualTo(publicSchedule.getStartTime());
+			assertThat(result.getEndTime()).isEqualTo(publicSchedule.getEndTime());
+		}
+
+		@Test
+		@DisplayName("Admin PublicSchedule 수정 테스트 - 실패 : 없는 일정을 수정하는 경우")
+		void updatePublicScheduleAdminTestFailNotExist() throws Exception {
+			// given
+			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
+			PublicScheduleAdminUpdateReqDto publicScheduleAdminUpdateReqDto = PublicScheduleAdminUpdateReqDto.builder()
+				.classification(DetailClassification.JOB_NOTICE)
+				.jobTag(JobTag.SHORTS_INTERN)
+				.techTag(TechTag.BACK_END)
+				.title("Job Notice")
+				.content("Job Notice")
+				.link("https://gg.42seoul.kr")
+				.status(ScheduleStatus.ACTIVATE)
+				.startTime(LocalDateTime.now().plusDays(1))
+				.endTime(LocalDateTime.now().plusDays(15))
+				.build();
+
+			// when
+			String response = mockMvc.perform(
+					put("/admin/calendar/public/100")
+						.header("Authorization", "Bearer " + accessToken)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(publicScheduleAdminUpdateReqDto)))
+				.andDo(print())
+				.andExpect(status().isNotFound())
+				.andReturn().getResponse().getContentAsString();
+
+			List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll();
+			PublicSchedule result = schedules.get(0);
+			assertThat(schedules.size()).isEqualTo(1);
+			assertThat(result.getClassification()).isEqualTo(publicSchedule.getClassification());
+			assertThat(result.getEventTag()).isEqualTo(publicSchedule.getEventTag());
+			assertThat(result.getTitle()).isEqualTo(publicSchedule.getTitle());
+			assertThat(result.getContent()).isEqualTo(publicSchedule.getContent());
+			assertThat(result.getLink()).isEqualTo(publicSchedule.getLink());
+			assertThat(result.getStartTime()).isEqualTo(publicSchedule.getStartTime());
+			assertThat(result.getEndTime()).isEqualTo(publicSchedule.getEndTime());
+		}
+
+		@Test
+		@DisplayName("Admin PublicSchedule 수정 테스트 - 실패 : 잘못된 id가 들어왔을 경우")
+		void updatePublicScheduleAdminTestFailBadArgument() throws Exception {
+			// given
+			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
+			PublicScheduleAdminUpdateReqDto publicScheduleAdminUpdateReqDto = PublicScheduleAdminUpdateReqDto.builder()
+				.classification(DetailClassification.JOB_NOTICE)
+				.jobTag(JobTag.SHORTS_INTERN)
+				.techTag(TechTag.BACK_END)
+				.title("Job Notice")
+				.content("Job Notice")
+				.link("https://gg.42seoul.kr")
+				.status(ScheduleStatus.ACTIVATE)
+				.startTime(LocalDateTime.now().plusDays(1))
+				.endTime(LocalDateTime.now().plusDays(15))
+				.build();
+
+			// when
+			String response = mockMvc.perform(
+					put("/admin/calendar/public/asdasdasd")
+						.header("Authorization", "Bearer " + accessToken)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(publicScheduleAdminUpdateReqDto)))
+				.andDo(print())
+				.andExpect(status().isBadRequest())
+				.andReturn().getResponse().getContentAsString();
+
+			List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll();
+			PublicSchedule result = schedules.get(0);
+			assertThat(schedules.size()).isEqualTo(1);
+			assertThat(result.getClassification()).isEqualTo(publicSchedule.getClassification());
+			assertThat(result.getEventTag()).isEqualTo(publicSchedule.getEventTag());
+			assertThat(result.getTitle()).isEqualTo(publicSchedule.getTitle());
+			assertThat(result.getContent()).isEqualTo(publicSchedule.getContent());
+			assertThat(result.getLink()).isEqualTo(publicSchedule.getLink());
+			assertThat(result.getStartTime()).isEqualTo(publicSchedule.getStartTime());
+			assertThat(result.getEndTime()).isEqualTo(publicSchedule.getEndTime());
 		}
 	}
 }

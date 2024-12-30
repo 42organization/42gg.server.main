@@ -16,4 +16,6 @@ public interface PublicScheduleAdminRepository extends JpaRepository<PublicSched
 	List<PublicSchedule> findByAuthor(String author);
 
 	Page<PublicSchedule> findAllByClassification(DetailClassification detailClassification, Pageable pageable);
+
+	List<PublicSchedule> findAll();
 }
