@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
@@ -15,16 +16,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
 import gg.calendar.api.admin.PublicScheduleAdminMockData;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateReqDto;
+import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminResDto;
 import gg.calendar.api.admin.schedule.publicschedule.service.PublicScheduleAdminService;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
@@ -34,6 +43,7 @@ import gg.data.calendar.type.ScheduleStatus;
 import gg.data.user.User;
 import gg.utils.TestDataUtils;
 import gg.utils.annotation.IntegrationTest;
+import gg.utils.dto.PageResponseDto;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -168,6 +178,57 @@ public class PublicScheduleAdminControllerTest {
 					.content(objectMapper.writeValueAsString(requestDto)))
 				.andDo(print())
 				.andExpect(status().isBadRequest());
+		}
+	}
+
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+	@Nested
+	@DisplayName("Admin PublicSchedule 태그 조회 테스트")
+	class GetPublicScheduleAdminClassificationListTest {
+
+		private Stream<Arguments> inputParams() {
+			return Stream.of(Arguments.of("EVENT", 2, 10), Arguments.of("JOB_NOTICE", 1, 10),
+				Arguments.of("PRIVATE_SCHEDULE", 1, 2));
+		}
+
+		@ParameterizedTest
+		@MethodSource("inputParams")
+		@DisplayName("Admin PublicSchedule 태그 조회 테스트 - 성공")
+		void getPublicScheduleAdminClassificationListTestSuccess(String tags, int page, int size) throws
+			Exception {
+			// given
+			publicScheduleAdminMockData.createPublicScheduleEvent(20);
+			publicScheduleAdminMockData.createPublicScheduleJob(10);
+			publicScheduleAdminMockData.createPublicSchedulePrivate(5);
+
+			MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+			params.add("page", String.valueOf(page));
+			params.add("size", String.valueOf(size));
+
+			// when
+			// multivalue map 을 통해서 값이 넘어옴
+			String response = mockMvc.perform(
+					get("/admin/calendar/public/list/{detailClassification}", tags).header("Authorization",
+							"Bearer " + accessToken)
+						.params(params))
+				.andDo(print())
+				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+			// then
+			PageResponseDto<PublicScheduleAdminResDto> pageResponseDto = objectMapper.readValue(
+				response, new TypeReference<>() {
+				});
+			List<PublicScheduleAdminResDto> result = pageResponseDto.getContent();
+
+			if (DetailClassification.valueOf(tags) == DetailClassification.PRIVATE_SCHEDULE) {
+				assertThat(result.size()).isEqualTo(2);
+			} else {
+				assertThat(result.size()).isEqualTo(10);
+			}
+
+			for (PublicScheduleAdminResDto dto : result) {
+				System.out.println(dto.toString());
+			}
 		}
 	}
 }
