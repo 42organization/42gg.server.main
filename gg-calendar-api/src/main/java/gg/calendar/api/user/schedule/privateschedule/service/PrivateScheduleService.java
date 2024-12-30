@@ -49,9 +49,9 @@ public class PrivateScheduleService {
 	public PrivateScheduleUpdateResDto updatePrivateSchedule(UserDto userDto,
 		PrivateScheduleUpdateReqDto privateScheduleUpdateReqDto, Long privateScheduleId) {
 		validateTimeRange(privateScheduleUpdateReqDto.getStartTime(), privateScheduleUpdateReqDto.getEndTime());
-		User user = userRepository.getById(userDto.getId());
 		PrivateSchedule privateSchedule = privateScheduleRepository.findById(privateScheduleId)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PRIVATE_SCHEDULE_NOT_FOUND));
+		validateAuthor(userDto.getIntraId(), privateSchedule.getPublicSchedule().getAuthor());
 		scheduleGroupRepository.findById(privateScheduleUpdateReqDto.getGroupId())
 			.orElseThrow(() -> new NotExistException(ErrorCode.SCHEDULE_GROUP_NOT_FOUND));
 		privateSchedule.update(privateScheduleUpdateReqDto.getEventTag(), privateScheduleUpdateReqDto.getJobTag(),
@@ -66,6 +66,12 @@ public class PrivateScheduleService {
 	public void validateTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
 		if (endTime.isBefore(startTime)) {
 			throw new InvalidParameterException(ErrorCode.CALENDAR_BEFORE_DATE);
+		}
+	}
+
+	public void validateAuthor(String intraId, String author) {
+		if (intraId.equals(author)) {
+			throw new InvalidParameterException(ErrorCode.CALENDAR_AUTHOR_NOT_MATCH);
 		}
 	}
 }
