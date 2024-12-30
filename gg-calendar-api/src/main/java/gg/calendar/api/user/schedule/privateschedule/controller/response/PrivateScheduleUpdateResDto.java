@@ -47,8 +47,7 @@ public class PrivateScheduleUpdateResDto {
 	@Builder
 	private PrivateScheduleUpdateResDto(Long id, DetailClassification classification, EventTag eventTag, JobTag jobTag,
 		TechTag techTag, String author, String title, String content, String link, ScheduleStatus status,
-		LocalDateTime startTime,
-		LocalDateTime endTime, boolean alarm, Long groupId) {
+		LocalDateTime startTime, LocalDateTime endTime, boolean alarm, Long groupId) {
 		this.id = id;
 		this.classification = classification;
 		this.eventTag = eventTag;

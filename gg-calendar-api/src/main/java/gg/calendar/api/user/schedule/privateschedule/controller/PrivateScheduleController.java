@@ -4,11 +4,11 @@ import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import gg.auth.UserDto;
@@ -37,7 +37,7 @@ public class PrivateScheduleController {
 	public ResponseEntity<PrivateScheduleUpdateResDto> privateScheduleUpdate(
 		@Login @Parameter(hidden = true) UserDto userDto,
 		@Valid @RequestBody PrivateScheduleUpdateReqDto privateScheduleUpdateReqDto,
-		@RequestParam Long id) {
+		@PathVariable Long id) {
 		PrivateScheduleUpdateResDto privateScheduleUpdateResDto = privateScheduleService.updatePrivateSchedule(userDto,
 			privateScheduleUpdateReqDto, id);
 		return ResponseEntity.status(HttpStatus.OK).body(privateScheduleUpdateResDto);

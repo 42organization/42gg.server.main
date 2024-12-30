@@ -18,6 +18,7 @@ import gg.repo.calendar.PublicScheduleRepository;
 import gg.repo.calendar.ScheduleGroupRepository;
 import gg.repo.user.UserRepository;
 import gg.utils.exception.ErrorCode;
+import gg.utils.exception.custom.ForbiddenException;
 import gg.utils.exception.custom.InvalidParameterException;
 import gg.utils.exception.custom.NotExistException;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +55,7 @@ public class PrivateScheduleService {
 		validateAuthor(userDto.getIntraId(), privateSchedule.getPublicSchedule().getAuthor());
 		scheduleGroupRepository.findById(privateScheduleUpdateReqDto.getGroupId())
 			.orElseThrow(() -> new NotExistException(ErrorCode.SCHEDULE_GROUP_NOT_FOUND));
+
 		privateSchedule.update(privateScheduleUpdateReqDto.getEventTag(), privateScheduleUpdateReqDto.getJobTag(),
 			privateScheduleUpdateReqDto.getTechTag(), privateScheduleUpdateReqDto.getTitle(),
 			privateScheduleUpdateReqDto.getContent(), privateScheduleUpdateReqDto.getLink(),
@@ -70,8 +72,8 @@ public class PrivateScheduleService {
 	}
 
 	public void validateAuthor(String intraId, String author) {
-		if (intraId.equals(author)) {
-			throw new InvalidParameterException(ErrorCode.CALENDAR_AUTHOR_NOT_MATCH);
+		if (!intraId.equals(author)) {
+			throw new ForbiddenException(ErrorCode.CALENDAR_AUTHOR_NOT_MATCH);
 		}
 	}
 }
