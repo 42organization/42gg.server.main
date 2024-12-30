@@ -33,6 +33,7 @@ public class PublicScheduleAdminController {
 		publicScheduleAdminService.createPublicSchedule(publicScheduleAdminCreateReqDto);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
+
 	@GetMapping("/list/{detailClassification}")
 	public ResponseEntity<PageResponseDto<PublicScheduleAdminResDto>> publicScheduleAdminClassificationList(
 		@PathVariable DetailClassification detailClassification, @ModelAttribute PageRequestDto pageRequestDto) {
