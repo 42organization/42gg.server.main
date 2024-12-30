@@ -4,11 +4,13 @@ import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Component;
 
+import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.ScheduleGroup;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.ScheduleStatus;
 import gg.data.user.User;
+import gg.repo.calendar.PrivateScheduleRepository;
 import gg.repo.calendar.PublicScheduleRepository;
 import gg.repo.calendar.ScheduleGroupRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,15 +20,16 @@ import lombok.RequiredArgsConstructor;
 public class PrivateScheduleMockData {
 	private final PublicScheduleRepository publicScheduleRepository;
 	private final ScheduleGroupRepository scheduleGroupRepository;
+	private final PrivateScheduleRepository privateScheduleRepository;
 
-	public PublicSchedule createPublicSchedule() {
+	public PublicSchedule createPublicSchedule(String author) {
 		PublicSchedule publicSchedule = PublicSchedule.builder()
 			.classification(DetailClassification.EVENT)
 			.eventTag(null)
 			.jobTag(null)
 			.techTag(null)
 			.title("Test Schedule")
-			.author("author")
+			.author(author)
 			.content("Test Content")
 			.link("http://test.com")
 			.status(ScheduleStatus.ACTIVATE)
@@ -43,5 +46,11 @@ public class PrivateScheduleMockData {
 			.backgroundColor("")
 			.build();
 		return scheduleGroupRepository.save(scheduleGroup);
+	}
+
+	public PrivateSchedule createPrivateSchedule(PublicSchedule publicSchedule, ScheduleGroup scheduleGroup) {
+		PrivateSchedule privateSchedule = new PrivateSchedule(scheduleGroup.getUser(), publicSchedule, false,
+			scheduleGroup.getId());
+		return privateScheduleRepository.save(privateSchedule);
 	}
 }

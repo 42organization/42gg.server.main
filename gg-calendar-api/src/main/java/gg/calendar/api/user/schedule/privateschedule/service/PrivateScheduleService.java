@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import gg.auth.UserDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleCreateReqDto;
+import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleUpdateReqDto;
+import gg.calendar.api.user.schedule.privateschedule.controller.response.PrivateScheduleUpdateResDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.ScheduleGroup;
@@ -16,6 +18,7 @@ import gg.repo.calendar.PublicScheduleRepository;
 import gg.repo.calendar.ScheduleGroupRepository;
 import gg.repo.user.UserRepository;
 import gg.utils.exception.ErrorCode;
+import gg.utils.exception.custom.ForbiddenException;
 import gg.utils.exception.custom.InvalidParameterException;
 import gg.utils.exception.custom.NotExistException;
 import lombok.RequiredArgsConstructor;
@@ -43,9 +46,34 @@ public class PrivateScheduleService {
 		privateScheduleRepository.save(privateSchedule);
 	}
 
+	@Transactional
+	public PrivateScheduleUpdateResDto updatePrivateSchedule(UserDto userDto,
+		PrivateScheduleUpdateReqDto privateScheduleUpdateReqDto, Long privateScheduleId) {
+		validateTimeRange(privateScheduleUpdateReqDto.getStartTime(), privateScheduleUpdateReqDto.getEndTime());
+		PrivateSchedule privateSchedule = privateScheduleRepository.findById(privateScheduleId)
+			.orElseThrow(() -> new NotExistException(ErrorCode.PRIVATE_SCHEDULE_NOT_FOUND));
+		validateAuthor(userDto.getIntraId(), privateSchedule.getPublicSchedule().getAuthor());
+		scheduleGroupRepository.findById(privateScheduleUpdateReqDto.getGroupId())
+			.orElseThrow(() -> new NotExistException(ErrorCode.SCHEDULE_GROUP_NOT_FOUND));
+
+		privateSchedule.update(privateScheduleUpdateReqDto.getEventTag(), privateScheduleUpdateReqDto.getJobTag(),
+			privateScheduleUpdateReqDto.getTechTag(), privateScheduleUpdateReqDto.getTitle(),
+			privateScheduleUpdateReqDto.getContent(), privateScheduleUpdateReqDto.getLink(),
+			privateScheduleUpdateReqDto.getStatus(), privateScheduleUpdateReqDto.getStartTime(),
+			privateScheduleUpdateReqDto.getEndTime(), privateScheduleUpdateReqDto.isAlarm(),
+			privateScheduleUpdateReqDto.getGroupId());
+		return PrivateScheduleUpdateResDto.toDto(privateSchedule);
+	}
+
 	public void validateTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
 		if (endTime.isBefore(startTime)) {
 			throw new InvalidParameterException(ErrorCode.CALENDAR_BEFORE_DATE);
+		}
+	}
+
+	public void validateAuthor(String intraId, String author) {
+		if (!intraId.equals(author)) {
+			throw new ForbiddenException(ErrorCode.CALENDAR_AUTHOR_NOT_MATCH);
 		}
 	}
 }
