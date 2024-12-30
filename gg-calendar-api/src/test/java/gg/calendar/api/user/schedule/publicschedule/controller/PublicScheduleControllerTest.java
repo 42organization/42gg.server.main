@@ -419,4 +419,36 @@ public class PublicScheduleControllerTest {
 			assertThat(updatedSchedule.getContent()).isEqualTo("Original Content");
 		}
 	}
+
+	@Nested
+	@DisplayName("공개일정:삭제")
+	class DeletePublicSchedule {
+		@Test
+		@DisplayName("공개일정삭제성공")
+		void deletePublicScheduleSuccess() throws Exception {
+			// given
+			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateReqDto.builder()
+					.classification(DetailClassification.EVENT)
+					.author(user.getIntraId())
+					.title("Original Title")
+					.content("Original Content")
+					.link("http://original.com")
+					.startTime(LocalDateTime.now())
+					.endTime(LocalDateTime.now().plusDays(1))
+					.build());
+			publicScheduleRepository.save(publicSchedule);
+
+			// when
+			mockMvc.perform(
+					patch("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken))
+				.andExpect(status().isNoContent());
+
+			// then
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).hasSize(1);
+			assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.DELETE);
+		}
+	}
+
 }

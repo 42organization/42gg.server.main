@@ -12,6 +12,7 @@ import gg.data.user.User;
 import gg.repo.calendar.PublicScheduleRepository;
 import gg.repo.user.UserRepository;
 import gg.utils.exception.ErrorCode;
+import gg.utils.exception.custom.DuplicationException;
 import gg.utils.exception.custom.ForbiddenException;
 import gg.utils.exception.custom.InvalidParameterException;
 import gg.utils.exception.custom.NotExistException;
@@ -46,6 +47,18 @@ public class PublicScheduleService {
 		existingSchedule.update(req.getClassification(), req.getEventTag(), req.getJobTag(), req.getTechTag(),
 			req.getTitle(), req.getContent(), req.getLink(), req.getStartTime(), req.getEndTime(), req.getStatus());
 		return existingSchedule;
+	}
+
+	@Transactional
+	public void deletePublicSchedule(Long scheduleId, Long userId) {
+		User user = userRepository.getById(userId);
+		PublicSchedule existingSchedule = publicScheduleRepository.findById(scheduleId)
+			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
+		checkAuthor(existingSchedule.getAuthor(), user);
+		if (existingSchedule.getStatus().isDelete()) {
+			throw new DuplicationException(ErrorCode.CALENDAR_ALREADY_DELETE);
+		}
+		existingSchedule.delete();
 	}
 
 	private static void checkAuthor(String author, User user) {

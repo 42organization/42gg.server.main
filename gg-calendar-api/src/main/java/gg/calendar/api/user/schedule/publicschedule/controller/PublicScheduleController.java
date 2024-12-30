@@ -4,6 +4,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -40,6 +41,13 @@ public class PublicScheduleController {
 		@Login @Parameter(hidden = true) UserDto userDto) {
 		PublicSchedule updateSchedule = publicScheduleService.updatePublicSchedule(id, req, userDto.getId());
 		return ResponseEntity.ok(PublicScheduleUpdateResDto.toDto(updateSchedule));
+	}
+
+	@PatchMapping("/{id}")
+	public ResponseEntity<Void> publicScheduleDelete(@PathVariable Long id,
+		@Login @Parameter(hidden = true) UserDto userDto) {
+		publicScheduleService.deletePublicSchedule(id, userDto.getId());
+		return ResponseEntity.noContent().build();
 	}
 }
 
