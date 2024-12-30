@@ -26,5 +26,4 @@ public class PublicScheduleAdminController {
 		publicScheduleAdminService.createPublicSchedule(publicScheduleAdminCreateReqDto);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
-
 }

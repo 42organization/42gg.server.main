@@ -15,7 +15,9 @@ import gg.auth.UserDto;
 import gg.auth.argumentresolver.Login;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicScheduleUpdateResDto;
 import gg.calendar.api.user.schedule.publicschedule.service.PublicScheduleService;
+import gg.data.calendar.PublicSchedule;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 
@@ -33,12 +35,11 @@ public class PublicScheduleController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Void> publicScheduleUpdate(@PathVariable Long id,
+	public ResponseEntity<PublicScheduleUpdateResDto> publicScheduleUpdate(@PathVariable Long id,
 		@RequestBody @Valid PublicScheduleUpdateReqDto req,
 		@Login @Parameter(hidden = true) UserDto userDto) {
-		publicScheduleService.updatePublicSchedule(id, req, userDto.getId());
-		return ResponseEntity.status(HttpStatus.OK).build();
+		PublicSchedule updateSchedule = publicScheduleService.updatePublicSchedule(id, req, userDto.getId());
+		return ResponseEntity.ok(PublicScheduleUpdateResDto.toDto(updateSchedule));
 	}
-
 }
 

@@ -86,9 +86,10 @@ public class PublicSchedule extends BaseTimeEntity {
 		this.endTime = endTime;
 	}
 
-	public void publicScheduleUpdate(DetailClassification classification, EventTag eventTag, JobTag jobTag,
+	public void update(DetailClassification classification, EventTag eventTag, JobTag jobTag,
 		TechTag techTag,
-		String title, String content, String link, LocalDateTime startTime, LocalDateTime endTime) {
+		String title, String content, String link, LocalDateTime startTime, LocalDateTime endTime,
+		ScheduleStatus Status) {
 		this.classification = classification;
 		this.eventTag = eventTag;
 		this.jobTag = jobTag;
@@ -98,6 +99,7 @@ public class PublicSchedule extends BaseTimeEntity {
 		this.link = link;
 		this.startTime = startTime;
 		this.endTime = endTime;
+		this.status = status;
 	}
-
 }
+

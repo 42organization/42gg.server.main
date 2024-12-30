@@ -2,7 +2,9 @@ package gg.calendar.api.user.schedule.publicschedule.controller.request;
 
 import java.time.LocalDateTime;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
@@ -28,10 +30,16 @@ public class PublicScheduleCreateReqDto {
 	private TechTag techTag;
 	@NotNull
 	private String author;
-	@NotNull
+
+	@NotBlank
+	@Size(max = 50, message = "제목은 50자이하로 입력해주세요.")
 	private String title;
+
+	@Size(max = 2000, message = "내용은 2000자이하로 입력해주세요.")
 	private String content;
+
 	private String link;
+
 	@NotNull
 	private LocalDateTime startTime;
 	@NotNull
