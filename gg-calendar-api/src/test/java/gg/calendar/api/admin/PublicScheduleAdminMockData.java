@@ -29,6 +29,7 @@ public class PublicScheduleAdminMockData {
 			.title("취업설명회")
 			.content("취업설명회입니다.")
 			.link("https://gg.42seoul.kr")
+			.status(ScheduleStatus.ACTIVATE)
 			.startTime(LocalDateTime.now())
 			.endTime(LocalDateTime.now().plusDays(10))
 			.build();
