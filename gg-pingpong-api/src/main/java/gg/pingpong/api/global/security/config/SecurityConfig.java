@@ -48,6 +48,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.antMatchers("/agenda/admin/**")
 			.hasRole("ADMIN")
 			.antMatchers(HttpMethod.PUT, "/pingpong/users/{intraId}")
+			.hasRole("ADMIN")
+			.antMatchers("/admin/calendar/**")
 			.hasAnyRole("USER", "ADMIN")
 			.antMatchers(HttpMethod.POST, "/pingpong/match")
 			.hasAnyRole("USER", "ADMIN")
@@ -55,7 +57,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.hasAnyRole("USER", "ADMIN")
 			.antMatchers("/login", "/oauth2/authorization/**", "/", "/pingpong/users/oauth/**",
 				"/pingpong/users/accesstoken", "/actuator/**", "/swagger-ui/**", "/swagger-ui**", "/v3/api-docs/**",
-				"/v3/api-docs**", "/api-docs", "/admin/calendar/**")
+				"/v3/api-docs**", "/api-docs", "/calendar/**")
 			.permitAll()
 			.anyRequest()
 			.authenticated()
