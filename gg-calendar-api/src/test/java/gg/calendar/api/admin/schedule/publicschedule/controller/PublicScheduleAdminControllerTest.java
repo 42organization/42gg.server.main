@@ -197,8 +197,7 @@ public class PublicScheduleAdminControllerTest {
 		@ParameterizedTest
 		@MethodSource("inputParams")
 		@DisplayName("Admin PublicSchedule 태그 조회 테스트 - 성공")
-		void getPublicScheduleAdminClassificationListTestSuccess(String tags, int page, int size) throws
-			Exception {
+		void getPublicScheduleAdminClassificationListTestSuccess(String tags, int page, int size) throws Exception {
 			// given
 			publicScheduleAdminMockData.createPublicScheduleEvent(20);
 			publicScheduleAdminMockData.createPublicScheduleJob(10);
@@ -212,14 +211,16 @@ public class PublicScheduleAdminControllerTest {
 			// multivalue map 을 통해서 값이 넘어옴
 			String response = mockMvc.perform(
 					get("/admin/calendar/public/list/{detailClassification}", tags).header("Authorization",
-							"Bearer " + accessToken)
-						.params(params))
+						"Bearer " + accessToken).params(params))
 				.andDo(print())
-				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+				.andExpect(status().isOk())
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
 
 			// then
-			PageResponseDto<PublicScheduleAdminResDto> pageResponseDto = objectMapper.readValue(
-				response, new TypeReference<>() {
+			PageResponseDto<PublicScheduleAdminResDto> pageResponseDto = objectMapper.readValue(response,
+				new TypeReference<>() {
 				});
 			List<PublicScheduleAdminResDto> result = pageResponseDto.getContent();
 
@@ -258,13 +259,15 @@ public class PublicScheduleAdminControllerTest {
 
 			// when
 			String response = mockMvc.perform(
-					put("/admin/calendar/public/{id}", publicSchedule.getId())
-						.header("Authorization", "Bearer " + accessToken)
+					put("/admin/calendar/public/{id}", publicSchedule.getId()).header("Authorization",
+							"Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(publicScheduleAdminUpdateReqDto)))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andReturn().getResponse().getContentAsString();
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
 
 			PublicScheduleAdminUpdateResDto result = objectMapper.readValue(response,
 				PublicScheduleAdminUpdateResDto.class);
@@ -303,13 +306,15 @@ public class PublicScheduleAdminControllerTest {
 
 			// when
 			String response = mockMvc.perform(
-					put("/admin/calendar/public/{id}", publicSchedule.getId())
-						.header("Authorization", "Bearer " + accessToken)
+					put("/admin/calendar/public/{id}", publicSchedule.getId()).header("Authorization",
+							"Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(publicScheduleAdminUpdateReqDto)))
 				.andDo(print())
 				.andExpect(status().isBadRequest())
-				.andReturn().getResponse().getContentAsString();
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
 
 			List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll();
 			PublicSchedule result = schedules.get(0);
@@ -342,13 +347,15 @@ public class PublicScheduleAdminControllerTest {
 
 			// when
 			String response = mockMvc.perform(
-					put("/admin/calendar/public/{id}", publicSchedule.getId())
-						.header("Authorization", "Bearer " + accessToken)
+					put("/admin/calendar/public/{id}", publicSchedule.getId()).header("Authorization",
+							"Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(publicScheduleAdminUpdateReqDto)))
 				.andDo(print())
 				.andExpect(status().isBadRequest())
-				.andReturn().getResponse().getContentAsString();
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
 
 			List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll();
 			PublicSchedule result = schedules.get(0);
@@ -381,13 +388,15 @@ public class PublicScheduleAdminControllerTest {
 
 			// when
 			String response = mockMvc.perform(
-					put("/admin/calendar/public/{id}", publicSchedule.getId())
-						.header("Authorization", "Bearer " + accessToken)
+					put("/admin/calendar/public/{id}", publicSchedule.getId()).header("Authorization",
+							"Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(publicScheduleAdminUpdateReqDto)))
 				.andDo(print())
 				.andExpect(status().isBadRequest())
-				.andReturn().getResponse().getContentAsString();
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
 
 			List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll();
 			PublicSchedule result = schedules.get(0);
@@ -420,13 +429,14 @@ public class PublicScheduleAdminControllerTest {
 
 			// when
 			String response = mockMvc.perform(
-					put("/admin/calendar/public/100")
-						.header("Authorization", "Bearer " + accessToken)
+					put("/admin/calendar/public/100").header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(publicScheduleAdminUpdateReqDto)))
 				.andDo(print())
 				.andExpect(status().isNotFound())
-				.andReturn().getResponse().getContentAsString();
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
 
 			List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll();
 			PublicSchedule result = schedules.get(0);
@@ -459,13 +469,14 @@ public class PublicScheduleAdminControllerTest {
 
 			// when
 			String response = mockMvc.perform(
-					put("/admin/calendar/public/asdasdasd")
-						.header("Authorization", "Bearer " + accessToken)
+					put("/admin/calendar/public/asdasdasd").header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(publicScheduleAdminUpdateReqDto)))
 				.andDo(print())
 				.andExpect(status().isBadRequest())
-				.andReturn().getResponse().getContentAsString();
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
 
 			List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll();
 			PublicSchedule result = schedules.get(0);
@@ -477,6 +488,78 @@ public class PublicScheduleAdminControllerTest {
 			assertThat(result.getLink()).isEqualTo(publicSchedule.getLink());
 			assertThat(result.getStartTime()).isEqualTo(publicSchedule.getStartTime());
 			assertThat(result.getEndTime()).isEqualTo(publicSchedule.getEndTime());
+		}
+
+		@Test
+		@DisplayName("Admin PublicSchedule 삭제 테스트 - 성공")
+		void deletePublicScheduleAdminTestSuccess() throws Exception {
+			// given
+			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
+
+			// when
+			mockMvc.perform(patch("/admin/calendar/public/{id}", publicSchedule.getId()).header("Authorization",
+						"Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isOk());
+
+			PublicSchedule result = publicScheduleAdminRepository.findById(publicSchedule.getId()).get();
+			assertThat(result.getStatus()).isEqualTo(ScheduleStatus.DELETE);
+			System.out.println("PublicSchedule Status : " + result.getStatus());
+		}
+
+		@Test
+		@DisplayName("Admin PublicSchedule 삭제 테스트 - 실패 : 잘못된 id형식이 들어왔을 경우")
+		void deletePublicScheduleAdminTestFailNotBadArgument() throws Exception {
+			// given
+			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
+
+			// when
+			mockMvc.perform(patch("/admin/calendar/public/qwe1asdv").header("Authorization",
+						"Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isBadRequest());
+
+			PublicSchedule result = publicScheduleAdminRepository.findById(publicSchedule.getId()).get();
+			assertThat(result.getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+			System.out.println("PublicSchedule Status : " + result.getStatus());
+		}
+
+		@Test
+		@DisplayName("Admin PublicSchedule 삭제 테스트 - 실패 : 없는 id가 들어왔을 경우")
+		void deletePublicScheduleAdminTestFailNotFound() throws Exception {
+			// given
+			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
+
+			// when
+			mockMvc.perform(patch("/admin/calendar/public/50123125").header("Authorization",
+						"Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isNotFound());
+
+			PublicSchedule result = publicScheduleAdminRepository.findById(publicSchedule.getId()).get();
+			assertThat(result.getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+			System.out.println("PublicSchedule Status : " + result.getStatus());
+		}
+
+		@Test
+		@DisplayName("Admin PublicSchedule 삭제 테스트 - 실패 : 이미 삭제된 일정을 삭제하는 경우")
+		void deletePublicScheduleAdminTestFailAlreadyDelete() throws Exception {
+			// given
+			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
+			publicSchedule.delete();
+			// when
+			mockMvc.perform(patch("/admin/calendar/public/{id}", publicSchedule.getId()).header("Authorization",
+						"Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isBadRequest());
+
+			PublicSchedule result = publicScheduleAdminRepository.findById(publicSchedule.getId()).get();
+			assertThat(result.getStatus()).isEqualTo(ScheduleStatus.DELETE);
+			System.out.println("PublicSchedule Status : " + result.getStatus());
 		}
 	}
 }
