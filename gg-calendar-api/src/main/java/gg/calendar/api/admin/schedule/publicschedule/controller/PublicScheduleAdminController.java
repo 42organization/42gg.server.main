@@ -59,11 +59,11 @@ public class PublicScheduleAdminController {
 		return ResponseEntity.ok(publicScheduleAdminUpdateRes);
 	}
 
-
 	@PatchMapping("/{id}")
 	public ResponseEntity<Void> publicScheduleDelete(@PathVariable Long id) {
 		publicScheduleAdminService.deletePublicSchedule(id);
 		return ResponseEntity.status(HttpStatus.OK).build();
+	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<PublicScheduleAdminResDto> publicScheduleDetail(@PathVariable Long id) {
