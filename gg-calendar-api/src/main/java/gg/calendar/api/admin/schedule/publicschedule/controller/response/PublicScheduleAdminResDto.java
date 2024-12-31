@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PublicScheduleAdminResDto {
+
 	private Long id;
 
 	private DetailClassification classification;

@@ -76,6 +76,7 @@ public class PublicScheduleAdminService {
 		return PublicScheduleAdminUpdateResDto.toDto(publicSchedule);
 	}
 
+
 	@Transactional
 	public void deletePublicSchedule(Long id) {
 		PublicSchedule publicSchedule = publicScheduleAdminRepository.findById(id)
@@ -84,6 +85,13 @@ public class PublicScheduleAdminService {
 			throw new InvalidParameterException(ErrorCode.PUBLIC_SCHEDULE_ALREADY_DELETED);
 		}
 		publicSchedule.delete();
+  }
+  
+	public PublicScheduleAdminResDto detailPublicSchedule(Long id) {
+		PublicSchedule publicSchedule = publicScheduleAdminRepository.findById(id)
+			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
+
+		return new PublicScheduleAdminResDto(publicSchedule);
 	}
 
 	private void dateTimeErrorCheck(LocalDateTime startTime, LocalDateTime endTime) {
