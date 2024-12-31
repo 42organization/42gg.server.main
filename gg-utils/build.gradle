@@ -22,7 +22,7 @@ reporting {
 reporting {
     reports {
         integrationTestCoverageReport(JacocoCoverageReport) {
-            testType = TestSuiteType.UNIT_TEST
+            testType = TestSuiteType.INTEGRATION_TEST
         }
     }
 }
@@ -100,6 +100,8 @@ dependencies {
     testFixturesImplementation project(":gg-admin-repo")
     testFixturesImplementation project(":gg-pingpong-api")
     testFixturesImplementation project(":gg-recruit-api")
+    testFixturesImplementation project(":gg-agenda-api")
+    testFixturesImplementation project(":gg-calendar-api")
 
     jacocoAggregation(project(':gg-data'))
     jacocoAggregation(project(':gg-auth'))
@@ -107,6 +109,8 @@ dependencies {
     jacocoAggregation(project(':gg-admin-repo'))
     jacocoAggregation(project(':gg-pingpong-api'))
     jacocoAggregation(project(':gg-recruit-api'))
+    jacocoAggregation(project(':gg-agenda-api'))
+    jacocoAggregation(project(':gg-calendar-api'))
 }
 
 test {
