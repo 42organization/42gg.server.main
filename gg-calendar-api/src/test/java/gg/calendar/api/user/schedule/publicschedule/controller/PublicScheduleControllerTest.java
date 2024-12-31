@@ -479,7 +479,6 @@ public class PublicScheduleControllerTest {
 					.endTime(LocalDateTime.now().plusDays(1))
 					.build());
 			publicScheduleRepository.save(publicSchedule);
-
 			// when
 			mockMvc.perform(
 					patch("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken))
@@ -561,14 +560,12 @@ public class PublicScheduleControllerTest {
 					.startTime(LocalDateTime.now())
 					.endTime(LocalDateTime.now().plusDays(1))
 					.build());
-			publicScheduleRepository.save(publicSchedule);
-
-			publicSchedule.delete();  // 엔티티 생성 후 상태 변경
+			publicSchedule.delete();
 			publicScheduleRepository.save(publicSchedule);
 			// when
 			mockMvc.perform(
 					patch("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken))
-				.andExpect(status().isConflict()) //중복체크
+				.andExpect(status().isConflict())
 				.andDo(print());
 			// then
 			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());

@@ -55,13 +55,17 @@ public class PublicScheduleService {
 		PublicSchedule existingSchedule = publicScheduleRepository.findById(scheduleId)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
 		checkAuthor(existingSchedule.getAuthor(), user);
-		if (existingSchedule.getStatus().isDelete()) {
-			throw new DuplicationException(ErrorCode.CALENDAR_ALREADY_DELETE);
-		}
+		duplicateDelete(existingSchedule);
 		existingSchedule.delete();
 	}
 
-	private static void checkAuthor(String author, User user) {
+	private void duplicateDelete(PublicSchedule existingSchedule) {
+		if (existingSchedule.getStatus().isDelete()) {
+			throw new DuplicationException(ErrorCode.CALENDAR_ALREADY_DELETE);
+		}
+	}
+
+	private void checkAuthor(String author, User user) {
 		if (!user.getIntraId().equals(author)) {
 			throw new ForbiddenException(ErrorCode.CALENDAR_AUTHOR_NOT_MATCH);
 		}
