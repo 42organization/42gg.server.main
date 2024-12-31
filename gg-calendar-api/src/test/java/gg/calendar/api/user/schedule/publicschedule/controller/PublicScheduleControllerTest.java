@@ -601,4 +601,105 @@ public class PublicScheduleControllerTest {
 		}
 	}
 
+	@Nested
+	@DisplayName("공개일정:상세조회")
+	class RetrievePublicScheduleDetail {
+		@Test
+		@DisplayName("공개일정상세조회성공")
+		void retrievePublicScheduleDetailSuccess() throws Exception {
+			// given
+			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateReqDto.builder()
+					.classification(DetailClassification.EVENT)
+					.author(user.getIntraId())
+					.title("Original Title")
+					.content("Original Content")
+					.link("http://original.com")
+					.startTime(LocalDateTime.now())
+					.endTime(LocalDateTime.now().plusDays(1))
+					.build());
+			publicScheduleRepository.save(publicSchedule);
+			// when
+			mockMvc.perform(
+					get("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.title").value("Original Title"))
+				.andExpect(jsonPath("$.content").value("Original Content"))
+				.andExpect(jsonPath("$.link").value("http://original.com"))
+				.andDo(print());
+		}
+
+		@Test
+		@DisplayName("공개일정상세조회실패-작성자가 다를 때")
+		void retrievePublicScheduleDetailFailNotMatchAuthor() throws Exception {
+			// given
+			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity("another",
+				PublicScheduleCreateReqDto.builder()
+					.classification(DetailClassification.EVENT)
+					.author("another")
+					.title("Original Title")
+					.content("Original Content")
+					.link("http://original.com")
+					.startTime(LocalDateTime.now())
+					.endTime(LocalDateTime.now().plusDays(1))
+					.build());
+			publicScheduleRepository.save(publicSchedule);
+
+			// when
+			mockMvc.perform(
+					get("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken))
+				.andExpect(status().isForbidden())
+				.andDo(print());
+		}
+
+		@Test
+		@DisplayName("공개일정상세조회실패-잘못된 id일 때(숫자가 아닌 문자열)")
+		void retrievePublicScheduleDetailFailWrongId() throws Exception {
+			// given
+			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateReqDto.builder()
+					.classification(DetailClassification.EVENT)
+					.author(user.getIntraId())
+					.title("Original Title")
+					.content("Original Content")
+					.link("http://original.com")
+					.startTime(LocalDateTime.now())
+					.endTime(LocalDateTime.now().plusDays(1))
+					.build());
+			publicScheduleRepository.save(publicSchedule);
+
+			// when & then
+			mockMvc.perform(
+					get("/calendar/public/abc").header("Authorization", "Bearer " + accssToken))
+				.andExpect(status().isBadRequest())
+				.andDo(print());
+
+		}
+
+		@Test
+		@DisplayName("공개일정상세조회실패-없는 일정일 때")
+		void retrievePublicScheduleDetailFailNotExist() throws Exception {
+			//given
+			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateReqDto.builder()
+					.classification(DetailClassification.EVENT)
+					.author(user.getIntraId())
+					.title("Original Title")
+					.content("Original Content")
+					.link("http://original.com")
+					.startTime(LocalDateTime.now())
+					.endTime(LocalDateTime.now().plusDays(1))
+					.build());
+			publicScheduleRepository.save(publicSchedule);
+
+			//when & then
+			mockMvc.perform(
+					get("/calendar/public/9999").header("Authorization", "Bearer " + accssToken))
+				.andExpect(status().isNotFound())
+				.andDo(print());
+
+		}
+
+	}
+
 }

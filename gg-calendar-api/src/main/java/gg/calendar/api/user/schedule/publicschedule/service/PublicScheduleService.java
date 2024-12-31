@@ -59,6 +59,14 @@ public class PublicScheduleService {
 		existingSchedule.delete();
 	}
 
+	public PublicSchedule getPublicScheduleDetailRetrive(Long sheduleId, Long userId) {
+		User user = userRepository.getById(userId);
+		PublicSchedule publicRetriveSchedule = publicScheduleRepository.findById(sheduleId)
+			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
+		checkAuthor(publicRetriveSchedule.getAuthor(), user);
+		return publicRetriveSchedule;
+	}
+
 	private void duplicateDelete(PublicSchedule existingSchedule) {
 		if (existingSchedule.getStatus().isDelete()) {
 			throw new DuplicationException(ErrorCode.CALENDAR_ALREADY_DELETE);

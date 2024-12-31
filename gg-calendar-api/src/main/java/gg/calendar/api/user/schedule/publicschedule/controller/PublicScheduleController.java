@@ -4,6 +4,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import gg.auth.UserDto;
 import gg.auth.argumentresolver.Login;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicScheduleDetailRetrieveResDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicScheduleUpdateResDto;
 import gg.calendar.api.user.schedule.publicschedule.service.PublicScheduleService;
 import gg.data.calendar.PublicSchedule;
@@ -48,6 +50,13 @@ public class PublicScheduleController {
 		@Login @Parameter(hidden = true) UserDto userDto) {
 		publicScheduleService.deletePublicSchedule(id, userDto.getId());
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<PublicScheduleDetailRetrieveResDto> publicScheduleDetailRetriveGet(@PathVariable Long id,
+		@Login @Parameter(hidden = true) UserDto userDto) {
+		PublicSchedule publicSchedule = publicScheduleService.getPublicScheduleDetailRetrive(id, userDto.getId());
+		return ResponseEntity.ok(PublicScheduleDetailRetrieveResDto.toDto(publicSchedule));
 	}
 }
 
