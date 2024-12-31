@@ -63,6 +63,6 @@ public class PrivateSchedule extends BaseTimeEntity {
 		this.alarm = alarm;
 		this.groupId = groupId;
 		this.publicSchedule.update(publicSchedule.getClassification(), eventTag, jobTag, techTag, title, content, link,
-			startTime, endTime, status);
+			startTime, endTime);
 	}
 }

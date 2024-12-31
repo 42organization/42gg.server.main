@@ -11,7 +11,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
-import gg.data.calendar.type.ScheduleStatus;
 import gg.data.calendar.type.TechTag;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -47,5 +46,4 @@ public class PublicScheduleUpdateReqDto {
 	@NotNull
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
 	private LocalDateTime endTime;
-	private ScheduleStatus status;
 }

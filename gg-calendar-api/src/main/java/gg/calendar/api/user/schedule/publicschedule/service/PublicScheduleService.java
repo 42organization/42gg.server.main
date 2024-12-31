@@ -45,7 +45,7 @@ public class PublicScheduleService {
 		checkAuthor(req.getAuthor(), user);
 		validateTimeRange(req.getStartTime(), req.getEndTime());
 		existingSchedule.update(req.getClassification(), req.getEventTag(), req.getJobTag(), req.getTechTag(),
-			req.getTitle(), req.getContent(), req.getLink(), req.getStartTime(), req.getEndTime(), req.getStatus());
+			req.getTitle(), req.getContent(), req.getLink(), req.getStartTime(), req.getEndTime());
 		return existingSchedule;
 	}
 

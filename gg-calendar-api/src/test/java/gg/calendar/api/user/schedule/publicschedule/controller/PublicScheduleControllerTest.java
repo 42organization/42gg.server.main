@@ -179,7 +179,6 @@ public class PublicScheduleControllerTest {
 				.link("http://updated.com")
 				.startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().plusDays(2))
-				.status(ScheduleStatus.ACTIVATE)
 				.build();
 
 			// when
