@@ -18,6 +18,7 @@ import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicS
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminUpdateResDto;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
+import gg.data.calendar.type.ScheduleStatus;
 import gg.utils.dto.PageResponseDto;
 import gg.utils.exception.ErrorCode;
 import gg.utils.exception.custom.InvalidParameterException;
@@ -73,6 +74,16 @@ public class PublicScheduleAdminService {
 			publicScheduleAdminUpdateReqDto.getStatus());
 
 		return PublicScheduleAdminUpdateResDto.toDto(publicSchedule);
+	}
+
+	@Transactional
+	public void deletePublicSchedule(Long id) {
+		PublicSchedule publicSchedule = publicScheduleAdminRepository.findById(id)
+			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
+		if (publicSchedule.getStatus().equals(ScheduleStatus.DELETE)) {
+			throw new InvalidParameterException(ErrorCode.PUBLIC_SCHEDULE_ALREADY_DELETED);
+		}
+		publicSchedule.delete();
 	}
 
 	public PublicScheduleAdminResDto detailPublicSchedule(Long id) {

@@ -418,5 +418,187 @@ public class PublicScheduleControllerTest {
 			PublicSchedule updatedSchedule = publicScheduleRepository.findById(publicSchedule.getId()).get();
 			assertThat(updatedSchedule.getContent()).isEqualTo("Original Content");
 		}
+
+		@Test
+		@DisplayName("공개일정업데이트 실패-잘못된 id가 들어왔을때(숫자가 아닌 문자열)")
+		void updatePublicScheduleFailWrongId() throws Exception {
+			// given
+			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateReqDto.builder()
+					.classification(DetailClassification.EVENT)
+					.author(user.getIntraId())
+					.title("Original Title")
+					.content("Original Content")
+					.link("http://original.com")
+					.startTime(LocalDateTime.now())
+					.endTime(LocalDateTime.now().plusDays(1))
+					.build());
+			publicScheduleRepository.save(publicSchedule);
+
+			PublicScheduleUpdateReqDto updateDto = PublicScheduleUpdateReqDto.builder()
+				.classification(DetailClassification.EVENT)
+				.author(user.getIntraId())
+				.title("Updated Title")
+				.content("Updated Content")
+				.link("http://updated.com")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(2))
+				.build();
+
+			// when
+			mockMvc.perform(
+					put("/calendar/public/abc").header("Authorization", "Bearer " + accssToken)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(updateDto)))
+				.andExpect(status().isBadRequest())
+				.andDo(print());
+
+			// then
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).hasSize(1);
+			assertThat(schedules.get(0).getTitle()).isEqualTo("Original Title");
+		}
+
 	}
+
+	@Nested
+	@DisplayName("공개일정:삭제")
+	class DeletePublicSchedule {
+		@Test
+		@DisplayName("공개일정삭제성공")
+		void deletePublicScheduleSuccess() throws Exception {
+			// given
+			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateReqDto.builder()
+					.classification(DetailClassification.EVENT)
+					.author(user.getIntraId())
+					.title("Original Title")
+					.content("Original Content")
+					.link("http://original.com")
+					.startTime(LocalDateTime.now())
+					.endTime(LocalDateTime.now().plusDays(1))
+					.build());
+			publicScheduleRepository.save(publicSchedule);
+			// when
+			mockMvc.perform(
+					patch("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken))
+				.andExpect(status().isNoContent());
+
+			// then
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).hasSize(1);
+			assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.DELETE);
+		}
+
+		@Test
+		@DisplayName("공개일정삭제실패-작성자가 다를 때")
+		void deletePublicScheduleFailNotMatchAuthor() throws Exception {
+			// given
+			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity("another",
+				PublicScheduleCreateReqDto.builder()
+					.classification(DetailClassification.EVENT)
+					.author("another")
+					.title("Original Title")
+					.content("Original Content")
+					.link("http://original.com")
+					.startTime(LocalDateTime.now())
+					.endTime(LocalDateTime.now().plusDays(1))
+					.build());
+			publicScheduleRepository.save(publicSchedule);
+
+			//when
+			mockMvc.perform(
+					patch("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken))
+				.andExpect(status().isForbidden())
+				.andDo(print());
+
+			//then
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor("another");
+			assertThat(schedules).hasSize(1);
+			assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+		}
+
+		@Test
+		@DisplayName("공개일정:삭제실패-없는 삭제 일정일 때")
+		void deletePublicScheduleFailFaultId() throws Exception {
+			// given
+			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateReqDto.builder()
+					.classification(DetailClassification.EVENT)
+					.author(user.getIntraId())
+					.title("Original Title")
+					.content("Original Content")
+					.link("http://original.com")
+					.startTime(LocalDateTime.now())
+					.endTime(LocalDateTime.now().plusDays(1))
+					.build());
+			publicScheduleRepository.save(publicSchedule);
+
+			// when
+			mockMvc.perform(patch("/calendar/public/9999").header("Authorization", "Bearer " + accssToken))
+				.andExpect(status().isNotFound())
+				.andDo(print());
+
+			log.info("public id : {}", publicSchedule.getId());
+			// then
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).hasSize(1);
+			assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+		}
+
+		@Test
+		@DisplayName("공개일정:삭제실패-이미 삭제된 일정일때")
+		void deletePublicScheduleFailAlreadyDelete() throws Exception {
+			// given
+			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateReqDto.builder()
+					.classification(DetailClassification.EVENT)
+					.author(user.getIntraId())
+					.title("Original Title")
+					.content("Original Content")
+					.link("http://original.com")
+					.startTime(LocalDateTime.now())
+					.endTime(LocalDateTime.now().plusDays(1))
+					.build());
+			publicSchedule.delete();
+			publicScheduleRepository.save(publicSchedule);
+			// when
+			mockMvc.perform(
+					patch("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken))
+				.andExpect(status().isConflict())
+				.andDo(print());
+			// then
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).hasSize(1);
+			assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.DELETE);
+		}
+
+		@Test
+		@DisplayName("공개일정:삭제실패-잘못된 id가 들어왔을때(숫자가 아닌 문자열)")
+		void deletePublicScheduleFailWrongId() throws Exception {
+			// given
+			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateReqDto.builder()
+					.classification(DetailClassification.EVENT)
+					.author(user.getIntraId())
+					.title("Original Title")
+					.content("Original Content")
+					.link("http://original.com")
+					.startTime(LocalDateTime.now())
+					.endTime(LocalDateTime.now().plusDays(1))
+					.build());
+			publicScheduleRepository.save(publicSchedule);
+
+			// when
+			mockMvc.perform(
+					patch("/calendar/public/abc").header("Authorization", "Bearer " + accssToken))
+				.andExpect(status().isBadRequest())
+				.andDo(print());
+			// then
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).hasSize(1);
+			assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+		}
+	}
+
 }
