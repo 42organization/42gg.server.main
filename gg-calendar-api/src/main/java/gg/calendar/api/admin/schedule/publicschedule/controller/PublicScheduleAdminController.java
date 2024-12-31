@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -58,9 +59,16 @@ public class PublicScheduleAdminController {
 		return ResponseEntity.ok(publicScheduleAdminUpdateRes);
 	}
 
+	@PatchMapping("/{id}")
+	public ResponseEntity<Void> publicScheduleDelete(@PathVariable Long id) {
+		publicScheduleAdminService.deletePublicSchedule(id);
+		return ResponseEntity.status(HttpStatus.OK).build();
+	}
+
 	@GetMapping("/{id}")
 	public ResponseEntity<PublicScheduleAdminResDto> publicScheduleDetail(@PathVariable Long id) {
 		PublicScheduleAdminResDto publicScheduleAdminResDto = publicScheduleAdminService.detailPublicSchedule(id);
 		return ResponseEntity.ok(publicScheduleAdminResDto);
+
 	}
 }

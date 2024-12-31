@@ -100,5 +100,9 @@ public class PublicSchedule extends BaseTimeEntity {
 		this.endTime = endTime;
 		this.status = status;
 	}
+
+	public void delete() {
+		this.status = ScheduleStatus.DELETE;
+	}
 }
 
