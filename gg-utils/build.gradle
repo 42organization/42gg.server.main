@@ -22,7 +22,7 @@ reporting {
 reporting {
     reports {
         integrationTestCoverageReport(JacocoCoverageReport) {
-            testType = TestSuiteType.INTEGRATION_TEST
+            testType = TestSuiteType.UNIT_TEST
         }
     }
 }
@@ -48,7 +48,9 @@ integrationTestCoverageReport {
     getClassDirectories().setFrom(files(
             [project(':gg-data'), project(':gg-admin-repo'),
              project(':gg-repo'), project(':gg-pingpong-api'),
-             project(':gg-auth'), project(':gg-utils')].collect {
+             project(':gg-auth'), project(':gg-utils'),
+             project(':gg-recruit-api'), project(':gg-agenda-api'),
+             project(':gg-calendar-api')].collect {
                 it.fileTree(dir: "${it.buildDir}/classes/java/main", exclude: jacocoExcludes)
             }
     ))
@@ -65,7 +67,9 @@ unitTestCoverageReport {
     getClassDirectories().setFrom(files(
             [project(':gg-data'), project(':gg-admin-repo'),
              project(':gg-repo'), project(':gg-pingpong-api'),
-             project(':gg-auth'), project(':gg-utils')].collect {
+             project(':gg-auth'), project(':gg-utils'),
+             project(':gg-recruit-api'), project(':gg-agenda-api'),
+             project(':gg-calendar-api')].collect {
                 it.fileTree(dir: "${it.buildDir}/classes/java/main", exclude: jacocoExcludes)
             }
     ))
