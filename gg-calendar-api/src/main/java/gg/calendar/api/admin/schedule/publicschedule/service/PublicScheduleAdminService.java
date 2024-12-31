@@ -75,6 +75,13 @@ public class PublicScheduleAdminService {
 		return PublicScheduleAdminUpdateResDto.toDto(publicSchedule);
 	}
 
+	@Transactional
+	public void deletePublicSchedule(Long id) {
+		PublicSchedule publicSchedule = publicScheduleAdminRepository.findById(id)
+			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
+		publicSchedule.delete();
+	}
+
 	private void dateTimeErrorCheck(LocalDateTime startTime, LocalDateTime endTime) {
 		if (startTime.isAfter(endTime)) {
 			throw new InvalidParameterException(ErrorCode.CALENDAR_BEFORE_DATE);
