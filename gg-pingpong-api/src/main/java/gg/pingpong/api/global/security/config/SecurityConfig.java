@@ -57,7 +57,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.hasAnyRole("USER", "ADMIN")
 			.antMatchers("/login", "/oauth2/authorization/**", "/", "/pingpong/users/oauth/**",
 				"/pingpong/users/accesstoken", "/actuator/**", "/swagger-ui/**", "/swagger-ui**", "/v3/api-docs/**",
-				"/v3/api-docs**", "/api-docs", "/calendar/**")
+				"/v3/api-docs**", "/api-docs")
 			.permitAll()
 			.anyRequest()
 			.authenticated()
