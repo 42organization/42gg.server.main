@@ -243,7 +243,8 @@ public enum ErrorCode {
 	CALENDAR_AUTHOR_NOT_MATCH(403, "CA205", "잘못된 사용자입니다."),
 	PRIVATE_SCHEDULE_NOT_FOUND(404, "CA101", "개인 일정을 찾을 수 없습니다."),
 	PUBLIC_SCHEDULE_NOT_FOUND(404, "CA102", "공유 일정을 찾을 수 없습니다."),
-	SCHEDULE_GROUP_NOT_FOUND(404, "CA103", "스캐줄 그룹을 찾을 수 없습니다.");
+	SCHEDULE_GROUP_NOT_FOUND(404, "CA103", "스캐줄 그룹을 찾을 수 없습니다."),
+	CALENDAR_ALREADY_DELETE(409, "CA104", "이미 삭제된 일정입니다.");
 
 	private final int status;
 	private final String errCode;

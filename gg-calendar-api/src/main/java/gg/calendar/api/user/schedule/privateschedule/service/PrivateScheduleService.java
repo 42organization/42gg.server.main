@@ -12,12 +12,14 @@ import gg.calendar.api.user.schedule.privateschedule.controller.response.Private
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.ScheduleGroup;
+import gg.data.calendar.type.ScheduleStatus;
 import gg.data.user.User;
 import gg.repo.calendar.PrivateScheduleRepository;
 import gg.repo.calendar.PublicScheduleRepository;
 import gg.repo.calendar.ScheduleGroupRepository;
 import gg.repo.user.UserRepository;
 import gg.utils.exception.ErrorCode;
+import gg.utils.exception.custom.DuplicationException;
 import gg.utils.exception.custom.ForbiddenException;
 import gg.utils.exception.custom.InvalidParameterException;
 import gg.utils.exception.custom.NotExistException;
@@ -69,7 +71,15 @@ public class PrivateScheduleService {
 	public void deletePrivateSchedule(UserDto userDto, Long privateScheduleId) {
 		PrivateSchedule privateSchedule = privateScheduleRepository.findById(privateScheduleId)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PRIVATE_SCHEDULE_NOT_FOUND));
+		validateDeletion(privateSchedule.getStatus());
+		validateAuthor(userDto.getIntraId(), privateSchedule.getPublicSchedule().getAuthor());
 		privateSchedule.delete();
+	}
+
+	public void validateDeletion(ScheduleStatus status) {
+		if (status == ScheduleStatus.DELETE) {
+			throw new DuplicationException(ErrorCode.CALENDAR_ALREADY_DELETE);
+		}
 	}
 
 	public void validateTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
