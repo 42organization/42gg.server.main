@@ -57,10 +57,14 @@ public class PublicScheduleAdminService {
 	public void deletePublicSchedule(Long id) {
 		PublicSchedule publicSchedule = publicScheduleAdminRepository.findById(id)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
+		isDeleted(publicSchedule);
+		publicSchedule.delete();
+	}
+
+	private void isDeleted(PublicSchedule publicSchedule) {
 		if (publicSchedule.getStatus().equals(ScheduleStatus.DELETE)) {
 			throw new InvalidParameterException(ErrorCode.PUBLIC_SCHEDULE_ALREADY_DELETED);
 		}
-		publicSchedule.delete();
 	}
 
 	public PublicScheduleAdminResDto detailPublicSchedule(Long id) {
