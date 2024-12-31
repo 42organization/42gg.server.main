@@ -48,7 +48,7 @@ public class PrivateScheduleUpdateReqDto {
 	private Long groupId;
 
 	@Builder
-	public PrivateScheduleUpdateReqDto(EventTag eventTag, JobTag jobTag, TechTag techTag, String title, String content,
+	private PrivateScheduleUpdateReqDto(EventTag eventTag, JobTag jobTag, TechTag techTag, String title, String content,
 		String link, ScheduleStatus status, LocalDateTime startTime, LocalDateTime endTime, boolean alarm,
 		Long groupId) {
 		this.eventTag = eventTag;

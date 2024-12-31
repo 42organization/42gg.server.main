@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import gg.data.BaseTimeEntity;
+import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
 import gg.data.calendar.type.ScheduleStatus;
@@ -64,5 +65,12 @@ public class PrivateSchedule extends BaseTimeEntity {
 		this.groupId = groupId;
 		this.publicSchedule.update(publicSchedule.getClassification(), eventTag, jobTag, techTag, title, content, link,
 			startTime, endTime, status);
+	}
+
+	public void delete() {
+		this.status = ScheduleStatus.DELETE;
+		if (this.publicSchedule.getClassification() == DetailClassification.PRIVATE_SCHEDULE) {
+			publicSchedule.delete();
+		}
 	}
 }
