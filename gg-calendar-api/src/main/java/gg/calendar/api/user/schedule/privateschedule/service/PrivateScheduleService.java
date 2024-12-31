@@ -65,6 +65,13 @@ public class PrivateScheduleService {
 		return PrivateScheduleUpdateResDto.toDto(privateSchedule);
 	}
 
+	@Transactional
+	public void deletePrivateSchedule(UserDto userDto, Long privateScheduleId) {
+		PrivateSchedule privateSchedule = privateScheduleRepository.findById(privateScheduleId)
+			.orElseThrow(() -> new NotExistException(ErrorCode.PRIVATE_SCHEDULE_NOT_FOUND));
+		privateSchedule.delete();
+	}
+
 	public void validateTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
 		if (endTime.isBefore(startTime)) {
 			throw new InvalidParameterException(ErrorCode.CALENDAR_BEFORE_DATE);

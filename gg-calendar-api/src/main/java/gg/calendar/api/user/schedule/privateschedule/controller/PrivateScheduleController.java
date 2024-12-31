@@ -4,6 +4,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -41,5 +42,12 @@ public class PrivateScheduleController {
 		PrivateScheduleUpdateResDto privateScheduleUpdateResDto = privateScheduleService.updatePrivateSchedule(userDto,
 			privateScheduleUpdateReqDto, id);
 		return ResponseEntity.status(HttpStatus.OK).body(privateScheduleUpdateResDto);
+	}
+
+	@PatchMapping("/{id}")
+	public ResponseEntity<Void> privateScheduleDelete(@Login @Parameter(hidden = true) UserDto userDto,
+		@PathVariable Long id) {
+		privateScheduleService.deletePrivateSchedule(userDto, id);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }
