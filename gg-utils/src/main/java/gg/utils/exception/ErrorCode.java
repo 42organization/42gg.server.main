@@ -241,6 +241,7 @@ public enum ErrorCode {
 	CALENDAR_AFTER_DATE(400, "CA202", "시작 시간이 종료 시간보다 늦을 수 없습니다."),
 	CALENDAR_EQUAL_DATE(400, "CA203", "시작 시간과 종료 시간이 같을 수 없습니다."),
 	CALENDAR_AUTHOR_NOT_MATCH(403, "CA205", "잘못된 사용자입니다."),
+	CALENDAR_ALREADY_DELETE(409, "CA206", "이미 삭제된 일정입니다."),
 	PRIVATE_SCHEDULE_NOT_FOUND(404, "CA101", "개인 일정을 찾을 수 없습니다."),
 	PUBLIC_SCHEDULE_NOT_FOUND(404, "CA102", "공유 일정을 찾을 수 없습니다."),
 	PUBLIC_SCHEDULE_ALREADY_DELETED(409, "CA104", "이미 삭제된 개인 일정입니다."),
