@@ -186,8 +186,8 @@ public class PublicScheduleAdminControllerTest {
 
 	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	@Nested
-	@DisplayName("Admin PublicSchedule 태그 조회 테스트")
-	class GetPublicScheduleAdminClassificationListTest {
+	@DisplayName("Admin PublicSchedule 조회 테스트")
+	class GetPublicScheduleAdminTest {
 
 		private Stream<Arguments> inputParams() {
 			return Stream.of(Arguments.of("EVENT", 2, 10), Arguments.of("JOB_NOTICE", 1, 10),
@@ -232,6 +232,70 @@ public class PublicScheduleAdminControllerTest {
 			for (PublicScheduleAdminResDto dto : result) {
 				System.out.println(dto.toString());
 			}
+		}
+
+		@Test
+		@DisplayName("Admin PublicSchedule 상세 조회 테스트 - 성공")
+		void getPublicScheduleAdminDetailTestSuccess() throws Exception {
+			// given
+			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
+
+			// when
+			String response = mockMvc.perform(
+					get("/admin/calendar/public/{id}", publicSchedule.getId()).header("Authorization",
+						"Bearer " + accessToken))
+				.andDo(print())
+				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+			PublicScheduleAdminResDto result = objectMapper.readValue(response, PublicScheduleAdminResDto.class);
+
+			// then
+			assertThat(result.getId()).isEqualTo(publicSchedule.getId());
+			assertThat(result.getClassification()).isEqualTo(publicSchedule.getClassification());
+			assertThat(result.getEventTag()).isEqualTo(publicSchedule.getEventTag());
+			assertThat(result.getJobTag()).isEqualTo(publicSchedule.getJobTag());
+			assertThat(result.getTechTag()).isEqualTo(publicSchedule.getTechTag());
+			assertThat(result.getAuthor()).isEqualTo(publicSchedule.getAuthor());
+			assertThat(result.getTitle()).isEqualTo(publicSchedule.getTitle());
+			assertThat(result.getStartTime()).isEqualTo(publicSchedule.getStartTime());
+			assertThat(result.getEndTime()).isEqualTo(publicSchedule.getEndTime());
+			assertThat(result.getLink()).isEqualTo(publicSchedule.getLink());
+			assertThat(result.getSharedCount()).isEqualTo(publicSchedule.getSharedCount());
+			assertThat(result.getStatus()).isEqualTo(publicSchedule.getStatus());
+		}
+
+		@Test
+		@DisplayName("Admin PublicSchedule 상세 조회 테스트 - 실패 : 잘못된 id가 들어왔을 경우")
+		void getPublicScheduleAdminDetailTestFailNotCorrectType() throws Exception {
+			// given
+			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
+
+			// when
+			String response = mockMvc.perform(
+					get("/admin/calendar/public/qweksd").header("Authorization",
+						"Bearer " + accessToken))
+				.andDo(print())
+				.andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();
+
+			// then
+			log.info("response :{}", response);
+		}
+
+		@Test
+		@DisplayName("Admin PublicSchedule 상세 조회 테스트 - 실패 : 없는 id가 들어왔을 경우")
+		void getPublicScheduleAdminDetailTestFailNotFound() throws Exception {
+			// given
+			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
+
+			// when
+			String response = mockMvc.perform(
+					get("/admin/calendar/public/500123").header("Authorization",
+						"Bearer " + accessToken))
+				.andDo(print())
+				.andExpect(status().isNotFound()).andReturn().getResponse().getContentAsString();
+
+			// then
+			log.info("response :{}", response);
 		}
 	}
 

@@ -57,4 +57,10 @@ public class PublicScheduleAdminController {
 			publicScheduleAdminUpdateReqDto, id);
 		return ResponseEntity.ok(publicScheduleAdminUpdateRes);
 	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<PublicScheduleAdminResDto> publicScheduleDetail(@PathVariable Long id) {
+		PublicScheduleAdminResDto publicScheduleAdminResDto = publicScheduleAdminService.detailPublicSchedule(id);
+		return ResponseEntity.ok(publicScheduleAdminResDto);
+	}
 }

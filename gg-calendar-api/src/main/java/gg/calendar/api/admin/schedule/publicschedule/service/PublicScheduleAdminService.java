@@ -75,6 +75,13 @@ public class PublicScheduleAdminService {
 		return PublicScheduleAdminUpdateResDto.toDto(publicSchedule);
 	}
 
+	public PublicScheduleAdminResDto detailPublicSchedule(Long id) {
+		PublicSchedule publicSchedule = publicScheduleAdminRepository.findById(id)
+			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
+
+		return new PublicScheduleAdminResDto(publicSchedule);
+	}
+
 	private void dateTimeErrorCheck(LocalDateTime startTime, LocalDateTime endTime) {
 		if (startTime.isAfter(endTime)) {
 			throw new InvalidParameterException(ErrorCode.CALENDAR_BEFORE_DATE);
