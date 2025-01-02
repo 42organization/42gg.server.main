@@ -28,7 +28,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
-import gg.calendar.api.admin.PublicScheduleAdminMockData;
+import gg.calendar.api.admin.schedule.publicschedule.PublicScheduleAdminMockData;
 import gg.calendar.api.admin.schedule.totalschedule.controller.response.TotalScheduleAdminResDto;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.user.User;

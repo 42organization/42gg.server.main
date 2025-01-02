@@ -10,5 +10,5 @@ import gg.data.calendar.ScheduleGroup;
 @Repository
 public interface ScheduleGroupAdminRepository extends JpaRepository<ScheduleGroup, Long> {
 
-	Optional<ScheduleGroup> findByScheduleGroupId(Long scheduleGroupId);
+	Optional<ScheduleGroup> findById(Long scheduleGroupId);
 }

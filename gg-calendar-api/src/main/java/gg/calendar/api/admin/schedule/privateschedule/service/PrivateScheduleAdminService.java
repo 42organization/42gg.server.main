@@ -24,7 +24,7 @@ public class PrivateScheduleAdminService {
 	public PrivateScheduleAdminDetailResDto detailPrivateSchedule(Long id) {
 		PrivateSchedule privateSchedule = privateScheduleAdminRepository.findById(id)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PRIVATE_SCHEDULE_NOT_FOUND));
-		ScheduleGroup scheduleGroup = scheduleGroupAdminRepository.findByScheduleGroupId(
+		ScheduleGroup scheduleGroup = scheduleGroupAdminRepository.findById(
 				privateSchedule.getGroupId())
 			.orElseThrow(() -> new NotExistException(ErrorCode.SCHEDULE_GROUP_NOT_FOUND));
 		return PrivateScheduleAdminDetailResDto.toDto(privateSchedule, scheduleGroup);
