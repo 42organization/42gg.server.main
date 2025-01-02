@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
 import gg.calendar.api.admin.schedule.publicschedule.PublicScheduleAdminMockData;
-import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateReqDto;
+import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateEventReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminUpdateReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminResDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminUpdateResDto;
@@ -83,11 +83,10 @@ public class PublicScheduleAdminControllerTest {
 		private PublicScheduleAdminService publicScheduleAdminService;
 
 		@Test
-		@DisplayName("Admin PublicSchedule 등록 테스트 - 성공")
-		void createPublicScheduleTestSuccess() throws Exception {
+		@DisplayName("Admin PublicScheduleEvent 등록 테스트 - 성공")
+		void createPublicScheduleEventTestSuccess() throws Exception {
 			// given
-			PublicScheduleAdminCreateReqDto publicScheduleAdminReqDto = PublicScheduleAdminCreateReqDto.builder()
-				.detailClassification(DetailClassification.EVENT)
+			PublicScheduleAdminCreateEventReqDto publicScheduleAdminReqDto = PublicScheduleAdminCreateEventReqDto.builder()
 				.eventTag(EventTag.JOB_FORUM)
 				.title("취업설명회")
 				.content("취업설명회입니다.")
@@ -98,7 +97,7 @@ public class PublicScheduleAdminControllerTest {
 				.build();
 
 			// when
-			mockMvc.perform(post("/admin/calendar/public").header("Authorization", "Bearer " + accessToken)
+			mockMvc.perform(post("/admin/calendar/public/event").header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(publicScheduleAdminReqDto)))
 				.andDo(print())
@@ -111,11 +110,10 @@ public class PublicScheduleAdminControllerTest {
 		}
 
 		@Test
-		@DisplayName("Admin PublicSchedule 등록 테스트 - 실패 : 종료날짜가 시작날짜보다 빠른경우")
-		public void createPublicScheduleWrongDateTime() throws Exception {
+		@DisplayName("Admin PublicScheduleEvent 등록 테스트 - 실패 : 종료날짜가 시작날짜보다 빠른경우")
+		public void createPublicScheduleEventWrongDateTime() throws Exception {
 			try {
-				PublicScheduleAdminCreateReqDto requestDto = PublicScheduleAdminCreateReqDto.builder()
-					.detailClassification(DetailClassification.EVENT)
+				PublicScheduleAdminCreateEventReqDto requestDto = PublicScheduleAdminCreateEventReqDto.builder()
 					.eventTag(EventTag.JOB_FORUM)
 					.title("취업설명회")
 					.content("취업설명회입니다.")
@@ -124,19 +122,18 @@ public class PublicScheduleAdminControllerTest {
 					.startTime(LocalDateTime.now().plusDays(10))
 					.endTime(LocalDateTime.now())
 					.build();
-				publicScheduleAdminService.createPublicSchedule(requestDto);
+				publicScheduleAdminService.createPublicScheduleEvent(requestDto);
 			} catch (Exception e) {
 				assertThat(e.getMessage()).isEqualTo("종료 시간이 시작 시간보다 빠를 수 없습니다.");
 			}
 		}
 
 		@Test
-		@DisplayName("Admin PublicSchedule 등록 테스트 - 실패 : 제목이 50자가 넘는경우")
-		public void createPublicScheduleTitleMax() throws Exception {
+		@DisplayName("Admin PublicScheduleEvent 등록 테스트 - 실패 : 제목이 50자가 넘는경우")
+		public void createPublicScheduleEventTitleMax() throws Exception {
 
-			PublicScheduleAdminCreateReqDto requestDto = PublicScheduleAdminCreateReqDto.builder()
-				.detailClassification(DetailClassification.JOB_NOTICE)
-				.jobTag(JobTag.SHORTS_INTERN)
+			PublicScheduleAdminCreateEventReqDto requestDto = PublicScheduleAdminCreateEventReqDto.builder()
+				.eventTag(EventTag.JOB_FORUM)
 				.title("TEST".repeat(13))
 				.content("취업설명회입니다.")
 				.status(ScheduleStatus.ACTIVATE)
@@ -145,7 +142,7 @@ public class PublicScheduleAdminControllerTest {
 				.endTime(LocalDateTime.now().plusDays(10))
 				.build();
 
-			mockMvc.perform(post("/admin/calendar/public").header("Authorization", "Bearer " + accessToken)
+			mockMvc.perform(post("/admin/calendar/public/event").header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(requestDto)))
 				.andDo(print())
@@ -153,12 +150,11 @@ public class PublicScheduleAdminControllerTest {
 		}
 
 		@Test
-		@DisplayName("Admin PublicSchedule 등록 테스트 - 실패 : 내용이 2000자가 넘는경우")
-		public void createPublicScheduleContentMax() throws Exception {
+		@DisplayName("Admin PublicScheduleEvent 등록 테스트 - 실패 : 내용이 2000자가 넘는경우")
+		public void createPublicScheduleEventContentMax() throws Exception {
 
-			PublicScheduleAdminCreateReqDto requestDto = PublicScheduleAdminCreateReqDto.builder()
-				.detailClassification(DetailClassification.JOB_NOTICE)
-				.jobTag(JobTag.SHORTS_INTERN)
+			PublicScheduleAdminCreateEventReqDto requestDto = PublicScheduleAdminCreateEventReqDto.builder()
+				.eventTag(EventTag.JOB_FORUM)
 				.title("취업설명회")
 				.content("취업설명회".repeat(401))
 				.status(ScheduleStatus.ACTIVATE)
@@ -167,7 +163,27 @@ public class PublicScheduleAdminControllerTest {
 				.endTime(LocalDateTime.now().plusDays(10))
 				.build();
 
-			mockMvc.perform(post("/admin/calendar/public").header("Authorization", "Bearer " + accessToken)
+			mockMvc.perform(post("/admin/calendar/public/event").header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(requestDto)))
+				.andDo(print())
+				.andExpect(status().isBadRequest());
+		}
+
+		@Test
+		@DisplayName("Admin PublicScheduleEvent 등록 테스트 - 실패 : EventTag가 NULL인 경우")
+		public void createPublicScheduleEventFailNoEventTag() throws Exception {
+
+			PublicScheduleAdminCreateEventReqDto requestDto = PublicScheduleAdminCreateEventReqDto.builder()
+				.title("취업설명회")
+				.content("취업설명회")
+				.status(ScheduleStatus.ACTIVATE)
+				.link("https://gg.42seoul.kr")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(10))
+				.build();
+
+			mockMvc.perform(post("/admin/calendar/public/event").header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(requestDto)))
 				.andDo(print())

@@ -14,7 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
-import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateReqDto;
+import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateEventReqDto;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
@@ -49,8 +49,7 @@ public class PublicScheduleAdminServiceTest {
 				.build();
 			when(publicScheduleAdminRepository.save(any())).thenReturn(publicSchedule);
 			// When
-			PublicScheduleAdminCreateReqDto requestDto = PublicScheduleAdminCreateReqDto.builder()
-				.detailClassification(DetailClassification.EVENT)
+			PublicScheduleAdminCreateEventReqDto requestDto = PublicScheduleAdminCreateEventReqDto.builder()
 				.eventTag(EventTag.JOB_FORUM)
 				.title("취업설명회")
 				.content("취업설명회입니다.")
@@ -58,7 +57,7 @@ public class PublicScheduleAdminServiceTest {
 				.startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().plusDays(10))
 				.build();
-			publicScheduleAdminService.createPublicSchedule(requestDto);
+			publicScheduleAdminService.createPublicScheduleEvent(requestDto);
 			// Then
 			verify(publicScheduleAdminRepository, times(1)).save(any(PublicSchedule.class));
 			assertThat(DetailClassification.EVENT).isEqualTo(publicSchedule.getClassification());
