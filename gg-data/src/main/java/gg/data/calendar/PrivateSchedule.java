@@ -58,11 +58,20 @@ public class PrivateSchedule extends BaseTimeEntity {
 	}
 
 	public void update(EventTag eventTag, JobTag jobTag, TechTag techTag, String title, String content,
-		String link, ScheduleStatus status, LocalDateTime startTime, LocalDateTime endTime, boolean alarm,
+		String link, LocalDateTime startTime, LocalDateTime endTime, boolean alarm,
 		Long groupId) {
 		this.alarm = alarm;
 		this.groupId = groupId;
 		this.publicSchedule.update(publicSchedule.getClassification(), eventTag, jobTag, techTag, title, content, link,
 			startTime, endTime);
+	}
+
+	public void delete() {
+		this.status = ScheduleStatus.DELETE;
+	}
+
+	public void deleteCascade() {
+		this.status = ScheduleStatus.DELETE;
+		this.getPublicSchedule().delete();
 	}
 }

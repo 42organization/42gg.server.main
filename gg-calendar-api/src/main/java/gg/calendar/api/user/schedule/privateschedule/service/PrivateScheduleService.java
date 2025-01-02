@@ -12,6 +12,7 @@ import gg.calendar.api.user.schedule.privateschedule.controller.response.Private
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.ScheduleGroup;
+import gg.data.calendar.type.DetailClassification;
 import gg.data.user.User;
 import gg.repo.calendar.PrivateScheduleRepository;
 import gg.repo.calendar.PublicScheduleRepository;
@@ -59,10 +60,24 @@ public class PrivateScheduleService {
 		privateSchedule.update(privateScheduleUpdateReqDto.getEventTag(), privateScheduleUpdateReqDto.getJobTag(),
 			privateScheduleUpdateReqDto.getTechTag(), privateScheduleUpdateReqDto.getTitle(),
 			privateScheduleUpdateReqDto.getContent(), privateScheduleUpdateReqDto.getLink(),
-			privateScheduleUpdateReqDto.getStatus(), privateScheduleUpdateReqDto.getStartTime(),
-			privateScheduleUpdateReqDto.getEndTime(), privateScheduleUpdateReqDto.isAlarm(),
-			privateScheduleUpdateReqDto.getGroupId());
+			privateScheduleUpdateReqDto.getStartTime(), privateScheduleUpdateReqDto.getEndTime(),
+			privateScheduleUpdateReqDto.isAlarm(), privateScheduleUpdateReqDto.getGroupId());
 		return PrivateScheduleUpdateResDto.toDto(privateSchedule);
+	}
+
+	@Transactional
+	public void deletePrivateSchedule(UserDto userDto, Long privateScheduleId) {
+		PrivateSchedule privateSchedule = privateScheduleRepository.findById(privateScheduleId)
+			.orElseThrow(() -> new NotExistException(ErrorCode.PRIVATE_SCHEDULE_NOT_FOUND));
+		validateAuthor(userDto.getIntraId(), privateSchedule.getPublicSchedule().getAuthor());
+		validateDetailClassification(privateSchedule.getPublicSchedule().getClassification());
+		privateSchedule.deleteCascade();
+	}
+
+	public void validateDetailClassification(DetailClassification classification) {
+		if (classification != DetailClassification.PRIVATE_SCHEDULE) {
+			throw new ForbiddenException(ErrorCode.CALENDAR_NO_PRIVATE);
+		}
 	}
 
 	public void validateTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
