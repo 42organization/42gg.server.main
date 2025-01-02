@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -25,11 +26,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import gg.calendar.api.user.schedule.publicschedule.PublicScheduleMockData;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
+import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.ScheduleStatus;
 import gg.data.user.User;
+import gg.repo.calendar.PrivateScheduleRepository;
 import gg.repo.calendar.PublicScheduleRepository;
 import gg.repo.user.UserRepository;
 import gg.utils.TestDataUtils;
@@ -52,6 +55,9 @@ public class PublicScheduleControllerTest {
 
 	@Autowired
 	private PublicScheduleRepository publicScheduleRepository;
+
+	@Autowired
+	private PrivateScheduleRepository privateScheduleRepository;
 
 	@Autowired
 	private PublicScheduleMockData publicScheduleMockData;
@@ -570,6 +576,40 @@ public class PublicScheduleControllerTest {
 			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
 			assertThat(schedules).hasSize(1);
 			assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+		}
+
+		@Test
+		@DisplayName("공개일정: 공개일정 삭제 시 연관된 개인일정도 삭제")
+		void deletePublicScheduleAndPrivateSchedule() throws Exception {
+			// given
+			User otherUser = testDataUtils.createNewUser();
+
+			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateReqDto.builder()
+					.classification(DetailClassification.EVENT)
+					.author(user.getIntraId())
+					.title("Original Title")
+					.content("Original Content")
+					.link("http://original.com")
+					.startTime(LocalDateTime.now())
+					.endTime(LocalDateTime.now().plusDays(1))
+					.build());
+			publicScheduleRepository.save(publicSchedule);
+			PrivateSchedule privateSchedule1 = new PrivateSchedule(user, publicSchedule, false, 1L);
+			PrivateSchedule privateSchedule2 = new PrivateSchedule(otherUser, publicSchedule, true, 2L);
+			privateScheduleRepository.saveAll(Arrays.asList(privateSchedule1, privateSchedule2));
+
+			// when
+			mockMvc.perform(
+					patch("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken))
+				.andExpect(status().isNoContent())
+				.andDo(print());
+			// then
+			assertThat(publicScheduleRepository.findById(publicSchedule.getId()).get().getStatus())
+				.isEqualTo(ScheduleStatus.DELETE);
+			List<PrivateSchedule> deletedPrivateSchedules = privateScheduleRepository.findByPublicSchedule(
+				publicSchedule);
+			assertThat(deletedPrivateSchedules).allMatch(ps -> ps.getStatus().equals(ScheduleStatus.DELETE));
 		}
 	}
 

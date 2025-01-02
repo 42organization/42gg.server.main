@@ -58,5 +58,6 @@ public class PublicScheduleController {
 		PublicSchedule publicSchedule = publicScheduleService.getPublicScheduleDetailRetrieve(id, userDto.getId());
 		return ResponseEntity.ok(PublicScheduleDetailRetrieveResDto.toDto(publicSchedule));
 	}
+
 }
 
