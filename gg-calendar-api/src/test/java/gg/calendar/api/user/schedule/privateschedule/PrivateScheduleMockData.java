@@ -22,9 +22,9 @@ public class PrivateScheduleMockData {
 	private final ScheduleGroupRepository scheduleGroupRepository;
 	private final PrivateScheduleRepository privateScheduleRepository;
 
-	public PublicSchedule createPublicSchedule(String author) {
+	public PublicSchedule createPublicSchedule(String author, DetailClassification classification) {
 		PublicSchedule publicSchedule = PublicSchedule.builder()
-			.classification(DetailClassification.EVENT)
+			.classification(classification)
 			.eventTag(null)
 			.jobTag(null)
 			.techTag(null)
@@ -48,9 +48,8 @@ public class PrivateScheduleMockData {
 		return scheduleGroupRepository.save(scheduleGroup);
 	}
 
-	public PrivateSchedule createPrivateSchedule(PublicSchedule publicSchedule, ScheduleGroup scheduleGroup) {
-		PrivateSchedule privateSchedule = new PrivateSchedule(scheduleGroup.getUser(), publicSchedule, false,
-			scheduleGroup.getId());
+	public PrivateSchedule createPrivateSchedule(User user, PublicSchedule publicSchedule, Long scheduleGroupId) {
+		PrivateSchedule privateSchedule = new PrivateSchedule(user, publicSchedule, false, scheduleGroupId);
 		return privateScheduleRepository.save(privateSchedule);
 	}
 }

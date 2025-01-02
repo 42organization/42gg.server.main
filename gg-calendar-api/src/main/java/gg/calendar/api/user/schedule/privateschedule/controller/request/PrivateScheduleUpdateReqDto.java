@@ -8,7 +8,6 @@ import javax.validation.constraints.Size;
 
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
-import gg.data.calendar.type.ScheduleStatus;
 import gg.data.calendar.type.TechTag;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,9 +32,6 @@ public class PrivateScheduleUpdateReqDto {
 	private String link;
 
 	@NotNull
-	private ScheduleStatus status;
-
-	@NotNull
 	private LocalDateTime startTime;
 
 	@NotNull
@@ -49,15 +45,13 @@ public class PrivateScheduleUpdateReqDto {
 
 	@Builder
 	public PrivateScheduleUpdateReqDto(EventTag eventTag, JobTag jobTag, TechTag techTag, String title, String content,
-		String link, ScheduleStatus status, LocalDateTime startTime, LocalDateTime endTime, boolean alarm,
-		Long groupId) {
+		String link, LocalDateTime startTime, LocalDateTime endTime, boolean alarm, Long groupId) {
 		this.eventTag = eventTag;
 		this.jobTag = jobTag;
 		this.techTag = techTag;
 		this.title = title;
 		this.content = content;
 		this.link = link;
-		this.status = status;
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.alarm = alarm;

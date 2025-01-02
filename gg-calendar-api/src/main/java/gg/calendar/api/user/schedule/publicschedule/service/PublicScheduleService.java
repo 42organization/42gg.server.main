@@ -58,6 +58,7 @@ public class PublicScheduleService {
 		PublicSchedule existingSchedule = publicScheduleRepository.findById(scheduleId)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
 		checkAuthor(existingSchedule.getAuthor(), user);
+
 		List<PrivateSchedule> privateSchedules = privateScheduleRepository.findByPublicSchedule(existingSchedule);
 		existingSchedule.delete();
 		if (!privateSchedules.isEmpty()) {
@@ -67,9 +68,9 @@ public class PublicScheduleService {
 		}
 	}
 
-	public PublicSchedule getPublicScheduleDetailRetrive(Long sheduleId, Long userId) {
+	public PublicSchedule getPublicScheduleDetailRetrieve(Long scheduleId, Long userId) {
 		User user = userRepository.getById(userId);
-		PublicSchedule publicRetriveSchedule = publicScheduleRepository.findById(sheduleId)
+		PublicSchedule publicRetrieveSchedule = publicScheduleRepository.findById(scheduleId)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
 		checkAuthor(publicRetriveSchedule.getAuthor(), user);
 		return publicRetriveSchedule;
