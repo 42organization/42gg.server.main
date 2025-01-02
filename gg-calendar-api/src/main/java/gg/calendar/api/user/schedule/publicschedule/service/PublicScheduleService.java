@@ -45,7 +45,7 @@ public class PublicScheduleService {
 		checkAuthor(req.getAuthor(), user);
 		validateTimeRange(req.getStartTime(), req.getEndTime());
 		existingSchedule.update(req.getClassification(), req.getEventTag(), req.getJobTag(), req.getTechTag(),
-			req.getTitle(), req.getContent(), req.getLink(), req.getStartTime(), req.getEndTime(), req.getStatus());
+			req.getTitle(), req.getContent(), req.getLink(), req.getStartTime(), req.getEndTime());
 		return existingSchedule;
 	}
 
@@ -57,6 +57,14 @@ public class PublicScheduleService {
 		checkAuthor(existingSchedule.getAuthor(), user);
 		duplicateDelete(existingSchedule);
 		existingSchedule.delete();
+	}
+
+	public PublicSchedule getPublicScheduleDetailRetrive(Long sheduleId, Long userId) {
+		User user = userRepository.getById(userId);
+		PublicSchedule publicRetriveSchedule = publicScheduleRepository.findById(sheduleId)
+			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
+		checkAuthor(publicRetriveSchedule.getAuthor(), user);
+		return publicRetriveSchedule;
 	}
 
 	private void duplicateDelete(PublicSchedule existingSchedule) {

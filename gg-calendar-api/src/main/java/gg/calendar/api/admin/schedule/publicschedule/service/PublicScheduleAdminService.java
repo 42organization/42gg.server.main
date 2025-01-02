@@ -70,8 +70,7 @@ public class PublicScheduleAdminService {
 			publicScheduleAdminUpdateReqDto.getEventTag(), publicScheduleAdminUpdateReqDto.getJobTag(),
 			publicScheduleAdminUpdateReqDto.getTechTag(), publicScheduleAdminUpdateReqDto.getTitle(),
 			publicScheduleAdminUpdateReqDto.getContent(), publicScheduleAdminUpdateReqDto.getLink(),
-			publicScheduleAdminUpdateReqDto.getStartTime(), publicScheduleAdminUpdateReqDto.getEndTime(),
-			publicScheduleAdminUpdateReqDto.getStatus());
+			publicScheduleAdminUpdateReqDto.getStartTime(), publicScheduleAdminUpdateReqDto.getEndTime());
 
 		return PublicScheduleAdminUpdateResDto.toDto(publicSchedule);
 	}
