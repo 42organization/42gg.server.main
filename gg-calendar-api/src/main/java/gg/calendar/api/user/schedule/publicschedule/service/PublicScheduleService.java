@@ -72,8 +72,8 @@ public class PublicScheduleService {
 		User user = userRepository.getById(userId);
 		PublicSchedule publicRetrieveSchedule = publicScheduleRepository.findById(scheduleId)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
-		checkAuthor(publicRetriveSchedule.getAuthor(), user);
-		return publicRetriveSchedule;
+		checkAuthor(publicRetrieveSchedule.getAuthor(), user);
+		return publicRetrieveSchedule;
 	}
 
 	private void checkAuthor(String author, User user) {
