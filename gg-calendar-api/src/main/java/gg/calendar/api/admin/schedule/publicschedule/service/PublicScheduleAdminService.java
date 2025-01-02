@@ -12,7 +12,11 @@ import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicSc
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminResDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminUpdateResDto;
 import gg.data.calendar.PublicSchedule;
+import gg.data.calendar.type.DetailClassification;
+import gg.data.calendar.type.EventTag;
+import gg.data.calendar.type.JobTag;
 import gg.data.calendar.type.ScheduleStatus;
+import gg.data.calendar.type.TechTag;
 import gg.utils.exception.ErrorCode;
 import gg.utils.exception.custom.InvalidParameterException;
 import gg.utils.exception.custom.NotExistException;
@@ -48,6 +52,10 @@ public class PublicScheduleAdminService {
 	@Transactional
 	public PublicScheduleAdminUpdateResDto updatePublicSchedule(
 		PublicScheduleAdminUpdateReqDto publicScheduleAdminUpdateReqDto, Long id) {
+		tagErrorCheck(publicScheduleAdminUpdateReqDto.getClassification(),
+			publicScheduleAdminUpdateReqDto.getEventTag(),
+			publicScheduleAdminUpdateReqDto.getJobTag(), publicScheduleAdminUpdateReqDto.getTechTag());
+
 		dateTimeErrorCheck(publicScheduleAdminUpdateReqDto.getStartTime(),
 			publicScheduleAdminUpdateReqDto.getEndTime());
 
@@ -87,6 +95,12 @@ public class PublicScheduleAdminService {
 	private void isDeleted(PublicSchedule publicSchedule) {
 		if (publicSchedule.getStatus().equals(ScheduleStatus.DELETE)) {
 			throw new InvalidParameterException(ErrorCode.PUBLIC_SCHEDULE_ALREADY_DELETED);
+		}
+	}
+
+	private void tagErrorCheck(DetailClassification classification, EventTag eventTag, JobTag jobTag, TechTag techTag) {
+		if (!classification.isValid(eventTag, jobTag, techTag)) {
+			throw new InvalidParameterException(ErrorCode.CLASSIFICATION_NOT_MATCH);
 		}
 	}
 
