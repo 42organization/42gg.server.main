@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateEventReqDto;
+import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateJobReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminUpdateReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminResDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminUpdateResDto;
@@ -31,6 +32,16 @@ public class PublicScheduleAdminService {
 			publicScheduleAdminCreateEventReqDto.getEndTime());
 		PublicSchedule publicSchedule = PublicScheduleAdminCreateEventReqDto.toEntity(
 			publicScheduleAdminCreateEventReqDto);
+		publicScheduleAdminRepository.save(publicSchedule);
+	}
+
+	@Transactional
+	public void createPublicScheduleJob(PublicScheduleAdminCreateJobReqDto publicScheduleAdminCreateJobReqDto) {
+
+		dateTimeErrorCheck(publicScheduleAdminCreateJobReqDto.getStartTime(),
+			publicScheduleAdminCreateJobReqDto.getEndTime());
+		PublicSchedule publicSchedule = PublicScheduleAdminCreateJobReqDto.toEntity(
+			publicScheduleAdminCreateJobReqDto);
 		publicScheduleAdminRepository.save(publicSchedule);
 	}
 

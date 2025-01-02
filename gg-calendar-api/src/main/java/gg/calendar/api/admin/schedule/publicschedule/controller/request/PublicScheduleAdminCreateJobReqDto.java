@@ -10,7 +10,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
-import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
 import gg.data.calendar.type.ScheduleStatus;
 import gg.data.calendar.type.TechTag;
@@ -21,14 +20,14 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PublicScheduleAdminJobCreateReqDto {
-	@NotNull
+public class PublicScheduleAdminCreateJobReqDto {
+
 	private DetailClassification classification;
 
-	private EventTag eventTag;
-
+	@NotNull
 	private JobTag jobTag;
 
+	@NotNull
 	private TechTag techTag;
 
 	@NotBlank
@@ -52,13 +51,11 @@ public class PublicScheduleAdminJobCreateReqDto {
 	private LocalDateTime endTime;
 
 	@Builder
-	public PublicScheduleAdminJobCreateReqDto(DetailClassification detailClassification, EventTag eventTag,
-		JobTag jobTag,
+	public PublicScheduleAdminCreateJobReqDto(JobTag jobTag,
 		TechTag techTag, String title, String content, String link, ScheduleStatus status, LocalDateTime startTime,
 		LocalDateTime endTime) {
 
-		this.classification = detailClassification;
-		this.eventTag = eventTag;
+		this.classification = DetailClassification.JOB_NOTICE;
 		this.jobTag = jobTag;
 		this.techTag = techTag;
 		this.title = title;
@@ -69,20 +66,19 @@ public class PublicScheduleAdminJobCreateReqDto {
 		this.endTime = endTime;
 	}
 
-	public static PublicSchedule toEntity(PublicScheduleAdminJobCreateReqDto publicScheduleAdminCreateReqDto) {
+	public static PublicSchedule toEntity(PublicScheduleAdminCreateJobReqDto publicScheduleAdminCreateJobReqDto) {
 
 		return PublicSchedule.builder()
-			.classification(publicScheduleAdminCreateReqDto.classification)
-			.eventTag(publicScheduleAdminCreateReqDto.eventTag)
-			.jobTag(publicScheduleAdminCreateReqDto.jobTag)
-			.techTag(publicScheduleAdminCreateReqDto.techTag)
+			.classification(publicScheduleAdminCreateJobReqDto.classification)
+			.jobTag(publicScheduleAdminCreateJobReqDto.jobTag)
+			.techTag(publicScheduleAdminCreateJobReqDto.techTag)
 			.author("42GG")
-			.title(publicScheduleAdminCreateReqDto.title)
-			.content(publicScheduleAdminCreateReqDto.content)
-			.link(publicScheduleAdminCreateReqDto.link)
-			.status(publicScheduleAdminCreateReqDto.status)
-			.startTime(publicScheduleAdminCreateReqDto.startTime)
-			.endTime(publicScheduleAdminCreateReqDto.endTime)
+			.title(publicScheduleAdminCreateJobReqDto.title)
+			.content(publicScheduleAdminCreateJobReqDto.content)
+			.link(publicScheduleAdminCreateJobReqDto.link)
+			.status(publicScheduleAdminCreateJobReqDto.status)
+			.startTime(publicScheduleAdminCreateJobReqDto.startTime)
+			.endTime(publicScheduleAdminCreateJobReqDto.endTime)
 			.build();
 	}
 }
