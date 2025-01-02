@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateReqDto;
+import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateEventReqDto;
+import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateJobReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminUpdateReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminResDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminUpdateResDto;
@@ -27,10 +28,17 @@ public class PublicScheduleAdminController {
 
 	private final PublicScheduleAdminService publicScheduleAdminService;
 
-	@PostMapping
-	public ResponseEntity<Void> publicScheduleCreate(
-		@RequestBody @Valid PublicScheduleAdminCreateReqDto publicScheduleAdminCreateReqDto) {
-		publicScheduleAdminService.createPublicSchedule(publicScheduleAdminCreateReqDto);
+	@PostMapping("/event")
+	public ResponseEntity<Void> publicScheduleEventCreate(
+		@RequestBody @Valid PublicScheduleAdminCreateEventReqDto publicScheduleAdminCreateEventReqDto) {
+		publicScheduleAdminService.createPublicScheduleEvent(publicScheduleAdminCreateEventReqDto);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
+	@PostMapping("/job")
+	public ResponseEntity<Void> publicScheduleJobCreate(
+		@RequestBody @Valid PublicScheduleAdminCreateJobReqDto publicScheduleAdminCreateJobReqDto) {
+		publicScheduleAdminService.createPublicScheduleJob(publicScheduleAdminCreateJobReqDto);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
