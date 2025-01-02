@@ -53,9 +53,9 @@ public class PublicScheduleController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<PublicScheduleDetailRetrieveResDto> publicScheduleDetailRetriveGet(@PathVariable Long id,
+	public ResponseEntity<PublicScheduleDetailRetrieveResDto> publicScheduleDetailRetrieveGet(@PathVariable Long id,
 		@Login @Parameter(hidden = true) UserDto userDto) {
-		PublicSchedule publicSchedule = publicScheduleService.getPublicScheduleDetailRetrive(id, userDto.getId());
+		PublicSchedule publicSchedule = publicScheduleService.getPublicScheduleDetailRetrieve(id, userDto.getId());
 		return ResponseEntity.ok(PublicScheduleDetailRetrieveResDto.toDto(publicSchedule));
 	}
 }

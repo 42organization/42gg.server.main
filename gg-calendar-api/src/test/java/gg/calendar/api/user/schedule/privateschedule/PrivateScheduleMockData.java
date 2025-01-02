@@ -22,9 +22,9 @@ public class PrivateScheduleMockData {
 	private final ScheduleGroupRepository scheduleGroupRepository;
 	private final PrivateScheduleRepository privateScheduleRepository;
 
-	public PublicSchedule createPublicSchedule(String author) {
+	public PublicSchedule createPublicSchedule(String author, DetailClassification classification) {
 		PublicSchedule publicSchedule = PublicSchedule.builder()
-			.classification(DetailClassification.EVENT)
+			.classification(classification)
 			.eventTag(null)
 			.jobTag(null)
 			.techTag(null)

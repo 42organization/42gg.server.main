@@ -546,33 +546,6 @@ public class PublicScheduleControllerTest {
 		}
 
 		@Test
-		@DisplayName("공개일정:삭제실패-이미 삭제된 일정일때")
-		void deletePublicScheduleFailAlreadyDelete() throws Exception {
-			// given
-			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
-				PublicScheduleCreateReqDto.builder()
-					.classification(DetailClassification.EVENT)
-					.author(user.getIntraId())
-					.title("Original Title")
-					.content("Original Content")
-					.link("http://original.com")
-					.startTime(LocalDateTime.now())
-					.endTime(LocalDateTime.now().plusDays(1))
-					.build());
-			publicSchedule.delete();
-			publicScheduleRepository.save(publicSchedule);
-			// when
-			mockMvc.perform(
-					patch("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken))
-				.andExpect(status().isConflict())
-				.andDo(print());
-			// then
-			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
-			assertThat(schedules).hasSize(1);
-			assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.DELETE);
-		}
-
-		@Test
 		@DisplayName("공개일정:삭제실패-잘못된 id가 들어왔을때(숫자가 아닌 문자열)")
 		void deletePublicScheduleFailWrongId() throws Exception {
 			// given

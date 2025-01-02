@@ -26,6 +26,7 @@ import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateS
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.ScheduleGroup;
+import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.ScheduleStatus;
 import gg.data.user.User;
@@ -37,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @IntegrationTest
 @AutoConfigureMockMvc
+@Transactional
 public class PrivateScheduleControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
@@ -66,7 +68,6 @@ public class PrivateScheduleControllerTest {
 	@DisplayName("PrivateSchedule 생성하기")
 	class CreatePrivateSchedule {
 		@Test
-		@Transactional
 		@DisplayName("성공")
 		void success() throws Exception {
 			//given
@@ -100,9 +101,8 @@ public class PrivateScheduleControllerTest {
 		}
 
 		@Test
-		@Transactional
 		@DisplayName("일정 그룹이 없는 경우 404")
-		void noGroup() throws Exception {
+		void notFoundGroup() throws Exception {
 			//given
 			PrivateScheduleCreateReqDto reqDto = PrivateScheduleCreateReqDto.builder()
 				.eventTag(EventTag.ETC)
@@ -126,7 +126,6 @@ public class PrivateScheduleControllerTest {
 		}
 
 		@Test
-		@Transactional
 		@DisplayName("시작 날짜보다 끝나는 날짜가 빠른 경우 400")
 		void endTimeBeforeStartTime() throws Exception {
 			//given
@@ -156,12 +155,12 @@ public class PrivateScheduleControllerTest {
 	@DisplayName("PrivateSchedule 수정하기")
 	class UpdatePrivateSchedule {
 		@Test
-		@Transactional
 		@DisplayName("성공")
 		void success() throws Exception {
 			//given
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
-			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId());
+			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
+				DetailClassification.PRIVATE_SCHEDULE);
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(publicSchedule,
 				scheduleGroup);
 			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
@@ -191,12 +190,12 @@ public class PrivateScheduleControllerTest {
 		}
 
 		@Test
-		@Transactional
 		@DisplayName("종료 날짜가 시작 날짜보다 빠른 경우 400")
 		void endTimeBeforeStartTime() throws Exception {
 			//given
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
-			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId());
+			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
+				DetailClassification.PRIVATE_SCHEDULE);
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(publicSchedule,
 				scheduleGroup);
 			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
@@ -220,12 +219,12 @@ public class PrivateScheduleControllerTest {
 		}
 
 		@Test
-		@Transactional
 		@DisplayName("작성자가 아닌 사람이 일정을 수정 하려는 경우 403")
 		void notMatchAuthor() throws Exception {
 			//given
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
-			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule("notMatchAuthor");
+			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule("author",
+				DetailClassification.PRIVATE_SCHEDULE);
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(publicSchedule,
 				scheduleGroup);
 			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
@@ -249,12 +248,12 @@ public class PrivateScheduleControllerTest {
 		}
 
 		@Test
-		@Transactional
 		@DisplayName("일정이 없는 경우 404")
-		void noSchedule() throws Exception {
+		void notFoundSchedule() throws Exception {
 			//given
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
-			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule("notMatchAuthor");
+			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
+				DetailClassification.PRIVATE_SCHEDULE);
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(publicSchedule,
 				scheduleGroup);
 			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
@@ -275,6 +274,87 @@ public class PrivateScheduleControllerTest {
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(reqDto)))
 				.andExpect(status().isNotFound());
+		}
+	}
+
+	@Nested
+	@DisplayName("PrivateSchedule 삭제하기")
+	class DeletePrivateSchedule {
+		@Test
+		@DisplayName("삭제 성공 204")
+		void success() throws Exception {
+			//given
+			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
+			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
+				DetailClassification.PRIVATE_SCHEDULE);
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(publicSchedule,
+				scheduleGroup);
+			//when
+			mockMvc.perform(patch("/calendar/private/" + privateSchedule.getId())
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNoContent());
+			//then
+			Assertions.assertThat(privateSchedule.getStatus()).isEqualTo(ScheduleStatus.DELETE);
+			Assertions.assertThat(privateSchedule.getPublicSchedule().getStatus()).isEqualTo(ScheduleStatus.DELETE);
+		}
+
+		@Test
+		@DisplayName("작성자가 아닌 사람이 삭제하는 경우 403")
+		void notMatchAuthor() throws Exception {
+			//given
+			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
+			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule("author",
+				DetailClassification.PRIVATE_SCHEDULE);
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(publicSchedule,
+				scheduleGroup);
+			//when
+			mockMvc.perform(patch("/calendar/private/" + privateSchedule.getId())
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isForbidden());
+			//then
+			Assertions.assertThat(privateSchedule.getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+			Assertions.assertThat(privateSchedule.getPublicSchedule().getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+		}
+
+		@Test
+		@DisplayName("상세분류가 개인일정이 아닌 일정을 삭제하는 경우 403")
+		void notPrivateSchedule() throws Exception {
+			//given
+			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
+			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
+				DetailClassification.EVENT);
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(publicSchedule,
+				scheduleGroup);
+
+			//when
+			mockMvc.perform(patch("/calendar/private/" + privateSchedule.getId())
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isForbidden());
+			//then
+			Assertions.assertThat(privateSchedule.getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+			Assertions.assertThat(privateSchedule.getPublicSchedule().getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+		}
+
+		@Test
+		@DisplayName("없는 일정인 경우 404")
+		void notFoundSchedule() throws Exception {
+			//given
+			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
+			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
+				DetailClassification.PRIVATE_SCHEDULE);
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(publicSchedule,
+				scheduleGroup);
+			//when
+			mockMvc.perform(patch("/calendar/private/" + privateSchedule.getId() + 1234)
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
+			//then
+			Assertions.assertThat(privateSchedule.getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+			Assertions.assertThat(privateSchedule.getPublicSchedule().getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
 		}
 	}
 }
