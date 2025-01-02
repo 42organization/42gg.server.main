@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
-import gg.calendar.api.admin.PublicScheduleAdminMockData;
+import gg.calendar.api.admin.schedule.publicschedule.PublicScheduleAdminMockData;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminUpdateReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminResDto;

@@ -1,4 +1,4 @@
-package gg.calendar.api.admin;
+package gg.calendar.api.admin.schedule.publicschedule;
 
 import java.time.LocalDateTime;
 

@@ -1,8 +1,12 @@
 package gg.calendar.api.admin.schedule.privateschedule.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import gg.calendar.api.admin.schedule.privateschedule.controller.response.PrivateScheduleAdminDetailResDto;
 import gg.calendar.api.admin.schedule.privateschedule.service.PrivateScheduleAdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,4 +19,9 @@ public class PrivateScheduleAdminController {
 
 	private final PrivateScheduleAdminService privateScheduleAdminService;
 
+	@GetMapping("/{id}")
+	public ResponseEntity<PrivateScheduleAdminDetailResDto> privateScheduleDetail(@PathVariable Long id) {
+		PrivateScheduleAdminDetailResDto responseDto = privateScheduleAdminService.detailPrivateSchedule(id);
+		return ResponseEntity.ok(responseDto);
+	}
 }
