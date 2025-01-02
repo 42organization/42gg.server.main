@@ -1,5 +1,7 @@
 package gg.calendar.api.admin.schedule.publicschedule.controller;
 
+import static gg.data.calendar.type.JobTag.*;
+import static gg.data.calendar.type.TechTag.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -7,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
@@ -15,6 +18,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
@@ -87,7 +94,7 @@ public class PublicScheduleAdminControllerTest {
 		@DisplayName("Admin PublicScheduleJob 등록 테스트 - 성공")
 		void createPublicScheduleEventTestSuccess() throws Exception {
 			// given
-			PublicScheduleAdminCreateEventReqDto publicScheduleAdminReqDto = PublicScheduleAdminCreateEventReqDto.builder()
+			PublicScheduleAdminCreateEventReqDto publicScheduleReqDto = PublicScheduleAdminCreateEventReqDto.builder()
 				.eventTag(EventTag.JOB_FORUM)
 				.title("취업설명회")
 				.content("취업설명회입니다.")
@@ -100,14 +107,14 @@ public class PublicScheduleAdminControllerTest {
 			// when
 			mockMvc.perform(post("/admin/calendar/public/event").header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(publicScheduleAdminReqDto)))
+					.content(objectMapper.writeValueAsString(publicScheduleReqDto)))
 				.andDo(print())
 				.andExpect(status().isCreated());
 
 			// then
 			List<PublicSchedule> schedules = publicScheduleAdminRepository.findByAuthor("42GG");
 			assertThat(schedules).hasSize(1);
-			assertThat(schedules.get(0).getTitle()).isEqualTo(publicScheduleAdminReqDto.getTitle());
+			assertThat(schedules.get(0).getTitle()).isEqualTo(publicScheduleReqDto.getTitle());
 		}
 
 		@Test
@@ -197,7 +204,7 @@ public class PublicScheduleAdminControllerTest {
 			// given
 			PublicScheduleAdminCreateJobReqDto publicScheduleAdminReqDto = PublicScheduleAdminCreateJobReqDto.builder()
 				.jobTag(JobTag.EXPERIENCED)
-				.techTag(TechTag.BACK_END)
+				.techTag(BACK_END)
 				.title("취업설명회")
 				.content("취업설명회입니다.")
 				.link("https://gg.42seoul.kr")
@@ -225,7 +232,7 @@ public class PublicScheduleAdminControllerTest {
 			try {
 				PublicScheduleAdminCreateJobReqDto requestDto = PublicScheduleAdminCreateJobReqDto.builder()
 					.jobTag(JobTag.EXPERIENCED)
-					.techTag(TechTag.BACK_END)
+					.techTag(BACK_END)
 					.title("취업설명회")
 					.content("취업설명회입니다.")
 					.status(ScheduleStatus.ACTIVATE)
@@ -245,7 +252,7 @@ public class PublicScheduleAdminControllerTest {
 
 			PublicScheduleAdminCreateJobReqDto requestDto = PublicScheduleAdminCreateJobReqDto.builder()
 				.jobTag(JobTag.EXPERIENCED)
-				.techTag(TechTag.BACK_END)
+				.techTag(BACK_END)
 				.title("TEST".repeat(13))
 				.content("취업설명회입니다.")
 				.status(ScheduleStatus.ACTIVATE)
@@ -267,7 +274,7 @@ public class PublicScheduleAdminControllerTest {
 
 			PublicScheduleAdminCreateJobReqDto requestDto = PublicScheduleAdminCreateJobReqDto.builder()
 				.jobTag(JobTag.EXPERIENCED)
-				.techTag(TechTag.BACK_END)
+				.techTag(BACK_END)
 				.title("취업설명회")
 				.content("취업설명회".repeat(401))
 				.status(ScheduleStatus.ACTIVATE)
@@ -309,7 +316,7 @@ public class PublicScheduleAdminControllerTest {
 		public void createPublicScheduleJobFailNoTechTag() throws Exception {
 
 			PublicScheduleAdminCreateJobReqDto requestDto = PublicScheduleAdminCreateJobReqDto.builder()
-				.techTag(TechTag.BACK_END)
+				.techTag(BACK_END)
 				.title("취업설명회")
 				.content("취업설명회")
 				.status(ScheduleStatus.ACTIVATE)
@@ -395,9 +402,23 @@ public class PublicScheduleAdminControllerTest {
 		}
 	}
 
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	@Nested
 	@DisplayName("Admin PublicSchedule 수정 테스트")
 	class UpdatePublicScheduleAdminTest {
+
+		private Stream<Arguments> inputParams() {
+			return Stream.of(
+				Arguments.of(DetailClassification.EVENT, null, JobTag.SHORTS_INTERN, null), // JobTag should be null
+				// TechTag should be null
+				Arguments.of(DetailClassification.EVENT, EventTag.OFFICIAL_EVENT, null, TechTag.CLOUD),
+				Arguments.of(DetailClassification.JOB_NOTICE, EventTag.INSTRUCTION, JobTag.INCRUIT_INTERN,
+					TechTag.FRONT_END), // EventTag should be null
+				Arguments.of(DetailClassification.JOB_NOTICE, null, null, TechTag.AI), // JobTag should not be null
+				Arguments.of(DetailClassification.PRIVATE_SCHEDULE, EventTag.ETC, JobTag.NEW_COMER, TechTag.NETWORK)
+				// Always invalid
+			);
+		}
 
 		@Test
 		@DisplayName("Admin PublicSchedule 수정 테스트 - 성공")
@@ -406,8 +427,8 @@ public class PublicScheduleAdminControllerTest {
 			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
 			PublicScheduleAdminUpdateReqDto publicScheduleAdminUpdateReqDto = PublicScheduleAdminUpdateReqDto.builder()
 				.classification(DetailClassification.JOB_NOTICE)
-				.jobTag(JobTag.SHORTS_INTERN)
-				.techTag(TechTag.BACK_END)
+				.jobTag(SHORTS_INTERN)
+				.techTag(BACK_END)
 				.title("Job Notice")
 				.content("Job Notice")
 				.link("https://gg.42seoul.kr")
@@ -452,8 +473,8 @@ public class PublicScheduleAdminControllerTest {
 			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
 			PublicScheduleAdminUpdateReqDto publicScheduleAdminUpdateReqDto = PublicScheduleAdminUpdateReqDto.builder()
 				.classification(DetailClassification.JOB_NOTICE)
-				.jobTag(JobTag.SHORTS_INTERN)
-				.techTag(TechTag.BACK_END)
+				.jobTag(SHORTS_INTERN)
+				.techTag(BACK_END)
 				.title("Job Notice")
 				.content("Job Notice")
 				.link("https://gg.42seoul.kr")
@@ -492,8 +513,8 @@ public class PublicScheduleAdminControllerTest {
 			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
 			PublicScheduleAdminUpdateReqDto publicScheduleAdminUpdateReqDto = PublicScheduleAdminUpdateReqDto.builder()
 				.classification(DetailClassification.JOB_NOTICE)
-				.jobTag(JobTag.SHORTS_INTERN)
-				.techTag(TechTag.BACK_END)
+				.jobTag(SHORTS_INTERN)
+				.techTag(BACK_END)
 				.title("Job Notice".repeat(10))
 				.content("Job Notice")
 				.link("https://gg.42seoul.kr")
@@ -532,8 +553,8 @@ public class PublicScheduleAdminControllerTest {
 			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
 			PublicScheduleAdminUpdateReqDto publicScheduleAdminUpdateReqDto = PublicScheduleAdminUpdateReqDto.builder()
 				.classification(DetailClassification.JOB_NOTICE)
-				.jobTag(JobTag.SHORTS_INTERN)
-				.techTag(TechTag.BACK_END)
+				.jobTag(SHORTS_INTERN)
+				.techTag(BACK_END)
 				.title("Job Notice")
 				.content("Job Notice".repeat(500))
 				.link("https://gg.42seoul.kr")
@@ -572,8 +593,8 @@ public class PublicScheduleAdminControllerTest {
 			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
 			PublicScheduleAdminUpdateReqDto publicScheduleAdminUpdateReqDto = PublicScheduleAdminUpdateReqDto.builder()
 				.classification(DetailClassification.JOB_NOTICE)
-				.jobTag(JobTag.SHORTS_INTERN)
-				.techTag(TechTag.BACK_END)
+				.jobTag(SHORTS_INTERN)
+				.techTag(BACK_END)
 				.title("Job Notice")
 				.content("Job Notice")
 				.link("https://gg.42seoul.kr")
@@ -611,8 +632,8 @@ public class PublicScheduleAdminControllerTest {
 			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
 			PublicScheduleAdminUpdateReqDto publicScheduleAdminUpdateReqDto = PublicScheduleAdminUpdateReqDto.builder()
 				.classification(DetailClassification.JOB_NOTICE)
-				.jobTag(JobTag.SHORTS_INTERN)
-				.techTag(TechTag.BACK_END)
+				.jobTag(SHORTS_INTERN)
+				.techTag(BACK_END)
 				.title("Job Notice")
 				.content("Job Notice")
 				.link("https://gg.42seoul.kr")
@@ -631,6 +652,51 @@ public class PublicScheduleAdminControllerTest {
 				.getResponse()
 				.getContentAsString();
 
+			List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll();
+			PublicSchedule result = schedules.get(0);
+			assertThat(schedules.size()).isEqualTo(1);
+			assertThat(result.getClassification()).isEqualTo(publicSchedule.getClassification());
+			assertThat(result.getEventTag()).isEqualTo(publicSchedule.getEventTag());
+			assertThat(result.getTitle()).isEqualTo(publicSchedule.getTitle());
+			assertThat(result.getContent()).isEqualTo(publicSchedule.getContent());
+			assertThat(result.getLink()).isEqualTo(publicSchedule.getLink());
+			assertThat(result.getStartTime()).isEqualTo(publicSchedule.getStartTime());
+			assertThat(result.getEndTime()).isEqualTo(publicSchedule.getEndTime());
+		}
+
+		@ParameterizedTest
+		@MethodSource("inputParams")
+		@DisplayName("Admin PublicSchedule 수정 테스트 - 실패 : 태그가 올바르게 매칭되지 않는 경우")
+		void updatePublicScheduleAdminTestFailNotMatchTag(DetailClassification classification, EventTag eventTag,
+			JobTag jobTag, TechTag techTag) throws Exception {
+			// given
+			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
+			PublicScheduleAdminUpdateReqDto publicScheduleAdminUpdateReqDto = PublicScheduleAdminUpdateReqDto.builder()
+				.classification(classification)
+				.eventTag(eventTag)
+				.jobTag(jobTag)
+				.techTag(techTag)
+				.title("Job Notice")
+				.content("Job Notice")
+				.link("https://gg.42seoul.kr")
+				.startTime(LocalDateTime.now().plusDays(1))
+				.endTime(LocalDateTime.now().plusDays(15))
+				.build();
+
+			// when & then
+			String response = mockMvc.perform(
+					put("/admin/calendar/public/{id}", publicSchedule.getId())
+						.header("Authorization", "Bearer " + accessToken)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(publicScheduleAdminUpdateReqDto))
+				)
+				.andDo(print())
+				.andExpect(status().isBadRequest())
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
+
+			// 데이터 검증
 			List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll();
 			PublicSchedule result = schedules.get(0);
 			assertThat(schedules.size()).isEqualTo(1);
