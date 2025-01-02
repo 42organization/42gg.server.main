@@ -11,7 +11,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
-import gg.data.calendar.type.ScheduleStatus;
 import gg.data.calendar.type.TechTag;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -41,9 +40,6 @@ public class PublicScheduleAdminUpdateReqDto {
 	private String link;
 
 	@NotNull
-	private ScheduleStatus status;
-
-	@NotNull
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
 	private LocalDateTime startTime;
 
@@ -53,7 +49,7 @@ public class PublicScheduleAdminUpdateReqDto {
 
 	@Builder
 	private PublicScheduleAdminUpdateReqDto(DetailClassification classification, EventTag eventTag, JobTag jobTag,
-		TechTag techTag, String title, String content, String link, ScheduleStatus status, LocalDateTime startTime,
+		TechTag techTag, String title, String content, String link, LocalDateTime startTime,
 		LocalDateTime endTime) {
 
 		this.classification = classification;
@@ -63,7 +59,6 @@ public class PublicScheduleAdminUpdateReqDto {
 		this.title = title;
 		this.content = content;
 		this.link = link;
-		this.status = status;
 		this.startTime = startTime;
 		this.endTime = endTime;
 

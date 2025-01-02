@@ -260,7 +260,6 @@ public class PublicScheduleAdminControllerTest {
 				.title("Job Notice")
 				.content("Job Notice")
 				.link("https://gg.42seoul.kr")
-				.status(ScheduleStatus.ACTIVATE)
 				.startTime(LocalDateTime.now().plusDays(1))
 				.endTime(LocalDateTime.now().plusDays(15))
 				.build();
@@ -307,7 +306,6 @@ public class PublicScheduleAdminControllerTest {
 				.title("Job Notice")
 				.content("Job Notice")
 				.link("https://gg.42seoul.kr")
-				.status(ScheduleStatus.ACTIVATE)
 				.startTime(LocalDateTime.now().plusDays(15))
 				.endTime(LocalDateTime.now().plusDays(1))
 				.build();
@@ -348,7 +346,6 @@ public class PublicScheduleAdminControllerTest {
 				.title("Job Notice".repeat(10))
 				.content("Job Notice")
 				.link("https://gg.42seoul.kr")
-				.status(ScheduleStatus.ACTIVATE)
 				.startTime(LocalDateTime.now().plusDays(1))
 				.endTime(LocalDateTime.now().plusDays(15))
 				.build();
@@ -389,7 +386,6 @@ public class PublicScheduleAdminControllerTest {
 				.title("Job Notice")
 				.content("Job Notice".repeat(500))
 				.link("https://gg.42seoul.kr")
-				.status(ScheduleStatus.ACTIVATE)
 				.startTime(LocalDateTime.now().plusDays(1))
 				.endTime(LocalDateTime.now().plusDays(15))
 				.build();
@@ -430,7 +426,6 @@ public class PublicScheduleAdminControllerTest {
 				.title("Job Notice")
 				.content("Job Notice")
 				.link("https://gg.42seoul.kr")
-				.status(ScheduleStatus.ACTIVATE)
 				.startTime(LocalDateTime.now().plusDays(1))
 				.endTime(LocalDateTime.now().plusDays(15))
 				.build();
@@ -470,7 +465,6 @@ public class PublicScheduleAdminControllerTest {
 				.title("Job Notice")
 				.content("Job Notice")
 				.link("https://gg.42seoul.kr")
-				.status(ScheduleStatus.ACTIVATE)
 				.startTime(LocalDateTime.now().plusDays(1))
 				.endTime(LocalDateTime.now().plusDays(15))
 				.build();
