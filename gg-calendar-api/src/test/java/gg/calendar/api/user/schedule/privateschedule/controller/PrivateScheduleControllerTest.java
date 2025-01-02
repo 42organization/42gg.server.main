@@ -161,8 +161,8 @@ public class PrivateScheduleControllerTest {
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
 			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
 				DetailClassification.PRIVATE_SCHEDULE);
-			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(publicSchedule,
-				scheduleGroup);
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
+				scheduleGroup.getId());
 			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
 				.eventTag(null)
 				.techTag(null)
@@ -196,8 +196,8 @@ public class PrivateScheduleControllerTest {
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
 			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
 				DetailClassification.PRIVATE_SCHEDULE);
-			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(publicSchedule,
-				scheduleGroup);
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
+				scheduleGroup.getId());
 			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
 				.eventTag(null)
 				.techTag(null)
@@ -225,8 +225,8 @@ public class PrivateScheduleControllerTest {
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
 			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule("author",
 				DetailClassification.PRIVATE_SCHEDULE);
-			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(publicSchedule,
-				scheduleGroup);
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
+				scheduleGroup.getId());
 			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
 				.eventTag(null)
 				.techTag(null)
@@ -254,8 +254,8 @@ public class PrivateScheduleControllerTest {
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
 			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
 				DetailClassification.PRIVATE_SCHEDULE);
-			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(publicSchedule,
-				scheduleGroup);
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
+				scheduleGroup.getId());
 			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
 				.eventTag(null)
 				.techTag(null)
@@ -275,6 +275,35 @@ public class PrivateScheduleControllerTest {
 					.content(objectMapper.writeValueAsString(reqDto)))
 				.andExpect(status().isNotFound());
 		}
+
+		@Test
+		@DisplayName("커스터마이징 그룹이 없는 경우 404")
+		void notFoundScheduleGroup() throws Exception {
+			//given
+			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
+			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
+				DetailClassification.PRIVATE_SCHEDULE);
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
+				scheduleGroup.getId());
+			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
+				.eventTag(null)
+				.techTag(null)
+				.jobTag(null)
+				.alarm(false)
+				.title("123")
+				.content("")
+				.link(null)
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(1))
+				.groupId(0L)
+				.build();
+			//when
+			mockMvc.perform(put("/calendar/private/" + privateSchedule.getId())
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(reqDto)))
+				.andExpect(status().isNotFound());
+		}
 	}
 
 	@Nested
@@ -287,8 +316,8 @@ public class PrivateScheduleControllerTest {
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
 			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
 				DetailClassification.PRIVATE_SCHEDULE);
-			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(publicSchedule,
-				scheduleGroup);
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
+				scheduleGroup.getId());
 			//when
 			mockMvc.perform(patch("/calendar/private/" + privateSchedule.getId())
 					.header("Authorization", "Bearer " + accessToken)
@@ -306,8 +335,8 @@ public class PrivateScheduleControllerTest {
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
 			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule("author",
 				DetailClassification.PRIVATE_SCHEDULE);
-			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(publicSchedule,
-				scheduleGroup);
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
+				scheduleGroup.getId());
 			//when
 			mockMvc.perform(patch("/calendar/private/" + privateSchedule.getId())
 					.header("Authorization", "Bearer " + accessToken)
@@ -325,9 +354,8 @@ public class PrivateScheduleControllerTest {
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
 			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
 				DetailClassification.EVENT);
-			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(publicSchedule,
-				scheduleGroup);
-
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
+				scheduleGroup.getId());
 			//when
 			mockMvc.perform(patch("/calendar/private/" + privateSchedule.getId())
 					.header("Authorization", "Bearer " + accessToken)
@@ -345,8 +373,8 @@ public class PrivateScheduleControllerTest {
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
 			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
 				DetailClassification.PRIVATE_SCHEDULE);
-			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(publicSchedule,
-				scheduleGroup);
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
+				scheduleGroup.getId());
 			//when
 			mockMvc.perform(patch("/calendar/private/" + privateSchedule.getId() + 1234)
 					.header("Authorization", "Bearer " + accessToken)

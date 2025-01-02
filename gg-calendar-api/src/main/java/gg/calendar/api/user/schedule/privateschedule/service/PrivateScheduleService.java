@@ -76,7 +76,7 @@ public class PrivateScheduleService {
 
 	public void validateDetailClassification(DetailClassification classification) {
 		if (classification != DetailClassification.PRIVATE_SCHEDULE) {
-			throw new ForbiddenException(ErrorCode.CALENDAR_NO_PRIVATE);
+			throw new ForbiddenException(ErrorCode.CLASSIFICATION_NO_PRIVATE);
 		}
 	}
 
