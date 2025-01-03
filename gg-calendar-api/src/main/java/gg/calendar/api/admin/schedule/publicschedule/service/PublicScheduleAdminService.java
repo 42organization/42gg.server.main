@@ -1,21 +1,23 @@
 package gg.calendar.api.admin.schedule.publicschedule.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import gg.admin.repo.calendar.PrivateScheduleAdminRepository;
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateEventReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateJobReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminUpdateReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminResDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminUpdateResDto;
+import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
-import gg.data.calendar.type.ScheduleStatus;
 import gg.data.calendar.type.TechTag;
 import gg.utils.exception.ErrorCode;
 import gg.utils.exception.custom.InvalidParameterException;
@@ -28,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class PublicScheduleAdminService {
 
 	private final PublicScheduleAdminRepository publicScheduleAdminRepository;
+	private final PrivateScheduleAdminRepository privateScheduleAdminRepository;
 
 	@Transactional
 	public void createPublicScheduleEvent(PublicScheduleAdminCreateEventReqDto publicScheduleAdminCreateEventReqDto) {
@@ -73,10 +76,15 @@ public class PublicScheduleAdminService {
 
 	@Transactional
 	public void deletePublicSchedule(Long id) {
+
 		PublicSchedule publicSchedule = publicScheduleAdminRepository.findById(id)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
-		isDeleted(publicSchedule);
+		List<PrivateSchedule> privateSchedules = privateScheduleAdminRepository.findByPublicScheduleId(
+			publicSchedule.getId());
 		publicSchedule.delete();
+		for (PrivateSchedule privateSchedule : privateSchedules) {
+			privateSchedule.delete();
+		}
 	}
 
 	public PublicScheduleAdminResDto detailPublicSchedule(Long id) {
@@ -89,12 +97,6 @@ public class PublicScheduleAdminService {
 	private void dateTimeErrorCheck(LocalDateTime startTime, LocalDateTime endTime) {
 		if (startTime.isAfter(endTime)) {
 			throw new InvalidParameterException(ErrorCode.CALENDAR_BEFORE_DATE);
-		}
-	}
-
-	private void isDeleted(PublicSchedule publicSchedule) {
-		if (publicSchedule.getStatus().equals(ScheduleStatus.DELETE)) {
-			throw new InvalidParameterException(ErrorCode.PUBLIC_SCHEDULE_ALREADY_DELETED);
 		}
 	}
 
