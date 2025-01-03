@@ -29,7 +29,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import gg.admin.repo.calendar.PrivateScheduleAdminRepository;
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
+import gg.admin.repo.calendar.ScheduleGroupAdminRepository;
 import gg.calendar.api.admin.schedule.publicschedule.PublicScheduleAdminMockData;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateEventReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateJobReqDto;
@@ -37,7 +39,9 @@ import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicSc
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminResDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminUpdateResDto;
 import gg.calendar.api.admin.schedule.publicschedule.service.PublicScheduleAdminService;
+import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
+import gg.data.calendar.ScheduleGroup;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
@@ -65,6 +69,12 @@ public class PublicScheduleAdminControllerTest {
 
 	@Autowired
 	private PublicScheduleAdminRepository publicScheduleAdminRepository;
+
+	@Autowired
+	private PrivateScheduleAdminRepository privateScheduleAdminRepository;
+
+	@Autowired
+	private ScheduleGroupAdminRepository scheduleGroupAdminRepository;
 
 	@Autowired
 	private TestDataUtils testDataUtils;
@@ -728,6 +738,42 @@ public class PublicScheduleAdminControllerTest {
 		}
 
 		@Test
+		@DisplayName("Admin PublicSchedule 삭제 테스트 - 성공 : 연관된 개인일정들 삭제")
+		void deletePublicScheduleAdminTestSuccessPrivateScheduleDelete() throws Exception {
+			User other = testDataUtils.createAdminUser();
+			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
+			ScheduleGroup scheduleGroup = ScheduleGroup.builder()
+				.user(other)
+				.title("TEST")
+				.backgroundColor("#FFFFFF")
+				.build();
+			ScheduleGroup scheduleGroup2 = ScheduleGroup.builder()
+				.user(user)
+				.title("TEST2")
+				.backgroundColor("#FFFFFF")
+				.build();
+			scheduleGroupAdminRepository.save(scheduleGroup);
+			scheduleGroupAdminRepository.save(scheduleGroup2);
+			PrivateSchedule privateSchedule1 = new PrivateSchedule(other, publicSchedule, false, scheduleGroup.getId());
+			PrivateSchedule privateSchedule2 = new PrivateSchedule(user, publicSchedule, false, scheduleGroup2.getId());
+			privateScheduleAdminRepository.save(privateSchedule1);
+			privateScheduleAdminRepository.save(privateSchedule2);
+			mockMvc.perform(patch("/admin/calendar/public/{id}", publicSchedule.getId()).header("Authorization",
+						"Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isOk());
+
+			List<PrivateSchedule> privateSchedules = privateScheduleAdminRepository.findByPublicScheduleId(
+				publicSchedule.getId());
+			assertThat(privateSchedules.size()).isEqualTo(2);
+			for (PrivateSchedule ps : privateSchedules) {
+				assertThat(ps.getStatus()).isEqualTo(ScheduleStatus.DELETE);
+			}
+			assertThat(publicSchedule.getStatus()).isEqualTo(ScheduleStatus.DELETE);
+		}
+
+		@Test
 		@DisplayName("Admin PublicSchedule 삭제 테스트 - 실패 : 잘못된 id형식이 들어왔을 경우")
 		void deletePublicScheduleAdminTestFailNotBadArgument() throws Exception {
 			// given
@@ -763,22 +809,5 @@ public class PublicScheduleAdminControllerTest {
 			System.out.println("PublicSchedule Status : " + result.getStatus());
 		}
 
-		@Test
-		@DisplayName("Admin PublicSchedule 삭제 테스트 - 실패 : 이미 삭제된 일정을 삭제하는 경우")
-		void deletePublicScheduleAdminTestFailAlreadyDelete() throws Exception {
-			// given
-			PublicSchedule publicSchedule = publicScheduleAdminMockData.createPublicSchedule();
-			publicSchedule.delete();
-			// when
-			mockMvc.perform(patch("/admin/calendar/public/{id}", publicSchedule.getId()).header("Authorization",
-						"Bearer " + accessToken)
-					.contentType(MediaType.APPLICATION_JSON))
-				.andDo(print())
-				.andExpect(status().isBadRequest());
-
-			PublicSchedule result = publicScheduleAdminRepository.findById(publicSchedule.getId()).get();
-			assertThat(result.getStatus()).isEqualTo(ScheduleStatus.DELETE);
-			System.out.println("PublicSchedule Status : " + result.getStatus());
-		}
 	}
 }
