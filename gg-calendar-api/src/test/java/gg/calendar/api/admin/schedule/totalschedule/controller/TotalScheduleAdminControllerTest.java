@@ -200,7 +200,7 @@ class TotalScheduleAdminControllerTest {
 
 		@ParameterizedTest
 		@MethodSource("invalidInput")
-		@DisplayName("Admin TotalSchedule 페이지 조회 테스트 - 실패 : 페이지가 잘못된 값일 경우")
+		@DisplayName("Admin TotalSchedule 페이지 조회 테스트 - 실패 : 페이지 입력값이 잘못된 값일 경우")
 		void getTotalAdminPageNationListTestFailInvalidPage(PageRequestDto pageRequestDto) throws Exception {
 			// given
 			publicScheduleAdminMockData.createPublicScheduleEvent(20);
