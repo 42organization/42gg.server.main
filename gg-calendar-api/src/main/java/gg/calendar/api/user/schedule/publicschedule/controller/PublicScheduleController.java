@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import gg.auth.UserDto;
 import gg.auth.argumentresolver.Login;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateEventReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateJobReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicScheduleDetailRetrieveResDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicScheduleUpdateResDto;
@@ -37,10 +38,16 @@ public class PublicScheduleController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
+	@PostMapping("/job")
+	public ResponseEntity<Void> publicScheduleCreateJob(@RequestBody @Valid PublicScheduleCreateJobReqDto req,
+		@Login @Parameter(hidden = true) UserDto userDto) {
+		publicScheduleService.createJobPublicSchedule(req, userDto.getId());
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
 	@PutMapping("/{id}")
 	public ResponseEntity<PublicScheduleUpdateResDto> publicScheduleUpdate(@PathVariable Long id,
-		@RequestBody @Valid PublicScheduleUpdateReqDto req,
-		@Login @Parameter(hidden = true) UserDto userDto) {
+		@RequestBody @Valid PublicScheduleUpdateReqDto req, @Login @Parameter(hidden = true) UserDto userDto) {
 		PublicSchedule updateSchedule = publicScheduleService.updatePublicSchedule(id, req, userDto.getId());
 		return ResponseEntity.ok(PublicScheduleUpdateResDto.toDto(updateSchedule));
 	}
