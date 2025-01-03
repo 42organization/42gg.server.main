@@ -56,4 +56,12 @@ public class TotalScheduleAdminResDto {
 		this.sharedCount = publicSchedule.getSharedCount();
 		this.status = publicSchedule.getStatus();
 	}
+
+	@Override
+	public String toString() {
+		return "TotalScheduleAdminResDto [id=" + id + ", classification=" + classification + ", eventTag=" + eventTag
+			+ ", jobTag=" + jobTag + ", techTag=" + techTag + ", author=" + author + ", title=" + title
+			+ ", startTime=" + startTime + ", endTime=" + endTime + ", link=" + link + ", sharedCount=" + sharedCount
+			+ ", status=" + status + "]";
+	}
 }

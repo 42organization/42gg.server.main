@@ -4,24 +4,24 @@ import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Component;
 
+import gg.admin.repo.calendar.PrivateScheduleAdminRepository;
+import gg.admin.repo.calendar.PublicScheduleAdminRepository;
+import gg.admin.repo.calendar.ScheduleGroupAdminRepository;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.ScheduleGroup;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.ScheduleStatus;
 import gg.data.user.User;
-import gg.repo.calendar.PrivateScheduleRepository;
-import gg.repo.calendar.PublicScheduleRepository;
-import gg.repo.calendar.ScheduleGroupRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class PrivateScheduleAdminMockData {
 
-	private final PublicScheduleRepository publicScheduleRepository;
-	private final ScheduleGroupRepository scheduleGroupRepository;
-	private final PrivateScheduleRepository privateScheduleRepository;
+	private final PublicScheduleAdminRepository publicScheduleRepository;
+	private final ScheduleGroupAdminRepository scheduleGroupRepository;
+	private final PrivateScheduleAdminRepository privateScheduleRepository;
 
 	public PublicSchedule createPublicSchedule(String author) {
 		PublicSchedule publicSchedule = PublicSchedule.builder()
@@ -76,5 +76,31 @@ public class PrivateScheduleAdminMockData {
 		PrivateSchedule privateSchedule = new PrivateSchedule(user, publicSchedule, false,
 			500L);
 		return privateScheduleRepository.save(privateSchedule);
+	}
+
+	public void createPrivateSchedules(int size, User user) {
+		for (int i = 0; i < size; i++) {
+			PublicSchedule publicSchedule = PublicSchedule.builder()
+				.classification(DetailClassification.PRIVATE_SCHEDULE)
+				.author("42GG")
+				.title("Private " + i)
+				.content("TEST Private")
+				.link("https://gg.42seoul.kr")
+				.status(ScheduleStatus.ACTIVATE)
+				.startTime(LocalDateTime.now().plusDays(i))
+				.endTime(LocalDateTime.now().plusDays(i + 10))
+				.build();
+			publicScheduleRepository.save(publicSchedule);
+
+			ScheduleGroup scheduleGroup = ScheduleGroup.builder()
+				.user(user)
+				.title("title " + i)
+				.backgroundColor("color " + i)
+				.build();
+			scheduleGroupRepository.save(scheduleGroup);
+
+			PrivateSchedule privateSchedule = new PrivateSchedule(user, publicSchedule, false,
+				scheduleGroup.getId());
+		}
 	}
 }

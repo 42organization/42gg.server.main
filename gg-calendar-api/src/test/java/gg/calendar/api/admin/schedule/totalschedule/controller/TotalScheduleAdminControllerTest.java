@@ -28,12 +28,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
+import gg.calendar.api.admin.schedule.privateschedule.PrivateScheduleAdminMockData;
 import gg.calendar.api.admin.schedule.publicschedule.PublicScheduleAdminMockData;
 import gg.calendar.api.admin.schedule.totalschedule.controller.response.TotalScheduleAdminResDto;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.user.User;
 import gg.utils.TestDataUtils;
 import gg.utils.annotation.IntegrationTest;
+import gg.utils.dto.PageRequestDto;
 import gg.utils.dto.PageResponseDto;
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,6 +53,9 @@ class TotalScheduleAdminControllerTest {
 
 	@Autowired
 	private PublicScheduleAdminMockData publicScheduleAdminMockData;
+
+	@Autowired
+	private PrivateScheduleAdminMockData privateScheduleAdminMockData;
 
 	@Autowired
 	private PublicScheduleAdminRepository publicScheduleAdminRepository;
@@ -79,6 +84,16 @@ class TotalScheduleAdminControllerTest {
 		private Stream<Arguments> inputParams() {
 			return Stream.of(Arguments.of("EVENT", 2, 10), Arguments.of("JOB_NOTICE", 1, 10),
 				Arguments.of("PRIVATE_SCHEDULE", 1, 2));
+		}
+
+		private Stream<Arguments> inputPageReqDto() {
+			return Stream.of(Arguments.of(new PageRequestDto(1, 10)), Arguments.of(new PageRequestDto(2, 10)),
+				Arguments.of(new PageRequestDto(2, null)));
+		}
+
+		private Stream<Arguments> invalidInput() {
+			return Stream.of(Arguments.of(new PageRequestDto(0, 10)),
+				Arguments.of(new PageRequestDto(null, null)));
 		}
 
 		@ParameterizedTest
@@ -122,5 +137,94 @@ class TotalScheduleAdminControllerTest {
 			}
 		}
 
+		@ParameterizedTest
+		@MethodSource("inputPageReqDto")
+		@DisplayName("Admin TotalSchedule 태그 조회 테스트 - 실패 : 잘못된 태그가 들어왔을 경우")
+		void getTotalAdminClassificationListTestFailNotMatchTag(PageRequestDto pageRequestDto) throws Exception {
+			// given
+			publicScheduleAdminMockData.createPublicScheduleEvent(20);
+			publicScheduleAdminMockData.createPublicScheduleJob(10);
+			publicScheduleAdminMockData.createPublicSchedulePrivate(5);
+
+			MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+			params.add("page", String.valueOf(pageRequestDto.getPage()));
+			params.add("size", String.valueOf(pageRequestDto.getSize()));
+
+			// when
+			String response = mockMvc.perform(
+					get("/admin/calendar/list/{detailClassification}", "qweksd").header("Authorization",
+						"Bearer " + accessToken).params(params))
+				.andDo(print())
+				.andExpect(status().isBadRequest())
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
+
+			// then
+			log.info("response :{}", response);
+		}
+
+		@ParameterizedTest
+		@MethodSource("inputPageReqDto")
+		@DisplayName("Admin TotalSchedule 페이지 조회 테스트 - 성공")
+		void getTotalAdminPageNationListTesSuccess(PageRequestDto pageRequestDto) throws Exception {
+			// given
+			publicScheduleAdminMockData.createPublicScheduleEvent(20);
+			publicScheduleAdminMockData.createPublicScheduleJob(10);
+			privateScheduleAdminMockData.createPrivateSchedules(5, user);
+
+			MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+			params.add("page", String.valueOf(pageRequestDto.getPage()));
+			params.add("size", String.valueOf(pageRequestDto.getSize()));
+
+			// when
+			String response = mockMvc.perform(
+					get("/admin/calendar").header("Authorization",
+						"Bearer " + accessToken).params(params))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
+
+			// then
+			PageResponseDto<TotalScheduleAdminResDto> pageResponseDto = objectMapper.readValue(response,
+				new TypeReference<>() {
+				});
+			List<TotalScheduleAdminResDto> result = pageResponseDto.getContent();
+
+			for (TotalScheduleAdminResDto dto : result) {
+				System.out.println(dto.toString());
+			}
+		}
+
+		@ParameterizedTest
+		@MethodSource("invalidInput")
+		@DisplayName("Admin TotalSchedule 페이지 조회 테스트 - 실패 : 페이지 입력값이 잘못된 값일 경우")
+		void getTotalAdminPageNationListTestFailInvalidPage(PageRequestDto pageRequestDto) throws Exception {
+			// given
+			publicScheduleAdminMockData.createPublicScheduleEvent(20);
+			publicScheduleAdminMockData.createPublicScheduleJob(10);
+			privateScheduleAdminMockData.createPrivateSchedules(5, user);
+
+			MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+			params.add("page", String.valueOf(pageRequestDto.getPage()));
+			params.add("size", String.valueOf(pageRequestDto.getSize()));
+
+			// when
+			String response = mockMvc.perform(
+					get("/admin/calendar").header("Authorization",
+						"Bearer " + accessToken).params(params))
+				.andDo(print())
+				.andExpect(status().isBadRequest())
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
+
+			// then
+			log.info("response :{}", response);
+		}
+
 	}
+
 }
