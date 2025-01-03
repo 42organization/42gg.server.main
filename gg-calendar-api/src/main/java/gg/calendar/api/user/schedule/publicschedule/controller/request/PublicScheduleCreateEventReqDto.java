@@ -2,6 +2,7 @@ package gg.calendar.api.user.schedule.publicschedule.controller.request;
 
 import java.time.LocalDateTime;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -9,25 +10,21 @@ import javax.validation.constraints.Size;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
-import gg.data.calendar.type.JobTag;
 import gg.data.calendar.type.ScheduleStatus;
-import gg.data.calendar.type.TechTag;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PublicScheduleCreateReqDto {
-	@NotNull
+public class PublicScheduleCreateEventReqDto {
+
 	private DetailClassification classification;
+
+	@NotNull
 	private EventTag eventTag;
-	private JobTag jobTag;
-	private TechTag techTag;
+
 	@NotBlank
 	private String author;
 
@@ -45,19 +42,35 @@ public class PublicScheduleCreateReqDto {
 	@NotNull
 	private LocalDateTime endTime;
 
-	public static PublicSchedule toEntity(String intraId, PublicScheduleCreateReqDto dto) {
+	@Builder
+	public PublicScheduleCreateEventReqDto(EventTag eventTag, String author, String title, String content, String link,
+		LocalDateTime startTime, LocalDateTime endTime) {
+		this.classification = DetailClassification.EVENT;
+		this.eventTag = eventTag;
+		this.author = author;
+		this.title = title;
+		this.content = content;
+		this.link = link;
+		this.startTime = startTime;
+		this.endTime = endTime;
+	}
+
+	@AssertTrue(message = "classfication must be 42event type")
+	private boolean isEvent() {
+		return classification == DetailClassification.EVENT;
+	}
+
+	public static PublicSchedule toEntity(String intraId, PublicScheduleCreateEventReqDto dto) {
 		return PublicSchedule.builder()
-			.classification(dto.classification)
+			.classification(DetailClassification.EVENT)
 			.eventTag(dto.eventTag)
-			.jobTag(dto.jobTag)
-			.techTag(dto.techTag)
 			.author(intraId)
 			.title(dto.title)
 			.content(dto.content)
 			.link(dto.link)
-			.status(ScheduleStatus.ACTIVATE)
 			.startTime(dto.startTime)
 			.endTime(dto.endTime)
+			.status(ScheduleStatus.ACTIVATE)
 			.build();
 	}
 }

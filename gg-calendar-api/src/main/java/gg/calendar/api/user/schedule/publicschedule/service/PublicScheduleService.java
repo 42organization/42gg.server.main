@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateEventReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
@@ -29,14 +29,12 @@ public class PublicScheduleService {
 	private final PrivateScheduleRepository privateScheduleRepository;
 
 	@Transactional
-	public void createPublicSchedule(PublicScheduleCreateReqDto req, Long userId) {
+	public void createEventPublicSchedule(PublicScheduleCreateEventReqDto req, Long userId) {
 		User user = userRepository.getById(userId);
-		if (!user.getIntraId().equals(req.getAuthor())) {
-			throw new ForbiddenException(ErrorCode.CALENDAR_AUTHOR_NOT_MATCH);
-		}
+		checkAuthor(req.getAuthor(), user);
 		validateTimeRange(req.getStartTime(), req.getEndTime());
-		PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(), req);
-		publicScheduleRepository.save(publicSchedule);
+		PublicSchedule eventPublicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(), req);
+		publicScheduleRepository.save(eventPublicSchedule);
 	}
 
 	@Transactional
