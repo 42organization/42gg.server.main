@@ -40,6 +40,23 @@ public class PrivateScheduleAdminMockData {
 		return publicScheduleRepository.save(publicSchedule);
 	}
 
+	public PublicSchedule createPublicPrivateSchedule(String author) {
+		PublicSchedule publicSchedule = PublicSchedule.builder()
+			.classification(DetailClassification.PRIVATE_SCHEDULE)
+			.eventTag(null)
+			.jobTag(null)
+			.techTag(null)
+			.title("Test Schedule")
+			.author(author)
+			.content("Test Content")
+			.link("http://test.com")
+			.status(ScheduleStatus.ACTIVATE)
+			.startTime(LocalDateTime.now())
+			.endTime(LocalDateTime.now().plusDays(1))
+			.build();
+		return publicScheduleRepository.save(publicSchedule);
+	}
+
 	public ScheduleGroup createScheduleGroup(User user) {
 		ScheduleGroup scheduleGroup = ScheduleGroup.builder()
 			.user(user)

@@ -24,6 +24,7 @@ import gg.calendar.api.admin.schedule.privateschedule.PrivateScheduleAdminMockDa
 import gg.calendar.api.admin.schedule.privateschedule.controller.response.PrivateScheduleAdminDetailResDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
+import gg.data.calendar.type.ScheduleStatus;
 import gg.data.user.User;
 import gg.utils.TestDataUtils;
 import gg.utils.annotation.IntegrationTest;
@@ -152,6 +153,89 @@ public class PrivateScheduleAdminControllerTest {
 						"Bearer " + accessToken))
 				.andDo(print())
 				.andExpect(status().isNotFound()).andReturn().getResponse().getContentAsString();
+
+			// then
+			log.info("response :{}", response);
+		}
+	}
+
+	@Nested
+	@DisplayName("Admin PrivateSchedule 삭제 테스트")
+	class DeletePrivateScheduleAdminTest {
+
+		@Test
+		@DisplayName("Admin PrivateSchedule 삭제 테스트 - 성공")
+		void deletePrivateScheduleAdminTestSuccess() throws Exception {
+			// given
+			PublicSchedule publicSchedule = privateScheduleAdminMockData.createPublicPrivateSchedule("42gg");
+			PrivateSchedule privateSchedule = privateScheduleAdminMockData.createPrivateSchedule(publicSchedule,
+				privateScheduleAdminMockData.createScheduleGroup(user));
+
+			// when
+			mockMvc.perform(
+					patch("/admin/calendar/private/{id}", privateSchedule.getId()).header("Authorization",
+						"Bearer " + accessToken))
+				.andDo(print())
+				.andExpect(status().isOk());
+
+			// then
+			assertThat(publicSchedule.getStatus()).isEqualTo(ScheduleStatus.DELETE);
+			assertThat(privateSchedule.getStatus()).isEqualTo(ScheduleStatus.DELETE);
+		}
+
+		@Test
+		@DisplayName("Admin PrivateSchedule 삭제 테스트 - 실패 : 잘못된 id가 들어왔을 경우")
+		void deletePrivateScheduleAdminTestFailNotCorrectType() throws Exception {
+			// given
+			PublicSchedule publicSchedule = privateScheduleAdminMockData.createPublicPrivateSchedule("42gg");
+			PrivateSchedule privateSchedule = privateScheduleAdminMockData.createPrivateSchedule(publicSchedule,
+				privateScheduleAdminMockData.createScheduleGroup(user));
+
+			// when
+			String response = mockMvc.perform(
+					patch("/admin/calendar/private/qweksd").header("Authorization",
+						"Bearer " + accessToken))
+				.andDo(print())
+				.andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();
+
+			// then
+			log.info("response :{}", response);
+		}
+
+		@Test
+		@DisplayName("Admin PrivateSchedule 삭제 테스트 - 실패 : 없는 id가 들어왔을 경우")
+		void deletePrivateScheduleAdminTestFailNotFound() throws Exception {
+			// given
+			PublicSchedule publicSchedule = privateScheduleAdminMockData.createPublicPrivateSchedule("42gg");
+			PrivateSchedule privateSchedule = privateScheduleAdminMockData.createPrivateSchedule(publicSchedule,
+				privateScheduleAdminMockData.createScheduleGroup(user));
+
+			// when
+			String response = mockMvc.perform(
+					patch("/admin/calendar/private/500123").header("Authorization",
+						"Bearer " + accessToken))
+				.andDo(print())
+				.andExpect(status().isNotFound()).andReturn().getResponse().getContentAsString();
+
+			// then
+			log.info("response :{}", response);
+		}
+
+		@Test
+		@DisplayName("Admin PrivateSchedule 삭제 테스트 - 실패 : 상세분류가 개인일정이 아닌 경우")
+		void deletePrivateScheduleAdminTestFailNotPrivateSchedule() throws Exception {
+			// given
+			PublicSchedule publicSchedule = privateScheduleAdminMockData.createPublicSchedule("42gg");
+			publicScheduleAdminRepository.save(publicSchedule);
+			PrivateSchedule privateSchedule = privateScheduleAdminMockData.createPrivateSchedule(publicSchedule,
+				privateScheduleAdminMockData.createScheduleGroup(user));
+
+			// when
+			String response = mockMvc.perform(
+					patch("/admin/calendar/private/{id}", privateSchedule.getId()).header("Authorization",
+						"Bearer " + accessToken))
+				.andDo(print())
+				.andExpect(status().isForbidden()).andReturn().getResponse().getContentAsString();
 
 			// then
 			log.info("response :{}", response);
