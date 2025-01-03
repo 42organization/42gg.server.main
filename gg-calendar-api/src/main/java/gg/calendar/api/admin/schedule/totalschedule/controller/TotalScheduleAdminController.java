@@ -34,4 +34,15 @@ public class TotalScheduleAdminController {
 
 		return ResponseEntity.ok(pageResponseDto);
 	}
+
+	@GetMapping
+	public ResponseEntity<PageResponseDto<TotalScheduleAdminResDto>> totalScheduleAdminPageList(
+		@ModelAttribute @Valid PageRequestDto pageRequestDto) {
+		int page = pageRequestDto.getPage();
+		int size = pageRequestDto.getSize();
+
+		PageResponseDto<TotalScheduleAdminResDto> pageResponseDto = totalScheduleAdminService.findAll(page, size);
+
+		return ResponseEntity.ok(pageResponseDto);
+	}
 }

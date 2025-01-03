@@ -38,4 +38,16 @@ public class TotalScheduleAdminService {
 			.collect(Collectors.toList());
 		return PageResponseDto.of(publicSchedules.getTotalElements(), publicScheduleList);
 	}
+
+	public PageResponseDto<TotalScheduleAdminResDto> findAll(int page, int size) {
+		Pageable pageable = PageRequest.of(page - 1, size,
+			Sort.by(Sort.Order.asc("status"), Sort.Order.asc("startTime")));
+
+		Page<PublicSchedule> publicSchedules = publicScheduleAdminRepository.findAll(pageable);
+
+		List<TotalScheduleAdminResDto> publicScheduleList = publicSchedules.stream()
+			.map(TotalScheduleAdminResDto::new)
+			.collect(Collectors.toList());
+		return PageResponseDto.of(publicSchedules.getTotalElements(), publicScheduleList);
+	}
 }
