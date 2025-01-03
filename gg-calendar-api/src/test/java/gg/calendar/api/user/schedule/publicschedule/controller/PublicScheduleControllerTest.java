@@ -24,8 +24,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gg.calendar.api.user.schedule.publicschedule.PublicScheduleMockData;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateEventReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateJobReqDto;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.EventTag;
+import gg.data.calendar.type.JobTag;
+import gg.data.calendar.type.TechTag;
 import gg.data.user.User;
 import gg.repo.calendar.PrivateScheduleRepository;
 import gg.repo.calendar.PublicScheduleRepository;
@@ -89,7 +92,6 @@ public class PublicScheduleControllerTest {
 				.build();
 
 			// when
-			log.info("After mock data creation: {}", publicScheduleRepository.findByAuthor(user.getIntraId()).size());
 			mockMvc.perform(post("/calendar/public/event").header("Authorization", "Bearer " + accssToken)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(eventPublicScheduleDto))).andExpect(status().isCreated());
@@ -126,7 +128,7 @@ public class PublicScheduleControllerTest {
 
 		@Test
 		@DisplayName("공개일정-42event생성실패- 기간이 잘못되었을 때(종료닐짜가 시작날짜보다 빠를때)[400]")
-		void createPublicScheduleFailFaultPeriod() throws Exception {
+		void createEventPublicScheduleFailFaultPeriod() throws Exception {
 			// given
 			PublicScheduleCreateEventReqDto eventPublicScheduleDto = PublicScheduleCreateEventReqDto.builder()
 				.eventTag(EventTag.INSTRUCTION)
@@ -142,6 +144,85 @@ public class PublicScheduleControllerTest {
 			mockMvc.perform(post("/calendar/public/event").header("Authorization", "Bearer " + accssToken)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(eventPublicScheduleDto)))
+				.andExpect(status().isBadRequest())
+				.andExpect(result -> {
+					status().isBadRequest();
+				})
+				.andDo(print());
+			// then
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).isEmpty();
+		}
+
+		@Test
+		@DisplayName("공개일정-job생성성공[201]")
+		void createJobPublicScheduleSuccess() throws Exception {
+			// given
+			PublicScheduleCreateJobReqDto jobPublicScheduleDto = PublicScheduleCreateJobReqDto.builder()
+				.jobTag(JobTag.NEW_COMER)
+				.techTag(TechTag.CLOUD)
+				.author(user.getIntraId())
+				.title("JobTag")
+				.content("42JobTagTest")
+				.link("https://test.com")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(1))
+				.build();
+			// when
+			mockMvc.perform(post("/calendar/public/job").header("Authorization", "Bearer " + accssToken)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(jobPublicScheduleDto))).andExpect(status().isCreated());
+			// then
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).hasSize(1);
+			assertThat(schedules.get(0).getTitle()).isEqualTo(jobPublicScheduleDto.getTitle());
+		}
+
+		@Test
+		@DisplayName("공개일정-job생성실패-작성자가 다를 때[404]")
+		void createJobPublicScheduleFailNotMatchAuthor() throws Exception {
+			// given
+			PublicScheduleCreateJobReqDto jobPublicScheduleDto = PublicScheduleCreateJobReqDto.builder()
+				.jobTag(JobTag.EXPERIENCED)
+				.techTag(TechTag.NETWORK)
+				.author("another")
+				.title("JobTag")
+				.content("JobTagTest")
+				.link("https://test.com")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(1))
+				.build();
+
+			// when
+			mockMvc.perform(post("/calendar/public/job").header("Authorization", "Bearer " + accssToken)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(jobPublicScheduleDto)))
+				.andExpect(status().isForbidden())
+				.andDo(print());
+			// then
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).isEmpty();
+		}
+
+		@Test
+		@DisplayName("공개일정-job생성실패- 기간이 잘못되었을 때(종료닐짜가 시작날짜보다 빠를때)[400]")
+		void createJobPublicScheduleFailFaultPeriod() throws Exception {
+			// given
+			PublicScheduleCreateJobReqDto jobPublicScheduleDto = PublicScheduleCreateJobReqDto.builder()
+				.jobTag(JobTag.EXPERIENCED)
+				.techTag(TechTag.NETWORK)
+				.author(user.getIntraId())
+				.title("JobTag")
+				.content("JobTagTest")
+				.link("https://test.com")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().minusDays(1))
+				.build();
+
+			// when
+			mockMvc.perform(post("/calendar/public/job").header("Authorization", "Bearer " + accssToken)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(jobPublicScheduleDto)))
 				.andExpect(status().isBadRequest())
 				.andExpect(result -> {
 					status().isBadRequest();

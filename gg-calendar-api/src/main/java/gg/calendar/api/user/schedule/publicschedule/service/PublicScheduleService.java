@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateEventReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateJobReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
@@ -35,6 +36,15 @@ public class PublicScheduleService {
 		validateTimeRange(req.getStartTime(), req.getEndTime());
 		PublicSchedule eventPublicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(), req);
 		publicScheduleRepository.save(eventPublicSchedule);
+	}
+
+	@Transactional
+	public void createJobPublicSchedule(PublicScheduleCreateJobReqDto req, Long userId) {
+		User user = userRepository.getById(userId);
+		checkAuthor(req.getAuthor(), user);
+		validateTimeRange(req.getStartTime(), req.getEndTime());
+		PublicSchedule jobPublicSchedule = PublicScheduleCreateJobReqDto.toEntity(user.getIntraId(), req);
+		publicScheduleRepository.save(jobPublicSchedule);
 	}
 
 	@Transactional
