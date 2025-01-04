@@ -2,7 +2,6 @@ package gg.calendar.api.user.schedule.publicschedule.controller.request;
 
 import java.time.LocalDateTime;
 
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -55,10 +54,10 @@ public class PublicScheduleCreateEventReqDto {
 		this.endTime = endTime;
 	}
 
-	@AssertTrue(message = "classfication must be 42event type")
-	private boolean isEvent() {
-		return classification == DetailClassification.EVENT;
-	}
+	// @AssertTrue(message = "classfication must be 42event type")
+	// private boolean isEvent() {
+	// 	return classification == DetailClassification.EVENT;
+	// }
 
 	public static PublicSchedule toEntity(String intraId, PublicScheduleCreateEventReqDto dto) {
 		return PublicSchedule.builder()

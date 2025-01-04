@@ -23,11 +23,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PublicScheduleUpdateReqDto {
+
 	@NotNull
 	private DetailClassification classification;
+
 	private EventTag eventTag;
+
 	private JobTag jobTag;
+
 	private TechTag techTag;
+
 	@NotBlank
 	private String author;
 
@@ -37,6 +42,7 @@ public class PublicScheduleUpdateReqDto {
 
 	@Size(max = 2000, message = "내용은 2000자이하로 입력해주세요.")
 	private String content;
+
 	private String link;
 
 	@NotNull
@@ -46,4 +52,9 @@ public class PublicScheduleUpdateReqDto {
 	@NotNull
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
 	private LocalDateTime endTime;
+
+	// @AssertTrue(message = "classification must match with eventTag, jobTag, techTag")
+	// private boolean isValidClassification() {
+	// 	return classification.isValid(eventTag, jobTag, techTag);
+	// }
 }

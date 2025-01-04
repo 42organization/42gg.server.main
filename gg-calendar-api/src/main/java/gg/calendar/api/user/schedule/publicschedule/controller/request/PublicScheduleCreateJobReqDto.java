@@ -2,7 +2,6 @@ package gg.calendar.api.user.schedule.publicschedule.controller.request;
 
 import java.time.LocalDateTime;
 
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -60,10 +59,10 @@ public class PublicScheduleCreateJobReqDto {
 		this.endTime = endTime;
 	}
 
-	@AssertTrue(message = "classfication must be job_notice type")
-	private boolean isJobNotice() {
-		return classification == DetailClassification.JOB_NOTICE;
-	}
+	// @AssertTrue(message = "classfication must be job_notice type")
+	// private boolean isJobNotice() {
+	// 	return classification == DetailClassification.JOB_NOTICE;
+	// }
 
 	public static PublicSchedule toEntity(String intraId, PublicScheduleCreateJobReqDto dto) {
 		return PublicSchedule.builder()
