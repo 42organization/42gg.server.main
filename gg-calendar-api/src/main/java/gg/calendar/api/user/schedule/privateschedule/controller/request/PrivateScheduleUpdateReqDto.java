@@ -6,12 +6,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PrivateScheduleUpdateReqDto {
 	@NotBlank
 	@Size(max = 50)
@@ -35,7 +36,7 @@ public class PrivateScheduleUpdateReqDto {
 	private Long groupId;
 
 	@Builder
-	public PrivateScheduleUpdateReqDto(String title, String content, String link, LocalDateTime startTime,
+	private PrivateScheduleUpdateReqDto(String title, String content, String link, LocalDateTime startTime,
 		LocalDateTime endTime, boolean alarm, Long groupId) {
 		this.title = title;
 		this.content = content;
