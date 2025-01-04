@@ -57,11 +57,10 @@ public class PrivateScheduleService {
 		scheduleGroupRepository.findById(privateScheduleUpdateReqDto.getGroupId())
 			.orElseThrow(() -> new NotExistException(ErrorCode.SCHEDULE_GROUP_NOT_FOUND));
 
-		privateSchedule.update(privateScheduleUpdateReqDto.getEventTag(), privateScheduleUpdateReqDto.getJobTag(),
-			privateScheduleUpdateReqDto.getTechTag(), privateScheduleUpdateReqDto.getTitle(),
-			privateScheduleUpdateReqDto.getContent(), privateScheduleUpdateReqDto.getLink(),
-			privateScheduleUpdateReqDto.getStartTime(), privateScheduleUpdateReqDto.getEndTime(),
-			privateScheduleUpdateReqDto.isAlarm(), privateScheduleUpdateReqDto.getGroupId());
+		privateSchedule.update(privateScheduleUpdateReqDto.getTitle(), privateScheduleUpdateReqDto.getContent(),
+			privateScheduleUpdateReqDto.getLink(), privateScheduleUpdateReqDto.getStartTime(),
+			privateScheduleUpdateReqDto.getEndTime(), privateScheduleUpdateReqDto.isAlarm(),
+			privateScheduleUpdateReqDto.getGroupId());
 		return PrivateScheduleUpdateResDto.toDto(privateSchedule);
 	}
 

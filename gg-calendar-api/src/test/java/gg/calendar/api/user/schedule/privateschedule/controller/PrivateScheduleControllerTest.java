@@ -154,9 +154,6 @@ public class PrivateScheduleControllerTest {
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
 				scheduleGroup.getId());
 			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
-				.eventTag(null)
-				.techTag(null)
-				.jobTag(null)
 				.alarm(false)
 				.title("123")
 				.content("")
@@ -189,9 +186,6 @@ public class PrivateScheduleControllerTest {
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
 				scheduleGroup.getId());
 			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
-				.eventTag(null)
-				.techTag(null)
-				.jobTag(null)
 				.alarm(false)
 				.title("123")
 				.content("")
@@ -218,9 +212,6 @@ public class PrivateScheduleControllerTest {
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
 				scheduleGroup.getId());
 			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
-				.eventTag(null)
-				.techTag(null)
-				.jobTag(null)
 				.alarm(false)
 				.title("123")
 				.content("")
@@ -247,9 +238,6 @@ public class PrivateScheduleControllerTest {
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
 				scheduleGroup.getId());
 			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
-				.eventTag(null)
-				.techTag(null)
-				.jobTag(null)
 				.alarm(false)
 				.title("123")
 				.content("")
@@ -276,9 +264,6 @@ public class PrivateScheduleControllerTest {
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
 				scheduleGroup.getId());
 			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
-				.eventTag(null)
-				.techTag(null)
-				.jobTag(null)
 				.alarm(false)
 				.title("123")
 				.content("")
