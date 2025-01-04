@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ImportedPrivateScheduleUpdateResDto {
+public class ImportedScheduleUpdateResDto {
 	private Long id;
 
 	private DetailClassification classification;
@@ -45,7 +45,7 @@ public class ImportedPrivateScheduleUpdateResDto {
 	private Long groupId;
 
 	@Builder
-	private ImportedPrivateScheduleUpdateResDto(Long id, DetailClassification classification, EventTag eventTag,
+	private ImportedScheduleUpdateResDto(Long id, DetailClassification classification, EventTag eventTag,
 		JobTag jobTag, TechTag techTag, String author, String title, String content, String link, ScheduleStatus status,
 		LocalDateTime startTime, LocalDateTime endTime, boolean alarm, Long groupId) {
 		this.id = id;
@@ -64,8 +64,8 @@ public class ImportedPrivateScheduleUpdateResDto {
 		this.groupId = groupId;
 	}
 
-	public static ImportedPrivateScheduleUpdateResDto toDto(PrivateSchedule privateSchedule) {
-		return ImportedPrivateScheduleUpdateResDto.builder()
+	public static ImportedScheduleUpdateResDto toDto(PrivateSchedule privateSchedule) {
+		return ImportedScheduleUpdateResDto.builder()
 			.id(privateSchedule.getId())
 			.classification(privateSchedule.getPublicSchedule().getClassification())
 			.eventTag(privateSchedule.getPublicSchedule().getEventTag())

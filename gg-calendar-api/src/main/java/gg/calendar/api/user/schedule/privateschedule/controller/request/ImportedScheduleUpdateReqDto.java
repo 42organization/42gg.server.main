@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ImportedPrivateScheduleUpdateReqDto {
+public class ImportedScheduleUpdateReqDto {
 	@NotNull
 	private boolean alarm;
 
@@ -17,7 +17,7 @@ public class ImportedPrivateScheduleUpdateReqDto {
 	private Long groupId;
 
 	@Builder
-	private ImportedPrivateScheduleUpdateReqDto(boolean alarm, Long groupId) {
+	private ImportedScheduleUpdateReqDto(boolean alarm, Long groupId) {
 		this.alarm = alarm;
 		this.groupId = groupId;
 	}

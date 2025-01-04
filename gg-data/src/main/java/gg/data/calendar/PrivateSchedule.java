@@ -55,7 +55,12 @@ public class PrivateSchedule extends BaseTimeEntity {
 		this.status = ScheduleStatus.ACTIVATE;
 	}
 
-	public void update(String title, String content, String link, LocalDateTime startTime, LocalDateTime endTime,
+	public void update(boolean alarm, Long groupId) {
+		this.alarm = alarm;
+		this.groupId = groupId;
+	}
+
+	public void updateCascade(String title, String content, String link, LocalDateTime startTime, LocalDateTime endTime,
 		boolean alarm, Long groupId) {
 		this.alarm = alarm;
 		this.groupId = groupId;
