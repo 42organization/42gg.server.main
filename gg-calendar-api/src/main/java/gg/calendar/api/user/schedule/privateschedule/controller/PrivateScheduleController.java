@@ -47,7 +47,7 @@ public class PrivateScheduleController {
 	}
 
 	@PutMapping("/imported/{id}")
-	public ResponseEntity<ImportedScheduleUpdateResDto> privateScheduleUpdate(
+	public ResponseEntity<ImportedScheduleUpdateResDto> importedScheduleUpdate(
 		@Login @Parameter(hidden = true) UserDto userDto,
 		@Valid @RequestBody ImportedScheduleUpdateReqDto importedScheduleUpdateReqDto,
 		@PathVariable Long id) {
