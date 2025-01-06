@@ -43,7 +43,7 @@ public class PrivateScheduleMockData {
 		ScheduleGroup scheduleGroup = ScheduleGroup.builder()
 			.user(user)
 			.title("title")
-			.backgroundColor("")
+			.backgroundColor("#FFFFFF")
 			.build();
 		return scheduleGroupRepository.save(scheduleGroup);
 	}
