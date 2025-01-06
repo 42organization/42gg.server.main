@@ -45,4 +45,15 @@ public class TotalScheduleAdminController {
 
 		return ResponseEntity.ok(pageResponseDto);
 	}
+
+	// @GetMapping("/search")
+	// public ResponseEntity<TotalScheduleAdminSearchListResDto> totalScheduleAdminSearchList(
+	// 	@ModelAttribute @Valid TotalScheduleAdminSearchReqDto totalScheduleAdminSearchReqDto) {
+	//
+	// 	TotalScheduleAdminSearchListResDto scheduleList = totalScheduleAdminService
+	// 		.searchTotalScheduleAdminList(totalScheduleAdminSearchReqDto);
+	//
+	// 	return ResponseEntity.ok(scheduleList);
+	// }
+
 }

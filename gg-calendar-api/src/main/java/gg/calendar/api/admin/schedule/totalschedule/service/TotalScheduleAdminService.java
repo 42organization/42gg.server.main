@@ -50,4 +50,11 @@ public class TotalScheduleAdminService {
 			.collect(Collectors.toList());
 		return PageResponseDto.of(publicSchedules.getTotalElements(), publicScheduleList);
 	}
+
+	// public List<TotalScheduleAdminResDto> searchTotalScheduleAdminList(TotalScheduleAdminSearchReqDto reqDto) {
+	// 	List<TotalScheduleAdminResDto> lists = publicScheduleAdminRepository.findByAuthor(author);
+	// 	return publicSchedules.stream()
+	// 		.map(TotalScheduleAdminResDto::new)
+	// 		.collect(Collectors.toList());
+	// }
 }
