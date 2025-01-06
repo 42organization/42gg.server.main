@@ -76,7 +76,6 @@ public class PrivateScheduleService {
 		privateSchedule.deleteCascade();
 	}
 
-	@Transactional
 	public PrivateScheduleDetailResDto getPrivateScheduleDetail(UserDto userDto, Long privateScheduleId) {
 		PrivateSchedule privateSchedule = privateScheduleRepository.findById(privateScheduleId)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PRIVATE_SCHEDULE_NOT_FOUND));
