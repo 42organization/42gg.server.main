@@ -124,7 +124,7 @@ public class PublicScheduleControllerTest {
 		}
 
 		@Test
-		@DisplayName("[400]공개일정-42event 생성실패- 기간이 잘못되었을 때(종료닐짜가 시작날짜보다 빠를때)")
+		@DisplayName("[400]공개일정-42event 생성실패- 기간이 잘못되었을 때(종료날짜가 시작날짜보다 빠를때)")
 		void createEventPublicScheduleFailFaultPeriod() throws Exception {
 			// given
 			PublicScheduleCreateEventReqDto eventPublicScheduleDto = PublicScheduleCreateEventReqDto.builder()
@@ -639,7 +639,7 @@ public class PublicScheduleControllerTest {
 					.endTime(LocalDateTime.now().plusDays(1))
 					.build());
 			publicScheduleRepository.save(publicSchedule);
-			
+
 			PublicScheduleUpdateReqDto updatePublicSchedule = PublicScheduleUpdateReqDto.builder()
 				.classification(DetailClassification.JOB_NOTICE)
 				.eventTag(EventTag.INSTRUCTION)
