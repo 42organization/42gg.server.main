@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import gg.auth.UserDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleCreateReqDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleUpdateReqDto;
+import gg.calendar.api.user.schedule.privateschedule.controller.response.PrivateScheduleDetailResDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.response.PrivateScheduleUpdateResDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
@@ -73,6 +74,16 @@ public class PrivateScheduleService {
 		validateDetailClassification(privateSchedule.getPublicSchedule().getClassification());
 
 		privateSchedule.deleteCascade();
+	}
+
+	@Transactional
+	public PrivateScheduleDetailResDto getPrivateScheduleDetail(UserDto userDto, Long privateScheduleId) {
+		PrivateSchedule privateSchedule = privateScheduleRepository.findById(privateScheduleId)
+			.orElseThrow(() -> new NotExistException(ErrorCode.PRIVATE_SCHEDULE_NOT_FOUND));
+		ScheduleGroup scheduleGroup = scheduleGroupRepository.findById(privateSchedule.getGroupId())
+			.orElseThrow(() -> new NotExistException(ErrorCode.SCHEDULE_GROUP_NOT_FOUND));
+		validateAuthor(userDto.getIntraId(), privateSchedule.getUser().getIntraId());
+		return PrivateScheduleDetailResDto.toDto(privateSchedule, scheduleGroup);
 	}
 
 	public void validateDetailClassification(DetailClassification classification) {
