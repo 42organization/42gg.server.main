@@ -52,7 +52,8 @@ public class PrivateScheduleService {
 
 	@Transactional
 	public PrivateScheduleUpdateResDto updatePrivateSchedule(UserDto userDto,
-		PrivateScheduleUpdateReqDto privateScheduleUpdateReqDto, Long privateScheduleId) {
+		PrivateScheduleUpdateReqDto privateScheduleUpdateReqDto,
+		Long privateScheduleId) {
 		validateTimeRange(privateScheduleUpdateReqDto.getStartTime(), privateScheduleUpdateReqDto.getEndTime());
 		PrivateSchedule privateSchedule = privateScheduleRepository.findById(privateScheduleId)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PRIVATE_SCHEDULE_NOT_FOUND));
@@ -87,6 +88,15 @@ public class PrivateScheduleService {
 		validateDetailClassification(privateSchedule.getPublicSchedule().getClassification());
 
 		privateSchedule.deleteCascade();
+	}
+
+	@Transactional
+	public void deleteImportedSchedule(UserDto userDto, Long privateScheduleId) {
+		PrivateSchedule privateSchedule = privateScheduleRepository.findById(privateScheduleId)
+			.orElseThrow(() -> new NotExistException(ErrorCode.PRIVATE_SCHEDULE_NOT_FOUND));
+		validateAuthor(userDto.getIntraId(), privateSchedule.getUser().getIntraId());
+
+		privateSchedule.delete();
 	}
 
 	public void validateDetailClassification(DetailClassification classification) {
