@@ -52,9 +52,4 @@ public class PublicScheduleUpdateReqDto {
 	@NotNull
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
 	private LocalDateTime endTime;
-
-	// @AssertTrue(message = "classification must match with eventTag, jobTag, techTag")
-	// private boolean isValidClassification() {
-	// 	return classification.isValid(eventTag, jobTag, techTag);
-	// }
 }

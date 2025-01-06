@@ -44,7 +44,6 @@ public class PublicScheduleCreateEventReqDto {
 	@Builder
 	public PublicScheduleCreateEventReqDto(EventTag eventTag, String author, String title, String content, String link,
 		LocalDateTime startTime, LocalDateTime endTime) {
-		this.classification = DetailClassification.EVENT;
 		this.eventTag = eventTag;
 		this.author = author;
 		this.title = title;
@@ -53,11 +52,6 @@ public class PublicScheduleCreateEventReqDto {
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}
-
-	// @AssertTrue(message = "classfication must be 42event type")
-	// private boolean isEvent() {
-	// 	return classification == DetailClassification.EVENT;
-	// }
 
 	public static PublicSchedule toEntity(String intraId, PublicScheduleCreateEventReqDto dto) {
 		return PublicSchedule.builder()
