@@ -1,11 +1,7 @@
 package gg.calendar.api.user.schedule.privateschedule.controller;
 
-import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,8 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gg.calendar.api.user.schedule.privateschedule.PrivateScheduleMockData;
-import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleCreateReqDto;
-import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleUpdateReqDto;
+import gg.calendar.api.user.schedule.privateschedule.controller.request.ImportedScheduleUpdateReqDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.ScheduleGroup;
@@ -38,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @IntegrationTest
 @AutoConfigureMockMvc
 @Transactional
-public class PrivateScheduleControllerTest {
+public class ImportedScheduleControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -64,86 +59,8 @@ public class PrivateScheduleControllerTest {
 	}
 
 	@Nested
-	@DisplayName("PrivateSchedule 생성하기")
-	class CreatePrivateSchedule {
-		@Test
-		@DisplayName("성공 201")
-		void success() throws Exception {
-			//given
-			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
-			PrivateScheduleCreateReqDto reqDto = PrivateScheduleCreateReqDto.builder()
-				.title("title")
-				.link("")
-				.content("")
-				.startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now().plusDays(1))
-				.alarm(true)
-				.groupId(scheduleGroup.getId())
-				.status(ScheduleStatus.ACTIVATE)
-				.build();
-			//when
-			mockMvc.perform(post("/calendar/private")
-					.header("Authorization", "Bearer " + accessToken)
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(reqDto)))
-				.andExpect(status().isCreated());
-			//then
-
-			List<PrivateSchedule> schedules = privateScheduleRepository.findAll();
-			assertThat(schedules.size()).isEqualTo(1);
-			PrivateSchedule privateSchedule = schedules.get(0);
-			Assertions.assertThat(privateSchedule.getGroupId()).isEqualTo(scheduleGroup.getId());
-			Assertions.assertThat(privateSchedule.isAlarm()).isEqualTo(reqDto.isAlarm());
-		}
-
-		@Test
-		@DisplayName("일정 그룹이 없는 경우 404")
-		void notFoundGroup() throws Exception {
-			//given
-			PrivateScheduleCreateReqDto reqDto = PrivateScheduleCreateReqDto.builder()
-				.title("title")
-				.link("")
-				.content("")
-				.startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now().plusDays(1))
-				.alarm(true)
-				.groupId(2L)
-				.status(ScheduleStatus.ACTIVATE)
-				.build();
-			//when&then
-			mockMvc.perform(post("/calendar/private")
-					.header("Authorization", "Bearer " + accessToken)
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(reqDto)))
-				.andExpect(status().isNotFound());
-		}
-
-		@Test
-		@DisplayName("시작 날짜보다 끝나는 날짜가 빠른 경우 400")
-		void endTimeBeforeStartTime() throws Exception {
-			//given
-			PrivateScheduleCreateReqDto reqDto = PrivateScheduleCreateReqDto.builder()
-				.title("title")
-				.link("")
-				.content("")
-				.startTime(LocalDateTime.now().plusDays(1))
-				.endTime(LocalDateTime.now())
-				.alarm(true)
-				.groupId(2L)
-				.status(ScheduleStatus.ACTIVATE)
-				.build();
-			//when&then
-			mockMvc.perform(post("/calendar/private")
-					.header("Authorization", "Bearer " + accessToken)
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(reqDto)))
-				.andExpect(status().isBadRequest());
-		}
-	}
-
-	@Nested
-	@DisplayName("PrivateSchedule 수정하기")
-	class UpdatePrivateSchedule {
+	@DisplayName("가져온 PrivateSchedule 수정하기")
+	class UpdateImportedSchedule {
 		@Test
 		@DisplayName("성공 200")
 		void success() throws Exception {
@@ -153,17 +70,12 @@ public class PrivateScheduleControllerTest {
 				DetailClassification.PRIVATE_SCHEDULE);
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
 				scheduleGroup.getId());
-			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
+			ImportedScheduleUpdateReqDto reqDto = ImportedScheduleUpdateReqDto.builder()
 				.alarm(false)
-				.title("123")
-				.content("")
-				.link(null)
-				.startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now().plusDays(1))
 				.groupId(scheduleGroup.getId())
 				.build();
 			//when
-			mockMvc.perform(put("/calendar/private/" + privateSchedule.getId())
+			mockMvc.perform(put("/calendar/private/imported/" + privateSchedule.getId())
 					.header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(reqDto)))
@@ -172,56 +84,24 @@ public class PrivateScheduleControllerTest {
 			PrivateSchedule updated = privateScheduleRepository.findById(privateSchedule.getId()).orElseThrow();
 			Assertions.assertThat(privateSchedule.getGroupId()).isEqualTo(updated.getGroupId());
 			Assertions.assertThat(privateSchedule.isAlarm()).isEqualTo(updated.isAlarm());
-			Assertions.assertThat(privateSchedule.getGroupId()).isEqualTo(updated.getGroupId());
-			Assertions.assertThat(privateSchedule.getPublicSchedule()).isEqualTo(updated.getPublicSchedule());
-		}
-
-		@Test
-		@DisplayName("종료 날짜가 시작 날짜보다 빠른 경우 400")
-		void endTimeBeforeStartTime() throws Exception {
-			//given
-			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
-			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
-				DetailClassification.PRIVATE_SCHEDULE);
-			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
-				scheduleGroup.getId());
-			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
-				.alarm(false)
-				.title("123")
-				.content("")
-				.link(null)
-				.startTime(LocalDateTime.now().plusDays(1))
-				.endTime(LocalDateTime.now())
-				.groupId(scheduleGroup.getId())
-				.build();
-			//when&then
-			mockMvc.perform(put("/calendar/private/" + privateSchedule.getId())
-					.header("Authorization", "Bearer " + accessToken)
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(reqDto)))
-				.andExpect(status().isBadRequest());
 		}
 
 		@Test
 		@DisplayName("작성자가 아닌 사람이 일정을 수정 하려는 경우 403")
 		void notMatchAuthor() throws Exception {
 			//given
+			User other = testDataUtils.createNewUser("other");
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
-			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule("author",
+			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
 				DetailClassification.PRIVATE_SCHEDULE);
-			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(other, publicSchedule,
 				scheduleGroup.getId());
-			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
+			ImportedScheduleUpdateReqDto reqDto = ImportedScheduleUpdateReqDto.builder()
 				.alarm(false)
-				.title("123")
-				.content("")
-				.link(null)
-				.startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now().plusDays(1))
 				.groupId(scheduleGroup.getId())
 				.build();
 			//when&then
-			mockMvc.perform(put("/calendar/private/" + privateSchedule.getId())
+			mockMvc.perform(put("/calendar/private/imported/" + privateSchedule.getId())
 					.header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(reqDto)))
@@ -237,17 +117,12 @@ public class PrivateScheduleControllerTest {
 				DetailClassification.PRIVATE_SCHEDULE);
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
 				scheduleGroup.getId());
-			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
+			ImportedScheduleUpdateReqDto reqDto = ImportedScheduleUpdateReqDto.builder()
 				.alarm(false)
-				.title("123")
-				.content("")
-				.link(null)
-				.startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now().plusDays(1))
 				.groupId(scheduleGroup.getId())
 				.build();
 			//when&then
-			mockMvc.perform(put("/calendar/private/" + privateSchedule.getId() + 123411243)
+			mockMvc.perform(put("/calendar/private/imported/" + privateSchedule.getId() + 123411243)
 					.header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(reqDto)))
@@ -263,17 +138,12 @@ public class PrivateScheduleControllerTest {
 				DetailClassification.PRIVATE_SCHEDULE);
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
 				scheduleGroup.getId());
-			PrivateScheduleUpdateReqDto reqDto = PrivateScheduleUpdateReqDto.builder()
+			ImportedScheduleUpdateReqDto reqDto = ImportedScheduleUpdateReqDto.builder()
 				.alarm(false)
-				.title("123")
-				.content("")
-				.link(null)
-				.startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now().plusDays(1))
 				.groupId(0L)
 				.build();
 			//when&then
-			mockMvc.perform(put("/calendar/private/" + privateSchedule.getId())
+			mockMvc.perform(put("/calendar/private/imported/" + privateSchedule.getId())
 					.header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(reqDto)))
@@ -282,8 +152,8 @@ public class PrivateScheduleControllerTest {
 	}
 
 	@Nested
-	@DisplayName("PrivateSchedule 삭제하기")
-	class DeletePrivateSchedule {
+	@DisplayName("가져온 PrivateSchedule 삭제하기")
+	class DeleteImportedSchedule {
 		@Test
 		@DisplayName("삭제 성공 204")
 		void success() throws Exception {
@@ -294,45 +164,27 @@ public class PrivateScheduleControllerTest {
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
 				scheduleGroup.getId());
 			//when
-			mockMvc.perform(patch("/calendar/private/" + privateSchedule.getId())
+			mockMvc.perform(patch("/calendar/private/imported/" + privateSchedule.getId())
 					.header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNoContent());
 			//then
 			Assertions.assertThat(privateSchedule.getStatus()).isEqualTo(ScheduleStatus.DELETE);
-			Assertions.assertThat(privateSchedule.getPublicSchedule().getStatus()).isEqualTo(ScheduleStatus.DELETE);
+			Assertions.assertThat(privateSchedule.getPublicSchedule().getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
 		}
 
 		@Test
 		@DisplayName("작성자가 아닌 사람이 삭제하는 경우 403")
 		void notMatchAuthor() throws Exception {
 			//given
-			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
-			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule("author",
-				DetailClassification.PRIVATE_SCHEDULE);
-			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
-				scheduleGroup.getId());
-			//when
-			mockMvc.perform(patch("/calendar/private/" + privateSchedule.getId())
-					.header("Authorization", "Bearer " + accessToken)
-					.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isForbidden());
-			//then
-			Assertions.assertThat(privateSchedule.getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
-			Assertions.assertThat(privateSchedule.getPublicSchedule().getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
-		}
-
-		@Test
-		@DisplayName("상세분류가 개인일정이 아닌 일정을 삭제하는 경우 403")
-		void notPrivateSchedule() throws Exception {
-			//given
+			User other = testDataUtils.createNewUser("other");
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
 			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
-				DetailClassification.EVENT);
-			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
+				DetailClassification.PRIVATE_SCHEDULE);
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(other, publicSchedule,
 				scheduleGroup.getId());
 			//when
-			mockMvc.perform(patch("/calendar/private/" + privateSchedule.getId())
+			mockMvc.perform(patch("/calendar/private/imported/" + privateSchedule.getId())
 					.header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isForbidden());
@@ -351,7 +203,7 @@ public class PrivateScheduleControllerTest {
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
 				scheduleGroup.getId());
 			//when
-			mockMvc.perform(patch("/calendar/private/" + privateSchedule.getId() + 1234)
+			mockMvc.perform(patch("/calendar/private/imported/" + privateSchedule.getId() + 1234)
 					.header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());

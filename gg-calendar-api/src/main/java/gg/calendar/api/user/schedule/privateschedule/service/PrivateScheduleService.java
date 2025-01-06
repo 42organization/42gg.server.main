@@ -6,10 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import gg.auth.UserDto;
-import gg.calendar.api.user.schedule.privateschedule.controller.request.ImportedScheduleUpdateReqDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleCreateReqDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleUpdateReqDto;
-import gg.calendar.api.user.schedule.privateschedule.controller.response.ImportedScheduleUpdateResDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.response.PrivateScheduleUpdateResDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
@@ -52,7 +50,8 @@ public class PrivateScheduleService {
 
 	@Transactional
 	public PrivateScheduleUpdateResDto updatePrivateSchedule(UserDto userDto,
-		PrivateScheduleUpdateReqDto privateScheduleUpdateReqDto, Long privateScheduleId) {
+		PrivateScheduleUpdateReqDto privateScheduleUpdateReqDto,
+		Long privateScheduleId) {
 		validateTimeRange(privateScheduleUpdateReqDto.getStartTime(), privateScheduleUpdateReqDto.getEndTime());
 		PrivateSchedule privateSchedule = privateScheduleRepository.findById(privateScheduleId)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PRIVATE_SCHEDULE_NOT_FOUND));
@@ -64,19 +63,6 @@ public class PrivateScheduleService {
 			privateScheduleUpdateReqDto.getLink(), privateScheduleUpdateReqDto.getStartTime(),
 			privateScheduleUpdateReqDto.getEndTime(), privateScheduleUpdateReqDto.isAlarm(), scheduleGroup.getId());
 		return PrivateScheduleUpdateResDto.toDto(privateSchedule);
-	}
-
-	@Transactional
-	public ImportedScheduleUpdateResDto updateImportedSchedule(UserDto userDto,
-		ImportedScheduleUpdateReqDto importedScheduleUpdateReqDto, Long privateScheduleId) {
-		PrivateSchedule privateSchedule = privateScheduleRepository.findById(privateScheduleId)
-			.orElseThrow(() -> new NotExistException(ErrorCode.PRIVATE_SCHEDULE_NOT_FOUND));
-		validateAuthor(userDto.getIntraId(), privateSchedule.getUser().getIntraId());
-		ScheduleGroup scheduleGroup = scheduleGroupRepository.findById(importedScheduleUpdateReqDto.getGroupId())
-			.orElseThrow(() -> new NotExistException(ErrorCode.SCHEDULE_GROUP_NOT_FOUND));
-
-		privateSchedule.update(importedScheduleUpdateReqDto.isAlarm(), scheduleGroup.getId());
-		return ImportedScheduleUpdateResDto.toDto(privateSchedule);
 	}
 
 	@Transactional
