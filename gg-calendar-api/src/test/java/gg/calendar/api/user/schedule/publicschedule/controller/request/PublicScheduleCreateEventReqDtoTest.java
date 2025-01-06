@@ -9,41 +9,33 @@ import org.junit.jupiter.api.Test;
 
 import gg.auth.UserDto;
 import gg.data.calendar.PublicSchedule;
-import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.utils.annotation.UnitTest;
 
-/*이  테스트는 reqDto의 of()메서드가 정상적으로 엔티티로 변환되는 지 검증하는 테스트*/
-
 @UnitTest
-public class PublicScheduleCreateReqDtoTest {
+public class PublicScheduleCreateEventReqDtoTest {
 	@Test
-	@DisplayName("PublicScheduleCreateReqDto 생성 성공")
-	void createPublicScheduleSuccess() {
+	@DisplayName("PublicScheduleCreateEventReqDto 생성 성공")
+	void createEventPublicScheduleSuccess() {
 		UserDto user = UserDto.builder().intraId("intraId").build();
 
-		PublicScheduleCreateReqDto dto = PublicScheduleCreateReqDto.builder()
-			.classification(DetailClassification.JOB_NOTICE)
+		PublicScheduleCreateEventReqDto dto = PublicScheduleCreateEventReqDto.builder()
 			.eventTag(EventTag.INSTRUCTION)
-			.title("Test Schedule")
 			.author(user.getIntraId())
-			.content("Test Content")
-			.link("http://test.com")
+			.title("event create test")
+			.content("event create test content!")
+			.link("https://test.com")
 			.startTime(LocalDateTime.now().plusDays(1))
 			.endTime(LocalDateTime.now().plusDays(2))
 			.build();
 
-		PublicSchedule schedule = dto.toEntity(user.getIntraId(), dto);
-
-		assertAll(() -> assertNotNull(schedule),
-			() -> assertEquals(dto.getClassification(), schedule.getClassification()),
-			() -> assertEquals(dto.getEventTag(), schedule.getEventTag()),
-			() -> assertEquals(dto.getTitle(), schedule.getTitle()),
+		PublicSchedule schedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(), dto);
+		assertAll(() -> assertNotNull(schedule), () -> assertEquals(dto.getEventTag(), schedule.getEventTag()),
 			() -> assertEquals(user.getIntraId(), schedule.getAuthor()),
+			() -> assertEquals(dto.getTitle(), schedule.getTitle()),
 			() -> assertEquals(dto.getContent(), schedule.getContent()),
 			() -> assertEquals(dto.getLink(), schedule.getLink()),
 			() -> assertEquals(dto.getStartTime(), schedule.getStartTime()),
 			() -> assertEquals(dto.getEndTime(), schedule.getEndTime()));
 	}
-
 }

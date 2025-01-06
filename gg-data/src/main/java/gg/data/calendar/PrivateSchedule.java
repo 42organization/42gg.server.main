@@ -14,10 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import gg.data.BaseTimeEntity;
-import gg.data.calendar.type.EventTag;
-import gg.data.calendar.type.JobTag;
+import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.ScheduleStatus;
-import gg.data.calendar.type.TechTag;
 import gg.data.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -57,12 +55,16 @@ public class PrivateSchedule extends BaseTimeEntity {
 		this.status = ScheduleStatus.ACTIVATE;
 	}
 
-	public void update(EventTag eventTag, JobTag jobTag, TechTag techTag, String title, String content,
-		String link, LocalDateTime startTime, LocalDateTime endTime, boolean alarm,
-		Long groupId) {
+	public void update(boolean alarm, Long groupId) {
 		this.alarm = alarm;
 		this.groupId = groupId;
-		this.publicSchedule.update(publicSchedule.getClassification(), eventTag, jobTag, techTag, title, content, link,
+	}
+
+	public void updateCascade(String title, String content, String link, LocalDateTime startTime, LocalDateTime endTime,
+		boolean alarm, Long groupId) {
+		this.alarm = alarm;
+		this.groupId = groupId;
+		this.publicSchedule.update(DetailClassification.PRIVATE_SCHEDULE, null, null, null, title, content, link,
 			startTime, endTime);
 	}
 

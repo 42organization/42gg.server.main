@@ -44,24 +44,24 @@ public class PrivateScheduleService {
 		User user = userRepository.getById(userDto.getId());
 		PrivateSchedule privateSchedule = new PrivateSchedule(user, publicSchedule,
 			privateScheduleCreateReqDto.isAlarm(), scheduleGroup.getId());
+
 		privateScheduleRepository.save(privateSchedule);
 	}
 
 	@Transactional
 	public PrivateScheduleUpdateResDto updatePrivateSchedule(UserDto userDto,
-		PrivateScheduleUpdateReqDto privateScheduleUpdateReqDto, Long privateScheduleId) {
+		PrivateScheduleUpdateReqDto privateScheduleUpdateReqDto,
+		Long privateScheduleId) {
 		validateTimeRange(privateScheduleUpdateReqDto.getStartTime(), privateScheduleUpdateReqDto.getEndTime());
 		PrivateSchedule privateSchedule = privateScheduleRepository.findById(privateScheduleId)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PRIVATE_SCHEDULE_NOT_FOUND));
 		validateAuthor(userDto.getIntraId(), privateSchedule.getPublicSchedule().getAuthor());
-		scheduleGroupRepository.findById(privateScheduleUpdateReqDto.getGroupId())
+		ScheduleGroup scheduleGroup = scheduleGroupRepository.findById(privateScheduleUpdateReqDto.getGroupId())
 			.orElseThrow(() -> new NotExistException(ErrorCode.SCHEDULE_GROUP_NOT_FOUND));
 
-		privateSchedule.update(privateScheduleUpdateReqDto.getEventTag(), privateScheduleUpdateReqDto.getJobTag(),
-			privateScheduleUpdateReqDto.getTechTag(), privateScheduleUpdateReqDto.getTitle(),
-			privateScheduleUpdateReqDto.getContent(), privateScheduleUpdateReqDto.getLink(),
-			privateScheduleUpdateReqDto.getStartTime(), privateScheduleUpdateReqDto.getEndTime(),
-			privateScheduleUpdateReqDto.isAlarm(), privateScheduleUpdateReqDto.getGroupId());
+		privateSchedule.updateCascade(privateScheduleUpdateReqDto.getTitle(), privateScheduleUpdateReqDto.getContent(),
+			privateScheduleUpdateReqDto.getLink(), privateScheduleUpdateReqDto.getStartTime(),
+			privateScheduleUpdateReqDto.getEndTime(), privateScheduleUpdateReqDto.isAlarm(), scheduleGroup.getId());
 		return PrivateScheduleUpdateResDto.toDto(privateSchedule);
 	}
 
@@ -71,6 +71,7 @@ public class PrivateScheduleService {
 			.orElseThrow(() -> new NotExistException(ErrorCode.PRIVATE_SCHEDULE_NOT_FOUND));
 		validateAuthor(userDto.getIntraId(), privateSchedule.getPublicSchedule().getAuthor());
 		validateDetailClassification(privateSchedule.getPublicSchedule().getClassification());
+
 		privateSchedule.deleteCascade();
 	}
 

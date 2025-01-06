@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gg.auth.UserDto;
 import gg.auth.argumentresolver.Login;
-import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateEventReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateJobReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicScheduleDetailRetrieveResDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicScheduleUpdateResDto;
@@ -30,17 +31,23 @@ import lombok.RequiredArgsConstructor;
 public class PublicScheduleController {
 	private final PublicScheduleService publicScheduleService;
 
-	@PostMapping
-	public ResponseEntity<Void> publicScheduleCreate(@RequestBody @Valid PublicScheduleCreateReqDto req,
+	@PostMapping("/event")
+	public ResponseEntity<Void> publicScheduleCreateEvent(@RequestBody @Valid PublicScheduleCreateEventReqDto req,
 		@Login @Parameter(hidden = true) UserDto userDto) {
-		publicScheduleService.createPublicSchedule(req, userDto.getId());
+		publicScheduleService.createEventPublicSchedule(req, userDto.getId());
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
+	@PostMapping("/job")
+	public ResponseEntity<Void> publicScheduleCreateJob(@RequestBody @Valid PublicScheduleCreateJobReqDto req,
+		@Login @Parameter(hidden = true) UserDto userDto) {
+		publicScheduleService.createJobPublicSchedule(req, userDto.getId());
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<PublicScheduleUpdateResDto> publicScheduleUpdate(@PathVariable Long id,
-		@RequestBody @Valid PublicScheduleUpdateReqDto req,
-		@Login @Parameter(hidden = true) UserDto userDto) {
+		@RequestBody @Valid PublicScheduleUpdateReqDto req, @Login @Parameter(hidden = true) UserDto userDto) {
 		PublicSchedule updateSchedule = publicScheduleService.updatePublicSchedule(id, req, userDto.getId());
 		return ResponseEntity.ok(PublicScheduleUpdateResDto.toDto(updateSchedule));
 	}

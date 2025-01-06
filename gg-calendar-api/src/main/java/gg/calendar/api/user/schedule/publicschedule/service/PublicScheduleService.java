@@ -6,10 +6,15 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateEventReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateJobReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
+import gg.data.calendar.type.DetailClassification;
+import gg.data.calendar.type.EventTag;
+import gg.data.calendar.type.JobTag;
+import gg.data.calendar.type.TechTag;
 import gg.data.user.User;
 import gg.repo.calendar.PrivateScheduleRepository;
 import gg.repo.calendar.PublicScheduleRepository;
@@ -29,18 +34,26 @@ public class PublicScheduleService {
 	private final PrivateScheduleRepository privateScheduleRepository;
 
 	@Transactional
-	public void createPublicSchedule(PublicScheduleCreateReqDto req, Long userId) {
+	public void createEventPublicSchedule(PublicScheduleCreateEventReqDto req, Long userId) {
 		User user = userRepository.getById(userId);
-		if (!user.getIntraId().equals(req.getAuthor())) {
-			throw new ForbiddenException(ErrorCode.CALENDAR_AUTHOR_NOT_MATCH);
-		}
+		checkAuthor(req.getAuthor(), user);
 		validateTimeRange(req.getStartTime(), req.getEndTime());
-		PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(), req);
-		publicScheduleRepository.save(publicSchedule);
+		PublicSchedule eventPublicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(), req);
+		publicScheduleRepository.save(eventPublicSchedule);
+	}
+
+	@Transactional
+	public void createJobPublicSchedule(PublicScheduleCreateJobReqDto req, Long userId) {
+		User user = userRepository.getById(userId);
+		checkAuthor(req.getAuthor(), user);
+		validateTimeRange(req.getStartTime(), req.getEndTime());
+		PublicSchedule jobPublicSchedule = PublicScheduleCreateJobReqDto.toEntity(user.getIntraId(), req);
+		publicScheduleRepository.save(jobPublicSchedule);
 	}
 
 	@Transactional
 	public PublicSchedule updatePublicSchedule(Long scheduleId, PublicScheduleUpdateReqDto req, Long userId) {
+		tagErrorCheck(req.getClassification(), req.getEventTag(), req.getJobTag(), req.getTechTag());
 		User user = userRepository.getById(userId);
 		PublicSchedule existingSchedule = publicScheduleRepository.findById(scheduleId)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
@@ -82,9 +95,15 @@ public class PublicScheduleService {
 		}
 	}
 
-	public void validateTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
+	private void validateTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
 		if (endTime.isBefore(startTime)) {
 			throw new InvalidParameterException(ErrorCode.CALENDAR_BEFORE_DATE);
+		}
+	}
+
+	private void tagErrorCheck(DetailClassification classification, EventTag eventTag, JobTag jobTag, TechTag techTag) {
+		if (!classification.isValid(eventTag, jobTag, techTag)) {
+			throw new InvalidParameterException(ErrorCode.CLASSIFICATION_NOT_MATCH);
 		}
 	}
 }
