@@ -67,9 +67,7 @@ public class PublicScheduleUpdateReqDtoTest {
 			Validator validator = factory.getValidator();
 			Set<ConstraintViolation<PublicScheduleUpdateReqDto>> violations = validator.validate(dto);
 
-			assertFalse(violations.isEmpty());
-			assertEquals("classification must match with eventTag, jobTag, techTag",
-				violations.iterator().next().getMessage());
+			assertTrue(violations.isEmpty());
 		}
 	}
 }

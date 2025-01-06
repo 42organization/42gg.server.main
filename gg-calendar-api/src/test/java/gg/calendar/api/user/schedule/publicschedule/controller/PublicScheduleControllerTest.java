@@ -342,7 +342,8 @@ public class PublicScheduleControllerTest {
 
 			// when
 			mockMvc.perform(
-					put("/calendar/public/" + jobPublicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
+					put("/calendar/public/" + jobPublicSchedule.getId())
+						.header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
 				.andExpect(status().isForbidden())
@@ -384,7 +385,8 @@ public class PublicScheduleControllerTest {
 
 			//when & then
 			mockMvc.perform(
-					put("/calendar/public/" + jobPublicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
+					put("/calendar/public/" + jobPublicSchedule.getId())
+						.header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
 				.andExpect(status().isForbidden())
@@ -425,7 +427,8 @@ public class PublicScheduleControllerTest {
 
 			// when
 			mockMvc.perform(
-					put("/calendar/public/" + jobPublicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
+					put("/calendar/public/" + jobPublicSchedule.getId())
+						.header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
 				.andExpect(status().isBadRequest())
@@ -639,7 +642,7 @@ public class PublicScheduleControllerTest {
 					.endTime(LocalDateTime.now().plusDays(1))
 					.build());
 			publicScheduleRepository.save(publicSchedule);
-			
+
 			PublicScheduleUpdateReqDto updatePublicSchedule = PublicScheduleUpdateReqDto.builder()
 				.classification(DetailClassification.JOB_NOTICE)
 				.eventTag(EventTag.INSTRUCTION)
@@ -653,7 +656,8 @@ public class PublicScheduleControllerTest {
 
 			//when
 			mockMvc.perform(
-					put("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
+					put("/calendar/public/" + publicSchedule.getId())
+						.header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updatePublicSchedule)))
 				.andExpect(status().isBadRequest())
@@ -829,7 +833,8 @@ public class PublicScheduleControllerTest {
 				publicScheduleRepository.save(publicSchedule);
 				// when
 				mockMvc.perform(
-						get("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accessToken))
+						get("/calendar/public/" + publicSchedule.getId())
+							.header("Authorization", "Bearer " + accessToken))
 					.andExpect(status().isOk())
 					.andExpect(jsonPath("$.title").value("Original Title"))
 					.andExpect(jsonPath("$.content").value("Original Content"))
@@ -854,7 +859,8 @@ public class PublicScheduleControllerTest {
 
 				// when & then
 				mockMvc.perform(
-						get("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accessToken))
+						get("/calendar/public/" + publicSchedule.getId())
+							.header("Authorization", "Bearer " + accessToken))
 					.andExpect(status().isForbidden())
 					.andDo(print());
 			}
