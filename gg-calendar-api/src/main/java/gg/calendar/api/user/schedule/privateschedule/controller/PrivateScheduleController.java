@@ -14,10 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gg.auth.UserDto;
 import gg.auth.argumentresolver.Login;
-import gg.calendar.api.user.schedule.privateschedule.controller.request.ImportedScheduleUpdateReqDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleCreateReqDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleUpdateReqDto;
-import gg.calendar.api.user.schedule.privateschedule.controller.response.ImportedScheduleUpdateResDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.response.PrivateScheduleUpdateResDto;
 import gg.calendar.api.user.schedule.privateschedule.service.PrivateScheduleService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -46,27 +44,10 @@ public class PrivateScheduleController {
 		return ResponseEntity.status(HttpStatus.OK).body(privateScheduleUpdateResDto);
 	}
 
-	@PutMapping("/imported/{id}")
-	public ResponseEntity<ImportedScheduleUpdateResDto> importedScheduleUpdate(
-		@Login @Parameter(hidden = true) UserDto userDto,
-		@Valid @RequestBody ImportedScheduleUpdateReqDto importedScheduleUpdateReqDto,
-		@PathVariable Long id) {
-		ImportedScheduleUpdateResDto importedScheduleUpdateResDto = privateScheduleService.updateImportedSchedule(
-			userDto, importedScheduleUpdateReqDto, id);
-		return ResponseEntity.status(HttpStatus.OK).body(importedScheduleUpdateResDto);
-	}
-
 	@PatchMapping("/{id}")
 	public ResponseEntity<Void> privateScheduleDelete(@Login @Parameter(hidden = true) UserDto userDto,
 		@PathVariable Long id) {
 		privateScheduleService.deletePrivateSchedule(userDto, id);
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-	}
-
-	@PatchMapping("/imported/{id}")
-	public ResponseEntity<Void> importedScheduleDelete(@Login @Parameter(hidden = true) UserDto userDto,
-		@PathVariable Long id) {
-		privateScheduleService.deleteImportedSchedule(userDto, id);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }
