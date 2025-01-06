@@ -499,8 +499,7 @@ public class PublicScheduleControllerTest {
 			//then
 			assertThat(publicScheduleRepository.findById(publicSchedule.getId())
 				.map(PublicSchedule::getTitle)
-				.orElseThrow())
-				.isEqualTo("Original Title");
+				.orElseThrow()).isEqualTo("Original Title");
 		}
 
 		@Test
@@ -541,8 +540,7 @@ public class PublicScheduleControllerTest {
 			//then
 			assertThat(publicScheduleRepository.findById(publicSchedule.getId())
 				.map(PublicSchedule::getTitle)
-				.orElseThrow())
-				.isEqualTo("Original Title");
+				.orElseThrow()).isEqualTo("Original Title");
 		}
 
 		@Test
@@ -683,10 +681,8 @@ public class PublicScheduleControllerTest {
 						.build());
 				publicScheduleRepository.save(publicSchedule);
 				// when
-				mockMvc.perform(
-						patch("/calendar/public/" + publicSchedule.getId()).header("Authorization",
-							"Bearer " + accessToken))
-					.andExpect(status().isNoContent());
+				mockMvc.perform(patch("/calendar/public/" + publicSchedule.getId()).header("Authorization",
+					"Bearer " + accessToken)).andExpect(status().isNoContent());
 
 				// then
 				List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
@@ -710,11 +706,8 @@ public class PublicScheduleControllerTest {
 				publicScheduleRepository.save(publicSchedule);
 
 				//when
-				mockMvc.perform(
-						patch("/calendar/public/" + publicSchedule.getId()).header("Authorization",
-							"Bearer " + accessToken))
-					.andExpect(status().isForbidden())
-					.andDo(print());
+				mockMvc.perform(patch("/calendar/public/" + publicSchedule.getId()).header("Authorization",
+					"Bearer " + accessToken)).andExpect(status().isForbidden()).andDo(print());
 
 				//then
 				List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor("another");
@@ -764,8 +757,7 @@ public class PublicScheduleControllerTest {
 				publicScheduleRepository.save(publicSchedule);
 
 				// when
-				mockMvc.perform(
-						patch("/calendar/public/abc").header("Authorization", "Bearer " + accessToken))
+				mockMvc.perform(patch("/calendar/public/abc").header("Authorization", "Bearer " + accessToken))
 					.andExpect(status().isBadRequest())
 					.andDo(print());
 				// then
@@ -797,16 +789,12 @@ public class PublicScheduleControllerTest {
 				privateScheduleRepository.saveAll(Arrays.asList(privateSchedule1, privateSchedule2));
 
 				// when
-				mockMvc.perform(
-						patch("/calendar/public/" + publicSchedule.getId()).header("Authorization",
-							"Bearer " + accessToken))
-					.andExpect(status().isNoContent())
-					.andDo(print());
+				mockMvc.perform(patch("/calendar/public/" + publicSchedule.getId()).header("Authorization",
+					"Bearer " + accessToken)).andExpect(status().isNoContent()).andDo(print());
 				// then
 				assertThat(publicScheduleRepository.findById(publicSchedule.getId())
 					.map(PublicSchedule::getStatus)
-					.orElseThrow())
-					.isEqualTo(ScheduleStatus.DELETE);
+					.orElseThrow()).isEqualTo(ScheduleStatus.DELETE);
 			}
 		}
 
@@ -875,8 +863,7 @@ public class PublicScheduleControllerTest {
 				publicScheduleRepository.save(publicSchedule);
 
 				// when & then
-				mockMvc.perform(
-						get("/calendar/public/abc").header("Authorization", "Bearer " + accessToken))
+				mockMvc.perform(get("/calendar/public/abc").header("Authorization", "Bearer " + accessToken))
 					.andExpect(status().isBadRequest())
 					.andDo(print());
 
@@ -898,8 +885,7 @@ public class PublicScheduleControllerTest {
 				publicScheduleRepository.save(publicSchedule);
 
 				//when & then
-				mockMvc.perform(
-						get("/calendar/public/9999").header("Authorization", "Bearer " + accessToken))
+				mockMvc.perform(get("/calendar/public/9999").header("Authorization", "Bearer " + accessToken))
 					.andExpect(status().isNotFound())
 					.andDo(print());
 			}
