@@ -62,4 +62,11 @@ public class PrivateScheduleController {
 		privateScheduleService.deletePrivateSchedule(userDto, id);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
+
+	@PatchMapping("/imported/{id}")
+	public ResponseEntity<Void> importedScheduleDelete(@Login @Parameter(hidden = true) UserDto userDto,
+		@PathVariable Long id) {
+		privateScheduleService.deleteImportedSchedule(userDto, id);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
 }
