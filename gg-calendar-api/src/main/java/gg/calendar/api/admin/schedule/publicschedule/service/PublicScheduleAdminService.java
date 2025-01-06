@@ -2,24 +2,23 @@ package gg.calendar.api.admin.schedule.publicschedule.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import gg.admin.repo.calendar.PrivateScheduleAdminRepository;
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
-import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateReqDto;
+import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateEventReqDto;
+import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminCreateJobReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.request.PublicScheduleAdminUpdateReqDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminResDto;
 import gg.calendar.api.admin.schedule.publicschedule.controller.response.PublicScheduleAdminUpdateResDto;
+import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
-import gg.data.calendar.type.ScheduleStatus;
-import gg.utils.dto.PageResponseDto;
+import gg.data.calendar.type.EventTag;
+import gg.data.calendar.type.JobTag;
+import gg.data.calendar.type.TechTag;
 import gg.utils.exception.ErrorCode;
 import gg.utils.exception.custom.InvalidParameterException;
 import gg.utils.exception.custom.NotExistException;
@@ -31,35 +30,35 @@ import lombok.RequiredArgsConstructor;
 public class PublicScheduleAdminService {
 
 	private final PublicScheduleAdminRepository publicScheduleAdminRepository;
+	private final PrivateScheduleAdminRepository privateScheduleAdminRepository;
 
 	@Transactional
-	public void createPublicSchedule(PublicScheduleAdminCreateReqDto publicScheduleAdminCreateReqDto) {
+	public void createPublicScheduleEvent(PublicScheduleAdminCreateEventReqDto publicScheduleAdminCreateEventReqDto) {
 
-		dateTimeErrorCheck(publicScheduleAdminCreateReqDto.getStartTime(),
-			publicScheduleAdminCreateReqDto.getEndTime());
-
-		PublicSchedule publicSchedule = PublicScheduleAdminCreateReqDto.toEntity(publicScheduleAdminCreateReqDto);
+		dateTimeErrorCheck(publicScheduleAdminCreateEventReqDto.getStartTime(),
+			publicScheduleAdminCreateEventReqDto.getEndTime());
+		PublicSchedule publicSchedule = PublicScheduleAdminCreateEventReqDto.toEntity(
+			publicScheduleAdminCreateEventReqDto);
 		publicScheduleAdminRepository.save(publicSchedule);
 	}
 
-	public PageResponseDto<PublicScheduleAdminResDto> findAllByClassification(DetailClassification detailClassification,
-		int page, int size) {
+	@Transactional
+	public void createPublicScheduleJob(PublicScheduleAdminCreateJobReqDto publicScheduleAdminCreateJobReqDto) {
 
-		Pageable pageable = PageRequest.of(page - 1, size,
-			Sort.by(Sort.Order.asc("status"), Sort.Order.asc("startTime")));
-
-		Page<PublicSchedule> publicSchedules = publicScheduleAdminRepository.findAllByClassification(
-			detailClassification, pageable);
-
-		List<PublicScheduleAdminResDto> publicScheduleList = publicSchedules.stream()
-			.map(PublicScheduleAdminResDto::new)
-			.collect(Collectors.toList());
-		return PageResponseDto.of(publicSchedules.getTotalElements(), publicScheduleList);
+		dateTimeErrorCheck(publicScheduleAdminCreateJobReqDto.getStartTime(),
+			publicScheduleAdminCreateJobReqDto.getEndTime());
+		PublicSchedule publicSchedule = PublicScheduleAdminCreateJobReqDto.toEntity(
+			publicScheduleAdminCreateJobReqDto);
+		publicScheduleAdminRepository.save(publicSchedule);
 	}
 
 	@Transactional
 	public PublicScheduleAdminUpdateResDto updatePublicSchedule(
 		PublicScheduleAdminUpdateReqDto publicScheduleAdminUpdateReqDto, Long id) {
+		tagErrorCheck(publicScheduleAdminUpdateReqDto.getClassification(),
+			publicScheduleAdminUpdateReqDto.getEventTag(),
+			publicScheduleAdminUpdateReqDto.getJobTag(), publicScheduleAdminUpdateReqDto.getTechTag());
+
 		dateTimeErrorCheck(publicScheduleAdminUpdateReqDto.getStartTime(),
 			publicScheduleAdminUpdateReqDto.getEndTime());
 
@@ -70,20 +69,22 @@ public class PublicScheduleAdminService {
 			publicScheduleAdminUpdateReqDto.getEventTag(), publicScheduleAdminUpdateReqDto.getJobTag(),
 			publicScheduleAdminUpdateReqDto.getTechTag(), publicScheduleAdminUpdateReqDto.getTitle(),
 			publicScheduleAdminUpdateReqDto.getContent(), publicScheduleAdminUpdateReqDto.getLink(),
-			publicScheduleAdminUpdateReqDto.getStartTime(), publicScheduleAdminUpdateReqDto.getEndTime(),
-			publicScheduleAdminUpdateReqDto.getStatus());
+			publicScheduleAdminUpdateReqDto.getStartTime(), publicScheduleAdminUpdateReqDto.getEndTime());
 
 		return PublicScheduleAdminUpdateResDto.toDto(publicSchedule);
 	}
 
 	@Transactional
 	public void deletePublicSchedule(Long id) {
+
 		PublicSchedule publicSchedule = publicScheduleAdminRepository.findById(id)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
-		if (publicSchedule.getStatus().equals(ScheduleStatus.DELETE)) {
-			throw new InvalidParameterException(ErrorCode.PUBLIC_SCHEDULE_ALREADY_DELETED);
-		}
+		List<PrivateSchedule> privateSchedules = privateScheduleAdminRepository.findByPublicScheduleId(
+			publicSchedule.getId());
 		publicSchedule.delete();
+		for (PrivateSchedule privateSchedule : privateSchedules) {
+			privateSchedule.delete();
+		}
 	}
 
 	public PublicScheduleAdminResDto detailPublicSchedule(Long id) {
@@ -96,6 +97,12 @@ public class PublicScheduleAdminService {
 	private void dateTimeErrorCheck(LocalDateTime startTime, LocalDateTime endTime) {
 		if (startTime.isAfter(endTime)) {
 			throw new InvalidParameterException(ErrorCode.CALENDAR_BEFORE_DATE);
+		}
+	}
+
+	private void tagErrorCheck(DetailClassification classification, EventTag eventTag, JobTag jobTag, TechTag techTag) {
+		if (!classification.isValid(eventTag, jobTag, techTag)) {
+			throw new InvalidParameterException(ErrorCode.CLASSIFICATION_NOT_MATCH);
 		}
 	}
 

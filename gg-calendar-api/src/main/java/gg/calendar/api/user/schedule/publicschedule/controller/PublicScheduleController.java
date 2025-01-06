@@ -4,6 +4,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,8 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gg.auth.UserDto;
 import gg.auth.argumentresolver.Login;
-import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateEventReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateJobReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicScheduleDetailRetrieveResDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicScheduleUpdateResDto;
 import gg.calendar.api.user.schedule.publicschedule.service.PublicScheduleService;
 import gg.data.calendar.PublicSchedule;
@@ -28,17 +31,23 @@ import lombok.RequiredArgsConstructor;
 public class PublicScheduleController {
 	private final PublicScheduleService publicScheduleService;
 
-	@PostMapping
-	public ResponseEntity<Void> publicScheduleCreate(@RequestBody @Valid PublicScheduleCreateReqDto req,
+	@PostMapping("/event")
+	public ResponseEntity<Void> publicScheduleCreateEvent(@RequestBody @Valid PublicScheduleCreateEventReqDto req,
 		@Login @Parameter(hidden = true) UserDto userDto) {
-		publicScheduleService.createPublicSchedule(req, userDto.getId());
+		publicScheduleService.createEventPublicSchedule(req, userDto.getId());
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
+	@PostMapping("/job")
+	public ResponseEntity<Void> publicScheduleCreateJob(@RequestBody @Valid PublicScheduleCreateJobReqDto req,
+		@Login @Parameter(hidden = true) UserDto userDto) {
+		publicScheduleService.createJobPublicSchedule(req, userDto.getId());
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<PublicScheduleUpdateResDto> publicScheduleUpdate(@PathVariable Long id,
-		@RequestBody @Valid PublicScheduleUpdateReqDto req,
-		@Login @Parameter(hidden = true) UserDto userDto) {
+		@RequestBody @Valid PublicScheduleUpdateReqDto req, @Login @Parameter(hidden = true) UserDto userDto) {
 		PublicSchedule updateSchedule = publicScheduleService.updatePublicSchedule(id, req, userDto.getId());
 		return ResponseEntity.ok(PublicScheduleUpdateResDto.toDto(updateSchedule));
 	}
@@ -49,5 +58,13 @@ public class PublicScheduleController {
 		publicScheduleService.deletePublicSchedule(id, userDto.getId());
 		return ResponseEntity.noContent().build();
 	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<PublicScheduleDetailRetrieveResDto> publicScheduleDetailRetrieveGet(@PathVariable Long id,
+		@Login @Parameter(hidden = true) UserDto userDto) {
+		PublicSchedule publicSchedule = publicScheduleService.getPublicScheduleDetailRetrieve(id, userDto.getId());
+		return ResponseEntity.ok(PublicScheduleDetailRetrieveResDto.toDto(publicSchedule));
+	}
+
 }
 

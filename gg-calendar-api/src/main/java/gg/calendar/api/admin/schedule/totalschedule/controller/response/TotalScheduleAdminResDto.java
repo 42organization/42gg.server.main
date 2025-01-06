@@ -1,4 +1,4 @@
-package gg.calendar.api.admin.schedule.publicschedule.controller.response;
+package gg.calendar.api.admin.schedule.totalschedule.controller.response;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PublicScheduleAdminResDto {
+public class TotalScheduleAdminResDto {
 
 	private Long id;
 
@@ -42,7 +42,7 @@ public class PublicScheduleAdminResDto {
 	private ScheduleStatus status;
 
 	@Builder
-	public PublicScheduleAdminResDto(PublicSchedule publicSchedule) {
+	public TotalScheduleAdminResDto(PublicSchedule publicSchedule) {
 		this.id = publicSchedule.getId();
 		this.classification = publicSchedule.getClassification();
 		this.eventTag = publicSchedule.getEventTag();
@@ -55,5 +55,13 @@ public class PublicScheduleAdminResDto {
 		this.link = publicSchedule.getLink();
 		this.sharedCount = publicSchedule.getSharedCount();
 		this.status = publicSchedule.getStatus();
+	}
+
+	@Override
+	public String toString() {
+		return "TotalScheduleAdminResDto [id=" + id + ", classification=" + classification + ", eventTag=" + eventTag
+			+ ", jobTag=" + jobTag + ", techTag=" + techTag + ", author=" + author + ", title=" + title
+			+ ", startTime=" + startTime + ", endTime=" + endTime + ", link=" + link + ", sharedCount=" + sharedCount
+			+ ", status=" + status + "]";
 	}
 }

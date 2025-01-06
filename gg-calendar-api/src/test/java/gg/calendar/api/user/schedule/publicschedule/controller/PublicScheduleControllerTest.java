@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -22,16 +23,19 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import gg.calendar.api.user.schedule.publicschedule.PublicScheduleMockData;
-import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateEventReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateJobReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
+import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
+import gg.data.calendar.type.JobTag;
 import gg.data.calendar.type.ScheduleStatus;
+import gg.data.calendar.type.TechTag;
 import gg.data.user.User;
+import gg.repo.calendar.PrivateScheduleRepository;
 import gg.repo.calendar.PublicScheduleRepository;
-import gg.repo.user.UserRepository;
 import gg.utils.TestDataUtils;
 import gg.utils.annotation.IntegrationTest;
 import lombok.extern.slf4j.Slf4j;
@@ -48,16 +52,13 @@ public class PublicScheduleControllerTest {
 	private ObjectMapper objectMapper;
 
 	@Autowired
-	private UserRepository userRepository;
-
-	@Autowired
 	private PublicScheduleRepository publicScheduleRepository;
 
 	@Autowired
-	private PublicScheduleMockData publicScheduleMockData;
+	private PrivateScheduleRepository privateScheduleRepository;
 
 	private User user;
-	private String accssToken;
+	private String accessToken;
 	@Autowired
 	private TestDataUtils testDataUtils;
 
@@ -67,54 +68,54 @@ public class PublicScheduleControllerTest {
 	@BeforeEach
 	void setUp() {
 		user = testDataUtils.createNewUser();
-		accssToken = testDataUtils.getLoginAccessTokenFromUser(user);
+		accessToken = testDataUtils.getLoginAccessTokenFromUser(user);
 	}
 
 	@Nested
 	@DisplayName("공개일정:생성")
-	class CreatePublicSchedule {
+	class CreateEventPublicSchedule {
 		@Test
-		@DisplayName("공개일정생성성공")
-		void createPublicScheduleSuccess() throws Exception {
+		@DisplayName("[201]공개일정-42event 생성성공")
+		void createEventPublicScheduleSuccess() throws Exception {
 			// given
-			PublicScheduleCreateReqDto publicScheduleDto = PublicScheduleCreateReqDto.builder()
-				.classification(DetailClassification.EVENT)
+			PublicScheduleCreateEventReqDto eventPublicSchedule = PublicScheduleCreateEventReqDto.builder()
+				.eventTag(EventTag.INSTRUCTION)
 				.author(user.getIntraId())
-				.title("Test Schedule")
-				.content("Test Content")
-				.link("http://test.com")
+				.title("42EventTag")
+				.content("42EventTagTest")
+				.link("https://test.com")
 				.startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().plusDays(1))
 				.build();
 
 			// when
-			log.info("After mock data creation: {}", publicScheduleRepository.findByAuthor(user.getIntraId()).size());
-			mockMvc.perform(post("/calendar/public").header("Authorization", "Bearer " + accssToken)
+			mockMvc.perform(post("/calendar/public/event").header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(publicScheduleDto))).andExpect(status().isCreated());
+				.content(objectMapper.writeValueAsString(eventPublicSchedule))).andExpect(status().isCreated());
 			// then
 			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
 			assertThat(schedules).hasSize(1);
-			assertThat(schedules.get(0).getTitle()).isEqualTo(publicScheduleDto.getTitle());
+			assertThat(schedules.get(0).getTitle()).isEqualTo(eventPublicSchedule.getTitle());
 		}
 
 		@Test
-		@DisplayName("공개일정생성실패-작성자가 다를 때")
-		void createPublicScheduleFailNotMatchAuthor() throws Exception {
+		@DisplayName("[404]공개일정-42event 생성실패-작성자가 다를 때")
+		void createEventPublicScheduleFailNotMatchAuthor() throws Exception {
 			// given
-			PublicScheduleCreateReqDto publicScheduleDto = PublicScheduleCreateReqDto.builder()
-				.classification(DetailClassification.EVENT)
+			PublicScheduleCreateEventReqDto eventPublicScheduleDto = PublicScheduleCreateEventReqDto.builder()
+				.eventTag(EventTag.INSTRUCTION)
 				.author("another")
-				.title("Test Schedule")
-				.content("Test Content")
-				.link("http://test.com")
+				.title("42EventTag")
+				.content("42EventTagTest")
+				.link("https://test.com")
 				.startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().plusDays(1))
 				.build();
+
 			// when
-			mockMvc.perform(post("/calendar/public").header("Authorization", "Bearer " + accssToken)
+			mockMvc.perform(post("/calendar/public/event").header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(publicScheduleDto)))
+					.content(objectMapper.writeValueAsString(eventPublicScheduleDto)))
 				.andExpect(status().isForbidden())
 				.andDo(print());
 			// then
@@ -123,27 +124,100 @@ public class PublicScheduleControllerTest {
 		}
 
 		@Test
-		@DisplayName("공개일정생성실패- 기간이 잘못되었을 때(종료닐짜가 시작날짜보다 빠를때)")
-		void createPublicScheduleFailFalutPeriod() throws Exception {
+		@DisplayName("[400]공개일정-42event 생성실패- 기간이 잘못되었을 때(종료닐짜가 시작날짜보다 빠를때)")
+		void createEventPublicScheduleFailFaultPeriod() throws Exception {
 			// given
-			PublicScheduleCreateReqDto publicScheduleDto = PublicScheduleCreateReqDto.builder()
-				.classification(DetailClassification.EVENT)
-				.eventTag(EventTag.ETC)
+			PublicScheduleCreateEventReqDto eventPublicScheduleDto = PublicScheduleCreateEventReqDto.builder()
+				.eventTag(EventTag.INSTRUCTION)
 				.author(user.getIntraId())
-				.title("Test Schedule")
-				.content("Test Content")
-				.link("http://test.com")
+				.title("42EventTag")
+				.content("42EventTagTest")
+				.link("https://test.com")
 				.startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().minusDays(1))
 				.build();
+
 			// when
-			mockMvc.perform(post("/calendar/public").header("Authorization", "Bearer " + accssToken)
+			mockMvc.perform(post("/calendar/public/event").header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(publicScheduleDto)))
+					.content(objectMapper.writeValueAsString(eventPublicScheduleDto)))
 				.andExpect(status().isBadRequest())
-				.andExpect(result -> {
-					status().isBadRequest();
-				})
+				.andDo(print());
+			// then
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).isEmpty();
+		}
+
+		@Test
+		@DisplayName("[201]공개일정-job 생성성공")
+		void createJobPublicScheduleSuccess() throws Exception {
+			// given
+			PublicScheduleCreateJobReqDto jobPublicScheduleDto = PublicScheduleCreateJobReqDto.builder()
+				.jobTag(JobTag.NEW_COMER)
+				.techTag(TechTag.CLOUD)
+				.author(user.getIntraId())
+				.title("JobTag")
+				.content("42JobTagTest")
+				.link("https://test.com")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(1))
+				.build();
+			// when
+			mockMvc.perform(post("/calendar/public/job").header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(jobPublicScheduleDto))).andExpect(status().isCreated());
+			// then
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).hasSize(1);
+			assertThat(schedules.get(0).getTitle()).isEqualTo(jobPublicScheduleDto.getTitle());
+		}
+
+		@Test
+		@DisplayName("[403]공개일정-job 생성실패-작성자가 다를 때")
+		void createJobPublicScheduleFailNotMatchAuthor() throws Exception {
+			// given
+			PublicScheduleCreateJobReqDto jobPublicScheduleDto = PublicScheduleCreateJobReqDto.builder()
+				.jobTag(JobTag.EXPERIENCED)
+				.techTag(TechTag.NETWORK)
+				.author("another")
+				.title("JobTag")
+				.content("JobTagTest")
+				.link("https://test.com")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(1))
+				.build();
+
+			// when
+			mockMvc.perform(post("/calendar/public/job").header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(jobPublicScheduleDto)))
+				.andExpect(status().isForbidden())
+				.andDo(print());
+			// then
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).isEmpty();
+		}
+
+		@Test
+		@DisplayName("[400]공개일정-job 생성실패- 기간이 잘못되었을 때(종료닐짜가 시작날짜보다 빠를때)")
+		void createJobPublicScheduleFailFaultPeriod() throws Exception {
+			// given
+			PublicScheduleCreateJobReqDto jobPublicScheduleDto = PublicScheduleCreateJobReqDto.builder()
+				.jobTag(JobTag.EXPERIENCED)
+				.techTag(TechTag.NETWORK)
+				.author(user.getIntraId())
+				.title("JobTag")
+				.content("JobTagTest")
+				.link("https://test.com")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().minusDays(1))
+				.build();
+
+			// when
+			mockMvc.perform(post("/calendar/public/job").header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(jobPublicScheduleDto)))
+				.andExpect(status().isBadRequest())
 				.andDo(print());
 			// then
 			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
@@ -156,35 +230,35 @@ public class PublicScheduleControllerTest {
 	class UpdatePublicSchedule {
 
 		@Test
-		@DisplayName("공개일정업데이트성공시")
-		void updatePublicScheduleSuccess() throws Exception {
+		@DisplayName("[200]공개일정업데이트성공시-42event")
+		void updateEventPublicScheduleSuccess() throws Exception {
 			// given
-			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
-				PublicScheduleCreateReqDto.builder()
-					.classification(DetailClassification.EVENT)
+			PublicSchedule eventPublicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateEventReqDto.builder()
+					.eventTag(EventTag.INSTRUCTION)
 					.author(user.getIntraId())
-					.title("Original Title")
-					.content("Original Content")
-					.link("http://original.com")
+					.title("42EventTag")
+					.content("42EventTagTest")
+					.link("https://test.com")
 					.startTime(LocalDateTime.now())
 					.endTime(LocalDateTime.now().plusDays(1))
 					.build());
-			publicScheduleRepository.save(publicSchedule);
+			publicScheduleRepository.save(eventPublicSchedule);
 
 			PublicScheduleUpdateReqDto updateDto = PublicScheduleUpdateReqDto.builder()
 				.classification(DetailClassification.EVENT)
+				.eventTag(EventTag.INSTRUCTION)
 				.author(user.getIntraId())
 				.title("Updated Title")
 				.content("Updated Content")
-				.link("http://updated.com")
+				.link("https://updated.com")
 				.startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().plusDays(2))
-				.status(ScheduleStatus.ACTIVATE)
 				.build();
 
 			// when
 			mockMvc.perform(
-				put("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken)
+				put("/calendar/public/" + eventPublicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(updateDto))).andExpect(status().isOk());
 
@@ -196,34 +270,80 @@ public class PublicScheduleControllerTest {
 		}
 
 		@Test
-		@DisplayName("공개일정업데이트실패-작성자가 다를 때")
-		void updatePublicScheduleFailNotMatchAuthor() throws Exception {
+		@DisplayName("[200]공개일정업데이트성공시-Job")
+		void updateJobPublicScheduleSuccess() throws Exception {
 			// given
-			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
-				PublicScheduleCreateReqDto.builder()
-					.classification(DetailClassification.EVENT)
+			PublicSchedule jobPublicSchedule = PublicScheduleCreateJobReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateJobReqDto.builder()
+					.jobTag(JobTag.NEW_COMER)
+					.techTag(TechTag.CLOUD)
 					.author(user.getIntraId())
-					.title("Original Title")
-					.content("Original Content")
-					.link("http://original.com")
+					.title("42JobTag")
+					.content("42JobTest")
+					.link("https://test.com")
 					.startTime(LocalDateTime.now())
 					.endTime(LocalDateTime.now().plusDays(1))
 					.build());
-			publicScheduleRepository.save(publicSchedule);
+			publicScheduleRepository.save(jobPublicSchedule);
 
 			PublicScheduleUpdateReqDto updateDto = PublicScheduleUpdateReqDto.builder()
-				.classification(DetailClassification.EVENT)
-				.author("another")
+				.classification(DetailClassification.JOB_NOTICE)
+				.jobTag(JobTag.EXPERIENCED)
+				.techTag(TechTag.NETWORK)
+				.author(user.getIntraId())
 				.title("Updated Title")
 				.content("Updated Content")
-				.link("http://updated.com")
+				.link("https://updated.com")
 				.startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().plusDays(2))
 				.build();
 
 			// when
 			mockMvc.perform(
-					put("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken)
+				put("/calendar/public/" + jobPublicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(updateDto))).andExpect(status().isOk());
+
+			// then
+			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+			assertThat(schedules).hasSize(1);
+			assertThat(schedules.get(0).getTitle()).isEqualTo("Updated Title");
+			assertThat(schedules.get(0).getContent()).isEqualTo("Updated Content");
+		}
+
+		@Test
+		@DisplayName("[403]공개일정업데이트실패-작성자가 다를 때")
+		void updatePublicScheduleFailNotMatchAuthor() throws Exception {
+			// given
+			PublicSchedule jobPublicSchedule = PublicScheduleCreateJobReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateJobReqDto.builder()
+					.jobTag(JobTag.NEW_COMER)
+					.techTag(TechTag.CLOUD)
+					.author(user.getIntraId())
+					.title("42JobTag")
+					.content("42JobTest")
+					.link("https://test.com")
+					.startTime(LocalDateTime.now())
+					.endTime(LocalDateTime.now().plusDays(1))
+					.build());
+			publicScheduleRepository.save(jobPublicSchedule);
+
+			PublicScheduleUpdateReqDto updateDto = PublicScheduleUpdateReqDto.builder()
+				.classification(DetailClassification.JOB_NOTICE)
+				.jobTag(JobTag.NEW_COMER)
+				.techTag(TechTag.CLOUD)
+				.author("another")
+				.title("42JobTag")
+				.content("42JobTest")
+				.link("https://test.com")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(2))
+				.build();
+
+			// when
+			mockMvc.perform(
+					put("/calendar/public/" + jobPublicSchedule.getId())
+						.header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
 				.andExpect(status().isForbidden())
@@ -232,105 +352,110 @@ public class PublicScheduleControllerTest {
 			// then
 			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
 			assertThat(schedules).hasSize(1);
-			assertThat(schedules.get(0).getTitle()).isEqualTo("Original Title");
-			assertThat(schedules.get(0).getContent()).isEqualTo("Original Content");
 		}
 
 		@Test
-		@DisplayName("공개일정업데이트실패-기존일정작성자가다를때")
+		@DisplayName("[403]공개일정업데이트실패-기존일정작성자가다를때")
 		void updatePublicScheduleFailExistingAuthorNotMatch() throws Exception {
-			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity("another",
-				PublicScheduleCreateReqDto.builder()
-					.classification(DetailClassification.EVENT)
-					.author("another")
-					.title("Original Title")
-					.content("Original Content")
-					.link("http://original.com")
+			// given
+			PublicSchedule jobPublicSchedule = PublicScheduleCreateJobReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateJobReqDto.builder()
+					.jobTag(JobTag.NEW_COMER)
+					.techTag(TechTag.CLOUD)
+					.author(user.getIntraId())
+					.title("42JobTag")
+					.content("42JobTest")
+					.link("https://test.com")
 					.startTime(LocalDateTime.now())
 					.endTime(LocalDateTime.now().plusDays(1))
 					.build());
+			publicScheduleRepository.save(jobPublicSchedule);
 
-			publicScheduleRepository.save(publicSchedule);
 			PublicScheduleUpdateReqDto updateDto = PublicScheduleUpdateReqDto.builder()
-				.classification(DetailClassification.EVENT)
-				.author(user.getIntraId())
-				.title("Updated Title")
-				.content("Updated Content")
-				.link("http://updated.com")
+				.classification(DetailClassification.JOB_NOTICE)
+				.jobTag(JobTag.NEW_COMER)
+				.techTag(TechTag.CLOUD)
+				.author("another")
+				.title("42JobTag")
+				.content("42JobTest")
+				.link("https://test.com")
 				.startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().plusDays(2))
 				.build();
+
+			//when & then
 			mockMvc.perform(
-					put("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken)
+					put("/calendar/public/" + jobPublicSchedule.getId())
+						.header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
 				.andExpect(status().isForbidden())
 				.andDo(print());
 
 			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
-			assertThat(schedules).hasSize(0);
+			assertThat(schedules).hasSize(1);
 		}
 
 		@Test
-		@DisplayName("공개일정업데이트실패-기간이 잘못되었을 때(종료날짜가 시작날짜보다 빠를 때)")
+		@DisplayName("[400]공개일정업데이트실패-기간이 잘못되었을 때(종료날짜가 시작날짜보다 빠를 때)")
 		void updatePublicScheduleFailFaultPeriod() throws Exception {
 			// given
-			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
-				PublicScheduleCreateReqDto.builder()
-					.classification(DetailClassification.EVENT)
+			PublicSchedule jobPublicSchedule = PublicScheduleCreateJobReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateJobReqDto.builder()
+					.jobTag(JobTag.NEW_COMER)
+					.techTag(TechTag.CLOUD)
 					.author(user.getIntraId())
-					.title("Original Title")
-					.content("Original Content")
-					.link("http://original.com")
+					.title("42JobTag")
+					.content("42JobTest")
+					.link("https://test.com")
 					.startTime(LocalDateTime.now())
 					.endTime(LocalDateTime.now().plusDays(1))
 					.build());
-			publicScheduleRepository.save(publicSchedule);
+			publicScheduleRepository.save(jobPublicSchedule);
 
 			PublicScheduleUpdateReqDto updateDto = PublicScheduleUpdateReqDto.builder()
-				.classification(DetailClassification.EVENT)
+				.classification(DetailClassification.JOB_NOTICE)
+				.jobTag(JobTag.NEW_COMER)
+				.techTag(TechTag.CLOUD)
 				.author(user.getIntraId())
-				.title("Updated Title")
-				.content("Updated Content")
-				.link("http://updated.com")
+				.title("42JobTag")
+				.content("42JobTest")
+				.link("https://test.com")
 				.startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now().minusDays(1))
+				.endTime(LocalDateTime.now().minusDays(2))
 				.build();
 
 			// when
 			mockMvc.perform(
-					put("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken)
+					put("/calendar/public/" + jobPublicSchedule.getId())
+						.header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
 				.andExpect(status().isBadRequest())
-				.andExpect(result -> {
-					status().isBadRequest();
-				})
 				.andDo(print());
 
 			// then
 			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
 			assertThat(schedules).hasSize(1);
-			assertThat(schedules.get(0).getTitle()).isEqualTo("Original Title");
-			assertThat(schedules.get(0).getContent()).isEqualTo("Original Content");
 		}
 
 		@Test
-		@DisplayName("공개일정업데이트실패-없는 일정일 때")
+		@DisplayName("[404]공개일정업데이트실패-없는 일정일 때")
 		void updatePublicScheduleFailNotExist() throws Exception {
 			// given
 			PublicScheduleUpdateReqDto updateDto = PublicScheduleUpdateReqDto.builder()
 				.classification(DetailClassification.EVENT)
+				.eventTag(EventTag.INSTRUCTION)
 				.author(user.getIntraId())
 				.title("Updated Title")
 				.content("Updated Content")
-				.link("http://updated.com")
+				.link("https://updated.com")
 				.startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().plusDays(2))
 				.build();
 
 			// when
-			mockMvc.perform(put("/calendar/public/9999").header("Authorization", "Bearer " + accssToken)
+			mockMvc.perform(put("/calendar/public/9999").header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(updateDto))).andExpect(status().isNotFound()).andDo(print());
 
@@ -340,16 +465,16 @@ public class PublicScheduleControllerTest {
 		}
 
 		@Test
-		@DisplayName("공개일정업데이트실패-제목이 50글자 초과일 때")
+		@DisplayName("[400]공개일정업데이트실패-제목이 50글자 초과일 때")
 		void updatePublicScheduleFailTitleTooLong() throws Exception {
 			// given
-			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
-				PublicScheduleCreateReqDto.builder()
-					.classification(DetailClassification.EVENT)
+			PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateEventReqDto.builder()
+					.eventTag(EventTag.INSTRUCTION)
 					.author(user.getIntraId())
 					.title("Original Title")
 					.content("Original Content")
-					.link("http://original.com")
+					.link("https://original.com")
 					.startTime(LocalDateTime.now())
 					.endTime(LocalDateTime.now().plusDays(1))
 					.build());
@@ -361,35 +486,37 @@ public class PublicScheduleControllerTest {
 				.author(user.getIntraId())
 				.title(longTitle)
 				.content("Updated Content")
-				.link("http://updated.com")
+				.link("https://updated.com")
 				.startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().plusDays(2))
 				.build();
 
 			// when
 			mockMvc.perform(
-					put("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken)
+					put("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
 				.andExpect(status().isBadRequest())
 				.andDo(print());
 
 			//then
-			PublicSchedule updatedSchedule = publicScheduleRepository.findById(publicSchedule.getId()).get();
-			assertThat(updatedSchedule.getTitle()).isEqualTo("Original Title");
+			assertThat(publicScheduleRepository.findById(publicSchedule.getId())
+				.map(PublicSchedule::getTitle)
+				.orElseThrow())
+				.isEqualTo("Original Title");
 		}
 
 		@Test
-		@DisplayName("공개일정업데이트실패-내용이 2000글자 초과일 때")
+		@DisplayName("[400]공개일정업데이트실패-내용이 2000글자 초과일 때")
 		void updatePublicScheduleFailContentTooLong() throws Exception {
 			// given
-			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
-				PublicScheduleCreateReqDto.builder()
-					.classification(DetailClassification.EVENT)
+			PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateEventReqDto.builder()
+					.eventTag(EventTag.INSTRUCTION)
 					.author(user.getIntraId())
 					.title("Original Title")
 					.content("Original Content")
-					.link("http://original.com")
+					.link("https://original.com")
 					.startTime(LocalDateTime.now())
 					.endTime(LocalDateTime.now().plusDays(1))
 					.build());
@@ -401,35 +528,37 @@ public class PublicScheduleControllerTest {
 				.author(user.getIntraId())
 				.title("Updated Title")
 				.content(longContent)
-				.link("http://updated.com")
+				.link("https://updated.com")
 				.startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().plusDays(2))
 				.build();
 
 			// when
 			mockMvc.perform(
-					put("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken)
+					put("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
 				.andExpect(status().isBadRequest())
 				.andDo(print());
 
 			//then
-			PublicSchedule updatedSchedule = publicScheduleRepository.findById(publicSchedule.getId()).get();
-			assertThat(updatedSchedule.getContent()).isEqualTo("Original Content");
+			assertThat(publicScheduleRepository.findById(publicSchedule.getId())
+				.map(PublicSchedule::getTitle)
+				.orElseThrow())
+				.isEqualTo("Original Title");
 		}
 
 		@Test
-		@DisplayName("공개일정업데이트 실패-잘못된 id가 들어왔을때(숫자가 아닌 문자열)")
+		@DisplayName("[400]공개일정업데이트 실패-잘못된 id가 들어왔을때(숫자가 아닌 문자열)")
 		void updatePublicScheduleFailWrongId() throws Exception {
 			// given
-			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
-				PublicScheduleCreateReqDto.builder()
-					.classification(DetailClassification.EVENT)
+			PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateEventReqDto.builder()
+					.eventTag(EventTag.INSTRUCTION)
 					.author(user.getIntraId())
 					.title("Original Title")
 					.content("Original Content")
-					.link("http://original.com")
+					.link("https://original.com")
 					.startTime(LocalDateTime.now())
 					.endTime(LocalDateTime.now().plusDays(1))
 					.build());
@@ -440,18 +569,15 @@ public class PublicScheduleControllerTest {
 				.author(user.getIntraId())
 				.title("Updated Title")
 				.content("Updated Content")
-				.link("http://updated.com")
+				.link("https://updated.com")
 				.startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().plusDays(2))
 				.build();
 
 			// when
-			mockMvc.perform(
-					put("/calendar/public/abc").header("Authorization", "Bearer " + accssToken)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(updateDto)))
-				.andExpect(status().isBadRequest())
-				.andDo(print());
+			mockMvc.perform(put("/calendar/public/abc").header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(updateDto))).andExpect(status().isBadRequest()).andDo(print());
 
 			// then
 			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
@@ -459,146 +585,330 @@ public class PublicScheduleControllerTest {
 			assertThat(schedules.get(0).getTitle()).isEqualTo("Original Title");
 		}
 
-	}
-
-	@Nested
-	@DisplayName("공개일정:삭제")
-	class DeletePublicSchedule {
 		@Test
-		@DisplayName("공개일정삭제성공")
-		void deletePublicScheduleSuccess() throws Exception {
+		@DisplayName("[400]공개일정업데이트실패-42Event 태그가 아닌 경우(JOB_TAG 들어왔을 때)")
+		void updateEventNotEventTag() throws Exception {
 			// given
-			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
-				PublicScheduleCreateReqDto.builder()
-					.classification(DetailClassification.EVENT)
+			PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateEventReqDto.builder()
+					.eventTag(EventTag.INSTRUCTION)
 					.author(user.getIntraId())
 					.title("Original Title")
 					.content("Original Content")
-					.link("http://original.com")
+					.link("https://original.com")
 					.startTime(LocalDateTime.now())
 					.endTime(LocalDateTime.now().plusDays(1))
 					.build());
 			publicScheduleRepository.save(publicSchedule);
-			// when
-			mockMvc.perform(
-					patch("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken))
-				.andExpect(status().isNoContent());
 
-			// then
-			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
-			assertThat(schedules).hasSize(1);
-			assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.DELETE);
-		}
-
-		@Test
-		@DisplayName("공개일정삭제실패-작성자가 다를 때")
-		void deletePublicScheduleFailNotMatchAuthor() throws Exception {
-			// given
-			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity("another",
-				PublicScheduleCreateReqDto.builder()
-					.classification(DetailClassification.EVENT)
-					.author("another")
-					.title("Original Title")
-					.content("Original Content")
-					.link("http://original.com")
-					.startTime(LocalDateTime.now())
-					.endTime(LocalDateTime.now().plusDays(1))
-					.build());
-			publicScheduleRepository.save(publicSchedule);
+			PublicScheduleUpdateReqDto updatePublicSchedule = PublicScheduleUpdateReqDto.builder()
+				.classification(DetailClassification.EVENT)
+				.jobTag(JobTag.EXPERIENCED)
+				.author(user.getIntraId())
+				.title("Updated Title")
+				.content("Updated Content")
+				.link("https://updated.com")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(2))
+				.build();
 
 			//when
 			mockMvc.perform(
-					patch("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken))
-				.andExpect(status().isForbidden())
+					put("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(updatePublicSchedule)))
+				.andExpect(status().isBadRequest())
 				.andDo(print());
 
 			//then
-			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor("another");
-			assertThat(schedules).hasSize(1);
-			assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
-		}
-
-		@Test
-		@DisplayName("공개일정:삭제실패-없는 삭제 일정일 때")
-		void deletePublicScheduleFailFaultId() throws Exception {
-			// given
-			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
-				PublicScheduleCreateReqDto.builder()
-					.classification(DetailClassification.EVENT)
-					.author(user.getIntraId())
-					.title("Original Title")
-					.content("Original Content")
-					.link("http://original.com")
-					.startTime(LocalDateTime.now())
-					.endTime(LocalDateTime.now().plusDays(1))
-					.build());
-			publicScheduleRepository.save(publicSchedule);
-
-			// when
-			mockMvc.perform(patch("/calendar/public/9999").header("Authorization", "Bearer " + accssToken))
-				.andExpect(status().isNotFound())
-				.andDo(print());
-
-			log.info("public id : {}", publicSchedule.getId());
-			// then
 			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
 			assertThat(schedules).hasSize(1);
-			assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+			assertThat(schedules.get(0).getTitle()).isEqualTo("Original Title");
 		}
 
 		@Test
-		@DisplayName("공개일정:삭제실패-이미 삭제된 일정일때")
-		void deletePublicScheduleFailAlreadyDelete() throws Exception {
+		@DisplayName("[400]공개일정업데이트실패-42Job 태그가 아닌 경우(EVENT_TAG 들어왔을 때)")
+		void updateJobNotJobTag() throws Exception {
 			// given
-			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
-				PublicScheduleCreateReqDto.builder()
-					.classification(DetailClassification.EVENT)
+			PublicSchedule publicSchedule = PublicScheduleCreateJobReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateJobReqDto.builder()
+					.jobTag(JobTag.NEW_COMER)
+					.techTag(TechTag.CLOUD)
 					.author(user.getIntraId())
 					.title("Original Title")
 					.content("Original Content")
-					.link("http://original.com")
-					.startTime(LocalDateTime.now())
-					.endTime(LocalDateTime.now().plusDays(1))
-					.build());
-			publicSchedule.delete();
-			publicScheduleRepository.save(publicSchedule);
-			// when
-			mockMvc.perform(
-					patch("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accssToken))
-				.andExpect(status().isConflict())
-				.andDo(print());
-			// then
-			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
-			assertThat(schedules).hasSize(1);
-			assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.DELETE);
-		}
-
-		@Test
-		@DisplayName("공개일정:삭제실패-잘못된 id가 들어왔을때(숫자가 아닌 문자열)")
-		void deletePublicScheduleFailWrongId() throws Exception {
-			// given
-			PublicSchedule publicSchedule = PublicScheduleCreateReqDto.toEntity(user.getIntraId(),
-				PublicScheduleCreateReqDto.builder()
-					.classification(DetailClassification.EVENT)
-					.author(user.getIntraId())
-					.title("Original Title")
-					.content("Original Content")
-					.link("http://original.com")
+					.link("https://original.com")
 					.startTime(LocalDateTime.now())
 					.endTime(LocalDateTime.now().plusDays(1))
 					.build());
 			publicScheduleRepository.save(publicSchedule);
 
-			// when
+			PublicScheduleUpdateReqDto updatePublicSchedule = PublicScheduleUpdateReqDto.builder()
+				.classification(DetailClassification.JOB_NOTICE)
+				.eventTag(EventTag.INSTRUCTION)
+				.author(user.getIntraId())
+				.title("Updated Title")
+				.content("Updated Content")
+				.link("https://updated.com")
+				.startTime(LocalDateTime.now())
+				.endTime(LocalDateTime.now().plusDays(2))
+				.build();
+
+			//when
 			mockMvc.perform(
-					patch("/calendar/public/abc").header("Authorization", "Bearer " + accssToken))
+					put("/calendar/public/" + publicSchedule.getId())
+						.header("Authorization", "Bearer " + accessToken)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(updatePublicSchedule)))
 				.andExpect(status().isBadRequest())
 				.andDo(print());
-			// then
+
+			//then
 			List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
 			assertThat(schedules).hasSize(1);
-			assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+			assertThat(schedules.get(0).getTitle()).isEqualTo("Original Title");
+		}
+
+		@Nested
+		@DisplayName("공개일정:삭제")
+		class DeletePublicSchedule {
+			@Test
+			@DisplayName("[204]공개일정삭제성공")
+			void deletePublicScheduleSuccess() throws Exception {
+				// given
+				PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(),
+					PublicScheduleCreateEventReqDto.builder()
+						.author(user.getIntraId())
+						.title("Original Title")
+						.content("Original Content")
+						.link("https://original.com")
+						.startTime(LocalDateTime.now())
+						.endTime(LocalDateTime.now().plusDays(1))
+						.build());
+				publicScheduleRepository.save(publicSchedule);
+				// when
+				mockMvc.perform(
+						patch("/calendar/public/" + publicSchedule.getId()).header("Authorization",
+							"Bearer " + accessToken))
+					.andExpect(status().isNoContent());
+
+				// then
+				List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+				assertThat(schedules).hasSize(1);
+				assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.DELETE);
+			}
+
+			@Test
+			@DisplayName("[403]공개일정삭제실패-작성자가 다를 때")
+			void deletePublicScheduleFailNotMatchAuthor() throws Exception {
+				// given
+				PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity("another",
+					PublicScheduleCreateEventReqDto.builder()
+						.author("another")
+						.title("Original Title")
+						.content("Original Content")
+						.link("https://original.com")
+						.startTime(LocalDateTime.now())
+						.endTime(LocalDateTime.now().plusDays(1))
+						.build());
+				publicScheduleRepository.save(publicSchedule);
+
+				//when
+				mockMvc.perform(
+						patch("/calendar/public/" + publicSchedule.getId()).header("Authorization",
+							"Bearer " + accessToken))
+					.andExpect(status().isForbidden())
+					.andDo(print());
+
+				//then
+				List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor("another");
+				assertThat(schedules).hasSize(1);
+				assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+			}
+
+			@Test
+			@DisplayName("[404]공개일정:삭제실패-없는 삭제 일정일 때")
+			void deletePublicScheduleFailFaultId() throws Exception {
+				// given
+				PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(),
+					PublicScheduleCreateEventReqDto.builder()
+						.author(user.getIntraId())
+						.title("Original Title")
+						.content("Original Content")
+						.link("https://original.com")
+						.startTime(LocalDateTime.now())
+						.endTime(LocalDateTime.now().plusDays(1))
+						.build());
+				publicScheduleRepository.save(publicSchedule);
+				// when
+				mockMvc.perform(patch("/calendar/public/9999").header("Authorization", "Bearer " + accessToken))
+					.andExpect(status().isNotFound())
+					.andDo(print());
+
+				log.info("public id : {}", publicSchedule.getId());
+				// then
+				List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+				assertThat(schedules).hasSize(1);
+				assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+			}
+
+			@Test
+			@DisplayName("[400]공개일정:삭제실패-잘못된 id가 들어왔을때(숫자가 아닌 문자열)")
+			void deletePublicScheduleFailWrongId() throws Exception {
+				// given
+				PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(),
+					PublicScheduleCreateEventReqDto.builder()
+						.author(user.getIntraId())
+						.title("Original Title")
+						.content("Original Content")
+						.link("https://original.com")
+						.startTime(LocalDateTime.now())
+						.endTime(LocalDateTime.now().plusDays(1))
+						.build());
+				publicScheduleRepository.save(publicSchedule);
+
+				// when
+				mockMvc.perform(
+						patch("/calendar/public/abc").header("Authorization", "Bearer " + accessToken))
+					.andExpect(status().isBadRequest())
+					.andDo(print());
+				// then
+				List<PublicSchedule> schedules = publicScheduleRepository.findByAuthor(user.getIntraId());
+				assertThat(schedules).hasSize(1);
+				assertThat(schedules.get(0).getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+			}
+
+			@Test
+			@DisplayName("[204]공개일정: 공개일정 삭제 시 연관된 개인일정도 삭제")
+			void deletePublicScheduleAndPrivateSchedule() throws Exception {
+				// given
+				User otherUser = testDataUtils.createNewUser();
+
+				PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(),
+					PublicScheduleCreateEventReqDto.builder()
+						.author(user.getIntraId())
+						.title("Original Title")
+						.content("Original Content")
+						.link("https://original.com")
+						.startTime(LocalDateTime.now())
+						.endTime(LocalDateTime.now().plusDays(1))
+						.build());
+
+				publicScheduleRepository.save(publicSchedule);
+
+				PrivateSchedule privateSchedule1 = new PrivateSchedule(user, publicSchedule, false, 1L);
+				PrivateSchedule privateSchedule2 = new PrivateSchedule(otherUser, publicSchedule, true, 2L);
+				privateScheduleRepository.saveAll(Arrays.asList(privateSchedule1, privateSchedule2));
+
+				// when
+				mockMvc.perform(
+						patch("/calendar/public/" + publicSchedule.getId()).header("Authorization",
+							"Bearer " + accessToken))
+					.andExpect(status().isNoContent())
+					.andDo(print());
+				// then
+				assertThat(publicScheduleRepository.findById(publicSchedule.getId())
+					.map(PublicSchedule::getStatus)
+					.orElseThrow())
+					.isEqualTo(ScheduleStatus.DELETE);
+			}
+		}
+
+		@Nested
+		@DisplayName("공개일정:상세조회")
+		class RetrievePublicScheduleDetail {
+			@Test
+			@DisplayName("[200]공개일정상세조회성공")
+			void retrievePublicScheduleDetailSuccess() throws Exception {
+				// given
+				PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(),
+					PublicScheduleCreateEventReqDto.builder()
+						.author(user.getIntraId())
+						.title("Original Title")
+						.content("Original Content")
+						.link("https://original.com")
+						.startTime(LocalDateTime.now())
+						.endTime(LocalDateTime.now().plusDays(1))
+						.build());
+				publicScheduleRepository.save(publicSchedule);
+				// when
+				mockMvc.perform(
+						get("/calendar/public/" + publicSchedule.getId())
+							.header("Authorization", "Bearer " + accessToken))
+					.andExpect(status().isOk())
+					.andExpect(jsonPath("$.title").value("Original Title"))
+					.andExpect(jsonPath("$.content").value("Original Content"))
+					.andExpect(jsonPath("$.link").value("https://original.com"))
+					.andDo(print());
+			}
+
+			@Test
+			@DisplayName("[403]공개일정상세조회실패-작성자가 다를 때")
+			void retrievePublicScheduleDetailFailNotMatchAuthor() throws Exception {
+				// given
+				PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity("another",
+					PublicScheduleCreateEventReqDto.builder()
+						.author("another")
+						.title("Original Title")
+						.content("Original Content")
+						.link("https://original.com")
+						.startTime(LocalDateTime.now())
+						.endTime(LocalDateTime.now().plusDays(1))
+						.build());
+				publicScheduleRepository.save(publicSchedule);
+
+				// when & then
+				mockMvc.perform(
+						get("/calendar/public/" + publicSchedule.getId())
+							.header("Authorization", "Bearer " + accessToken))
+					.andExpect(status().isForbidden())
+					.andDo(print());
+			}
+
+			@Test
+			@DisplayName("[400]공개일정상세조회실패-잘못된 id일 때(숫자가 아닌 문자열)")
+			void retrievePublicScheduleDetailFailWrongId() throws Exception {
+				// given
+				PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(),
+					PublicScheduleCreateEventReqDto.builder()
+						.author(user.getIntraId())
+						.title("Original Title")
+						.content("Original Content")
+						.link("https://original.com")
+						.startTime(LocalDateTime.now())
+						.endTime(LocalDateTime.now().plusDays(1))
+						.build());
+				publicScheduleRepository.save(publicSchedule);
+
+				// when & then
+				mockMvc.perform(
+						get("/calendar/public/abc").header("Authorization", "Bearer " + accessToken))
+					.andExpect(status().isBadRequest())
+					.andDo(print());
+
+			}
+
+			@Test
+			@DisplayName("[404]공개일정상세조회실패-없는 일정일 때")
+			void retrievePublicScheduleDetailFailNotExist() throws Exception {
+				//given
+				PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(),
+					PublicScheduleCreateEventReqDto.builder()
+						.author(user.getIntraId())
+						.title("Original Title")
+						.content("Original Content")
+						.link("https://original.com")
+						.startTime(LocalDateTime.now())
+						.endTime(LocalDateTime.now().plusDays(1))
+						.build());
+				publicScheduleRepository.save(publicSchedule);
+
+				//when & then
+				mockMvc.perform(
+						get("/calendar/public/9999").header("Authorization", "Bearer " + accessToken))
+					.andExpect(status().isNotFound())
+					.andDo(print());
+			}
 		}
 	}
-
 }
