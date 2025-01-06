@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gg.auth.UserDto;
 import gg.auth.argumentresolver.Login;
+import gg.calendar.api.user.schedule.privateschedule.controller.request.ImportedScheduleUpdateReqDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleCreateReqDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleUpdateReqDto;
+import gg.calendar.api.user.schedule.privateschedule.controller.response.ImportedScheduleUpdateResDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.response.PrivateScheduleUpdateResDto;
 import gg.calendar.api.user.schedule.privateschedule.service.PrivateScheduleService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,6 +44,16 @@ public class PrivateScheduleController {
 		PrivateScheduleUpdateResDto privateScheduleUpdateResDto = privateScheduleService.updatePrivateSchedule(userDto,
 			privateScheduleUpdateReqDto, id);
 		return ResponseEntity.status(HttpStatus.OK).body(privateScheduleUpdateResDto);
+	}
+
+	@PutMapping("/imported/{id}")
+	public ResponseEntity<ImportedScheduleUpdateResDto> importedScheduleUpdate(
+		@Login @Parameter(hidden = true) UserDto userDto,
+		@Valid @RequestBody ImportedScheduleUpdateReqDto importedScheduleUpdateReqDto,
+		@PathVariable Long id) {
+		ImportedScheduleUpdateResDto importedScheduleUpdateResDto = privateScheduleService.updateImportedSchedule(
+			userDto, importedScheduleUpdateReqDto, id);
+		return ResponseEntity.status(HttpStatus.OK).body(importedScheduleUpdateResDto);
 	}
 
 	@PatchMapping("/{id}")
