@@ -42,8 +42,7 @@ public class TotalScheduleRetrieveResDtoTest {
 		// when
 		TotalScheduleRetrieveResDto responseDto = TotalScheduleRetrieveResDto.toDto(schedule);
 		//then
-		assertAll(
-			() -> assertEquals(1L, responseDto.getId()),
+		assertAll(() -> assertEquals(1L, responseDto.getId()),
 			() -> assertEquals(DetailClassification.JOB_NOTICE, responseDto.getClassification()),
 			() -> assertEquals(JobTag.EXPERIENCED, responseDto.getJobTag()),
 			() -> assertEquals(TechTag.NETWORK, responseDto.getTechTag()),
@@ -53,7 +52,6 @@ public class TotalScheduleRetrieveResDtoTest {
 			() -> assertEquals("http://test.com", responseDto.getLink()),
 			() -> assertEquals(startTime.toString(), responseDto.getStartTime()),
 			() -> assertEquals(endTime.toString(), responseDto.getEndTime()),
-			() -> assertEquals("ACTIVATE", responseDto.getStatus())
-		);
+			() -> assertEquals("ACTIVATE", responseDto.getStatus()));
 	}
 }

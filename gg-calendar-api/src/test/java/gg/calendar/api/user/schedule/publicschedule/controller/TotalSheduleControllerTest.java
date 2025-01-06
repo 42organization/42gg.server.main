@@ -70,20 +70,17 @@ class TotalSheduleControllerTest {
 			mockData.createPublicScheduleEvent(7);
 			// when
 			mockMvc.perform(get("/calendar").header("Authorization", "Bearer " + accessToken)
-					.param("start", "2024-12-01")
-					.param("end", "2025-01-20"))
-				.andExpect(status().isOk());
+				.param("start", "2024-12-01")
+				.param("end", "2025-01-20")).andExpect(status().isOk());
 			// then
-			assertAll(
-				() -> assertEquals(7, publicScheduleRepository.findAll().size()),
+			assertAll(() -> assertEquals(7, publicScheduleRepository.findAll().size()),
 				() -> assertEquals("42GG", publicScheduleRepository.findAll().get(0).getAuthor()),
 				() -> assertEquals("Job 0", publicScheduleRepository.findAll().get(0).getTitle()),
 				() -> assertEquals("TEST JOB", publicScheduleRepository.findAll().get(0).getContent()),
 				() -> assertEquals("https://gg.42seoul.kr", publicScheduleRepository.findAll().get(0).getLink()),
 				() -> assertEquals(DetailClassification.EVENT,
 					publicScheduleRepository.findAll().get(0).getClassification()),
-				() -> assertEquals(EventTag.JOB_FORUM, publicScheduleRepository.findAll().get(0).getEventTag())
-			);
+				() -> assertEquals(EventTag.JOB_FORUM, publicScheduleRepository.findAll().get(0).getEventTag()));
 		}
 
 		@Test
@@ -93,20 +90,17 @@ class TotalSheduleControllerTest {
 			mockData.createPublicScheduleJob(7);
 			// when
 			mockMvc.perform(get("/calendar").header("Authorization", "Bearer " + accessToken)
-					.param("start", "2024-12-01")
-					.param("end", "2025-01-20"))
-				.andExpect(status().isOk());
+				.param("start", "2024-12-01")
+				.param("end", "2025-01-20")).andExpect(status().isOk());
 			// then
-			assertAll(
-				() -> assertEquals(7, publicScheduleRepository.findAll().size()),
+			assertAll(() -> assertEquals(7, publicScheduleRepository.findAll().size()),
 				() -> assertEquals("42GG", publicScheduleRepository.findAll().get(0).getAuthor()),
 				() -> assertEquals("Job 0", publicScheduleRepository.findAll().get(0).getTitle()),
 				() -> assertEquals("TEST JOB", publicScheduleRepository.findAll().get(0).getContent()),
 				() -> assertEquals("https://gg.42seoul.kr", publicScheduleRepository.findAll().get(0).getLink()),
 				() -> assertEquals(DetailClassification.JOB_NOTICE,
 					publicScheduleRepository.findAll().get(0).getClassification()),
-				() -> assertEquals(JobTag.EXPERIENCED, publicScheduleRepository.findAll().get(0).getJobTag())
-			);
+				() -> assertEquals(JobTag.EXPERIENCED, publicScheduleRepository.findAll().get(0).getJobTag()));
 		}
 
 		@Test
@@ -116,9 +110,8 @@ class TotalSheduleControllerTest {
 			mockData.createPublicScheduleEvent(7);
 			// when & then
 			mockMvc.perform(get("/calendar").header("Authorization", "Bearer " + accessToken)
-					.param("start", "2025-12-01")
-					.param("end", "2025-01-20"))
-				.andExpect(status().isBadRequest());
+				.param("start", "2025-12-01")
+				.param("end", "2025-01-20")).andExpect(status().isBadRequest());
 		}
 
 		@Test
@@ -128,9 +121,8 @@ class TotalSheduleControllerTest {
 			mockData.createPublicScheduleEvent(7);
 			// when & then
 			mockMvc.perform(get("/calendar").header("Authorization", "Bearer " + accessToken)
-					.param("start", "2025/12/01")
-					.param("end", "2025/12/20"))
-				.andExpect(status().isBadRequest());
+				.param("start", "2025/12/01")
+				.param("end", "2025/12/20")).andExpect(status().isBadRequest());
 		}
 	}
 }
