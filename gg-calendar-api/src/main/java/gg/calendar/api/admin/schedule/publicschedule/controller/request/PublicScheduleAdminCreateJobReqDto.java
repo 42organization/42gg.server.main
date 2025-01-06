@@ -22,8 +22,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PublicScheduleAdminCreateJobReqDto {
 
-	private DetailClassification classification;
-
 	@NotNull
 	private JobTag jobTag;
 
@@ -54,8 +52,6 @@ public class PublicScheduleAdminCreateJobReqDto {
 	public PublicScheduleAdminCreateJobReqDto(JobTag jobTag,
 		TechTag techTag, String title, String content, String link, ScheduleStatus status, LocalDateTime startTime,
 		LocalDateTime endTime) {
-
-		this.classification = DetailClassification.JOB_NOTICE;
 		this.jobTag = jobTag;
 		this.techTag = techTag;
 		this.title = title;
@@ -69,7 +65,7 @@ public class PublicScheduleAdminCreateJobReqDto {
 	public static PublicSchedule toEntity(PublicScheduleAdminCreateJobReqDto publicScheduleAdminCreateJobReqDto) {
 
 		return PublicSchedule.builder()
-			.classification(publicScheduleAdminCreateJobReqDto.classification)
+			.classification(DetailClassification.JOB_NOTICE)
 			.jobTag(publicScheduleAdminCreateJobReqDto.jobTag)
 			.techTag(publicScheduleAdminCreateJobReqDto.techTag)
 			.author("42GG")
