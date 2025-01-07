@@ -90,6 +90,15 @@ public class TotalScheduleAdminService {
 			.build();
 	}
 
+	public TotalScheduleAdminSearchListResDto totalScheduleAdminList() {
+		List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll();
+		return TotalScheduleAdminSearchListResDto.builder()
+			.schedules(schedules.stream()
+				.map(TotalScheduleAdminResDto::new)
+				.collect(Collectors.toList()))
+			.build();
+	}
+
 	private void dateTimeErrorCheck(LocalDate startTime, LocalDate endTime) {
 		if (startTime.isAfter(endTime)) {
 			throw new InvalidParameterException(ErrorCode.CALENDAR_BEFORE_DATE);
