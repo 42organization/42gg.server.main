@@ -1,7 +1,12 @@
 package gg.calendar.api.user.schedule.publicschedule.controller;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 import javax.validation.Valid;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import gg.auth.UserDto;
@@ -19,9 +25,12 @@ import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicSch
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateJobReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicScheduleDetailRetrieveResDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicSchedulePeriodRetrieveResDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicScheduleUpdateResDto;
 import gg.calendar.api.user.schedule.publicschedule.service.PublicScheduleService;
 import gg.data.calendar.PublicSchedule;
+import gg.data.calendar.type.DetailClassification;
+import gg.utils.dto.ListResponseDto;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 
@@ -66,5 +75,18 @@ public class PublicScheduleController {
 		return ResponseEntity.ok(PublicScheduleDetailRetrieveResDto.toDto(publicSchedule));
 	}
 
+	@GetMapping("/period/{detailClassification}")
+	public ResponseEntity<ListResponseDto<PublicSchedulePeriodRetrieveResDto>> publicSchedulePeriodRetrieveGet(
+		@PathVariable DetailClassification detailClassification,
+		@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
+		@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
+
+		System.out.println("detailClassification = " + detailClassification);
+		LocalDateTime startTime = start.atStartOfDay();
+		LocalDateTime endTime = end.atTime(LocalTime.MAX);
+		ListResponseDto<PublicSchedulePeriodRetrieveResDto> res = publicScheduleService.retrievePublicSchedulePeriod(
+			startTime, endTime, detailClassification);
+		return ResponseEntity.ok(res);
+	}
 }
 

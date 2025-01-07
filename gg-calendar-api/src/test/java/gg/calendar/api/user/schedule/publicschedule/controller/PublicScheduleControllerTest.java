@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import gg.calendar.api.user.schedule.publicschedule.PublicScheduleMockData;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateEventReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateJobReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
@@ -61,6 +62,9 @@ public class PublicScheduleControllerTest {
 	private String accessToken;
 	@Autowired
 	private TestDataUtils testDataUtils;
+
+	@Autowired
+	private PublicScheduleMockData mockData;
 
 	@Autowired
 	EntityManager em;
@@ -342,8 +346,7 @@ public class PublicScheduleControllerTest {
 
 			// when
 			mockMvc.perform(
-					put("/calendar/public/" + jobPublicSchedule.getId())
-						.header("Authorization", "Bearer " + accessToken)
+					put("/calendar/public/" + jobPublicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
 				.andExpect(status().isForbidden())
@@ -385,8 +388,7 @@ public class PublicScheduleControllerTest {
 
 			//when & then
 			mockMvc.perform(
-					put("/calendar/public/" + jobPublicSchedule.getId())
-						.header("Authorization", "Bearer " + accessToken)
+					put("/calendar/public/" + jobPublicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
 				.andExpect(status().isForbidden())
@@ -427,8 +429,7 @@ public class PublicScheduleControllerTest {
 
 			// when
 			mockMvc.perform(
-					put("/calendar/public/" + jobPublicSchedule.getId())
-						.header("Authorization", "Bearer " + accessToken)
+					put("/calendar/public/" + jobPublicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
 				.andExpect(status().isBadRequest())
@@ -654,8 +655,7 @@ public class PublicScheduleControllerTest {
 
 			//when
 			mockMvc.perform(
-					put("/calendar/public/" + publicSchedule.getId())
-						.header("Authorization", "Bearer " + accessToken)
+					put("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updatePublicSchedule)))
 				.andExpect(status().isBadRequest())
@@ -821,8 +821,7 @@ public class PublicScheduleControllerTest {
 				publicScheduleRepository.save(publicSchedule);
 				// when
 				mockMvc.perform(
-						get("/calendar/public/" + publicSchedule.getId())
-							.header("Authorization", "Bearer " + accessToken))
+						get("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accessToken))
 					.andExpect(status().isOk())
 					.andExpect(jsonPath("$.title").value("Original Title"))
 					.andExpect(jsonPath("$.content").value("Original Content"))
@@ -847,8 +846,7 @@ public class PublicScheduleControllerTest {
 
 				// when & then
 				mockMvc.perform(
-						get("/calendar/public/" + publicSchedule.getId())
-							.header("Authorization", "Bearer " + accessToken))
+						get("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accessToken))
 					.andExpect(status().isForbidden())
 					.andDo(print());
 			}
@@ -895,6 +893,92 @@ public class PublicScheduleControllerTest {
 					.andExpect(status().isNotFound())
 					.andDo(print());
 			}
+		}
+	}
+
+	@Nested
+	@DisplayName("공유일정기간조회")
+	class RetrievePublicScheduleByPeriod {
+		@Test
+		@DisplayName("[200]공개일정 event 기간조회성공")
+		void retrievePublicScheduleByEventPeriodSuccess() throws Exception {
+			//given
+			mockData.createPublicScheduleEvent(7);
+			DetailClassification detailClassification = DetailClassification.EVENT;
+			//when
+			mockMvc.perform(
+					get("/calendar/public/period/{detail_classification}", detailClassification).header("Authorization",
+						"Bearer " + accessToken).param("start", "2025-01-01").param("end", "2025-01-31"))
+				.andExpect(status().isOk())
+				.andDo(print());
+			
+			//then
+			assertThat(publicScheduleRepository.findAll()).hasSize(7);
+			assertThat(publicScheduleRepository.findAll()).extracting("classification")
+				.containsOnly(DetailClassification.EVENT);
+		}
+
+		@Test
+		@DisplayName("[200]공개일정 job 기간조회성공")
+		void retrievePublicScheduleByJobPeriodSuccess() throws Exception {
+			//given
+			mockData.createPublicScheduleJob(7);
+			DetailClassification detailClassification = DetailClassification.JOB_NOTICE;
+			//when
+			mockMvc.perform(
+					get("/calendar/public/period/{detail_classification}", detailClassification).header("Authorization",
+						"Bearer " + accessToken).param("start", "2025-01-01").param("end", "2025-01-31"))
+				.andExpect(status().isOk())
+				.andDo(print());
+			//then
+			assertThat(publicScheduleRepository.findAll()).hasSize(7);
+			assertThat(publicScheduleRepository.findAll()).extracting("classification")
+				.containsOnly(DetailClassification.JOB_NOTICE);
+		}
+
+		@Test
+		@DisplayName("[400]공개일정조회실패 - 조회기간이 잘못된 경우(종료날짜가 시작날짜보다 빠를 때)")
+		void retrievePublicScheduleFailFaultPeriod() throws Exception {
+			//given
+			mockData.createPublicScheduleEvent(7);
+			DetailClassification detailClassification = DetailClassification.EVENT;
+			//when & then
+			mockMvc.perform(
+					get("/calendar/public/period/{detail_classification}", detailClassification).header("Authorization",
+						"Bearer " + accessToken).param("start", "2025-01-01").param("end", "2024-01-31"))
+				.andExpect(status().isBadRequest())
+				.andDo(print());
+		}
+
+		@Test
+		@DisplayName("[400]공개일정 조회실패 - 잘못된 detail_classification 이 들어왔을 때")
+		void retrievePublicScheduleFaultDetailClassification() throws Exception {
+			// given
+			mockData.createPublicScheduleEvent(7);
+			//when & then
+			mockMvc.perform(get("/calendar/public/period/{detail_classification}", "wrong").header("Authorization",
+					"Bearer " + accessToken).param("start", "2025-01-01").param("end", "2025-01-31"))
+				.andExpect(status().isBadRequest())
+				.andExpect(result -> {
+					// 에러 응답의 세부 내용 출력
+					System.out.println("Response Body: " + result.getResponse().getContentAsString());
+					System.out.println("Status Code: " + result.getResponse().getStatus());
+				})
+				.andDo(print());
+		}
+
+		@Test
+		@DisplayName("[400]공개일정 조회실패 - 날짜형식이 잘못된 경우")
+		void retrievePublicScheduleFaultDateFormat() throws Exception {
+			// given
+			mockData.createPublicScheduleEvent(7);
+			DetailClassification detailClassification = DetailClassification.EVENT;
+			//when & then
+			mockMvc.perform(
+					get("/calendar/public/period/{detail_classification}", detailClassification).header("Authorization",
+						"Bearer " + accessToken).param("start", "2025/01/01").param("end", "2025/01/31"))
+				.andExpect(status().isBadRequest())
+				.andDo(print());
 		}
 	}
 }

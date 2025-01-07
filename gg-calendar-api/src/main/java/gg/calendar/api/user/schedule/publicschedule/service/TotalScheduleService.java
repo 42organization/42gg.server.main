@@ -23,7 +23,8 @@ public class TotalScheduleService {
 
 	public ListResponseDto<TotalScheduleRetrieveResDto> retrieveTotalSchedule(LocalDateTime start, LocalDateTime end) {
 		validateTimeRange(start, end);
-		List<PublicSchedule> schedules = publicScheduleRepository.findByStartTimeBetween(start, end);
+		List<PublicSchedule> schedules = publicScheduleRepository.findByEndTimeGreaterThanEqualAndStartTimeLessThanEqual(
+			start, end);
 		return ListResponseDto.toDto(
 			schedules.stream().map(TotalScheduleRetrieveResDto::toDto).collect(Collectors.toList()));
 	}

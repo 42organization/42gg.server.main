@@ -76,7 +76,7 @@ class TotalSheduleControllerTest {
 			assertAll(() -> assertEquals(7, publicScheduleRepository.findAll().size()),
 				() -> assertEquals("42GG", publicScheduleRepository.findAll().get(0).getAuthor()),
 				() -> assertEquals("Job 0", publicScheduleRepository.findAll().get(0).getTitle()),
-				() -> assertEquals("TEST JOB", publicScheduleRepository.findAll().get(0).getContent()),
+				() -> assertEquals("TEST EVENT", publicScheduleRepository.findAll().get(0).getContent()),
 				() -> assertEquals("https://gg.42seoul.kr", publicScheduleRepository.findAll().get(0).getLink()),
 				() -> assertEquals(DetailClassification.EVENT,
 					publicScheduleRepository.findAll().get(0).getClassification()),
