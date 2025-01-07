@@ -87,5 +87,12 @@ public class PublicScheduleController {
 			startTime, endTime, detailClassification);
 		return ResponseEntity.ok(ListResponseDto.toDto(res));
 	}
+
+	@PostMapping("/{id}/{groupId}")
+	public ResponseEntity<Void> publicScheduleToPrivateScheduleAdd(@PathVariable Long id, @PathVariable Long groupId,
+		@Login @Parameter(hidden = true) UserDto userDto) {
+		publicScheduleService.addPublicScheduleToPrivateSchedule(id, groupId, userDto);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
 }
 

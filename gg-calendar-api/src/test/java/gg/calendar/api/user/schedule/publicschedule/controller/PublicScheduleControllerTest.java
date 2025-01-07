@@ -29,6 +29,7 @@ import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicSch
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
+import gg.data.calendar.ScheduleGroup;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
@@ -37,6 +38,7 @@ import gg.data.calendar.type.TechTag;
 import gg.data.user.User;
 import gg.repo.calendar.PrivateScheduleRepository;
 import gg.repo.calendar.PublicScheduleRepository;
+import gg.repo.calendar.ScheduleGroupRepository;
 import gg.utils.TestDataUtils;
 import gg.utils.annotation.IntegrationTest;
 import lombok.extern.slf4j.Slf4j;
@@ -911,7 +913,7 @@ public class PublicScheduleControllerTest {
 						"Bearer " + accessToken).param("start", "2025-01-01").param("end", "2025-01-31"))
 				.andExpect(status().isOk())
 				.andDo(print());
-			
+
 			//then
 			assertThat(publicScheduleRepository.findAll()).hasSize(7);
 			assertThat(publicScheduleRepository.findAll()).extracting("classification")
@@ -979,6 +981,44 @@ public class PublicScheduleControllerTest {
 						"Bearer " + accessToken).param("start", "2025/01/01").param("end", "2025/01/31"))
 				.andExpect(status().isBadRequest())
 				.andDo(print());
+		}
+	}
+
+	@Nested
+	@DisplayName("가져온 개인일정 조회하기")
+	class publicToPrivate {
+		@Autowired
+		private ScheduleGroupRepository scheduleGroupRepository;
+
+		@Test
+		@DisplayName("[200]공개일정을 개인일정으로 가져오기 성공")
+		void addPublicToPrivate() throws Exception {
+			// given
+			ScheduleGroup scheduleGroup = ScheduleGroup.builder()
+				.user(user)
+				.title("TEST")
+				.backgroundColor("#FFFFFF")
+				.build();
+			scheduleGroupRepository.save(scheduleGroup);
+			PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateEventReqDto.builder()
+					.author(user.getIntraId())
+					.title("Original Title")
+					.content("Original Content")
+					.link("https://original.com")
+					.startTime(LocalDateTime.now())
+					.endTime(LocalDateTime.now().plusDays(1))
+					.build());
+			publicSchedule = publicScheduleRepository.save(publicSchedule);
+			// when
+			mockMvc.perform(
+					post("/calendar/public/{id}/{groupId}", publicSchedule.getId(), scheduleGroup.getId())
+						.header("Authorization", "Bearer " + accessToken))
+				.andExpect(status().isCreated())
+				.andDo(print());
+
+			// then
+			assertThat(privateScheduleRepository.findAll()).hasSize(1);
 		}
 	}
 }
