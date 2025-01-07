@@ -84,11 +84,11 @@ public class PrivateScheduleAdminMockData {
 				.classification(DetailClassification.PRIVATE_SCHEDULE)
 				.author("42GG")
 				.title("Private " + i)
-				.content("TEST Private")
+				.content("urgent")
 				.link("https://gg.42seoul.kr")
 				.status(ScheduleStatus.ACTIVATE)
 				.startTime(LocalDateTime.now().plusDays(i))
-				.endTime(LocalDateTime.now().plusDays(i + 10))
+				.endTime(LocalDateTime.now().plusDays(i + 1))
 				.build();
 			publicScheduleRepository.save(publicSchedule);
 
