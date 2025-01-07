@@ -905,12 +905,17 @@ public class PublicScheduleControllerTest {
 			//given
 			mockData.createPublicScheduleEvent(7);
 			DetailClassification detailClassification = DetailClassification.EVENT;
-			//when & then
+			//when
 			mockMvc.perform(
 					get("/calendar/public/period/{detail_classification}", detailClassification).header("Authorization",
 						"Bearer " + accessToken).param("start", "2025-01-01").param("end", "2025-01-31"))
 				.andExpect(status().isOk())
 				.andDo(print());
+			
+			//then
+			assertThat(publicScheduleRepository.findAll()).hasSize(7);
+			assertThat(publicScheduleRepository.findAll()).extracting("classification")
+				.containsOnly(DetailClassification.EVENT);
 		}
 
 		@Test
@@ -919,12 +924,16 @@ public class PublicScheduleControllerTest {
 			//given
 			mockData.createPublicScheduleJob(7);
 			DetailClassification detailClassification = DetailClassification.JOB_NOTICE;
-			//when & then
+			//when
 			mockMvc.perform(
 					get("/calendar/public/period/{detail_classification}", detailClassification).header("Authorization",
 						"Bearer " + accessToken).param("start", "2025-01-01").param("end", "2025-01-31"))
 				.andExpect(status().isOk())
 				.andDo(print());
+			//then
+			assertThat(publicScheduleRepository.findAll()).hasSize(7);
+			assertThat(publicScheduleRepository.findAll()).extracting("classification")
+				.containsOnly(DetailClassification.JOB_NOTICE);
 		}
 
 		@Test
