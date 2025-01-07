@@ -24,7 +24,7 @@ public class PublicScheduleMockData {
 				.eventTag(EventTag.JOB_FORUM)
 				.author("42GG")
 				.title("Job " + i)
-				.content("TEST JOB")
+				.content("TEST EVENT")
 				.link("https://gg.42seoul.kr")
 				.status(ScheduleStatus.ACTIVATE)
 				.startTime(LocalDateTime.now().plusDays(i))
