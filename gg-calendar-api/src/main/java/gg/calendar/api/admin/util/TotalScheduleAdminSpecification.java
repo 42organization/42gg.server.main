@@ -21,36 +21,29 @@ public class TotalScheduleAdminSpecification {
 		return (root, query, criteriaBuilder) -> {
 			List<Predicate> predicates = new ArrayList<>();
 
-			// LocalDate를 LocalDateTime으로 변환
-			LocalDateTime startDateTime = startTime.atStartOfDay(); // 00:00:00
-			LocalDateTime endDateTime = endTime.atTime(LocalTime.MAX); // 23:59:59
+			LocalDateTime startDateTime = startTime.atStartOfDay();
+			LocalDateTime endDateTime = endTime.atTime(LocalTime.MAX);
 
-			// 필수 조건
-			// predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("startTime"), startDateTime));
-			// predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("endTime"), endDateTime));
 			predicates.add(
 				criteriaBuilder.or(
 					criteriaBuilder.and(
-						criteriaBuilder.lessThanOrEqualTo(root.get("startTime"), endDateTime),  // 데이터 시작일이 요청 종료일 이전
-						criteriaBuilder.greaterThanOrEqualTo(root.get("endTime"), startDateTime)  // 데이터 종료일이 요청 시작일 이후
+						criteriaBuilder.lessThanOrEqualTo(root.get("startTime"), endDateTime),
+						criteriaBuilder.greaterThanOrEqualTo(root.get("endTime"), startDateTime)
 					),
 					criteriaBuilder.and(
 						criteriaBuilder.greaterThanOrEqualTo(root.get("startTime"), startDateTime),
-						// 데이터 시작일이 요청 시작일 이후
-						criteriaBuilder.lessThanOrEqualTo(root.get("endTime"), endDateTime)  // 데이터 종료일이 요청 종료일 이전
+						criteriaBuilder.lessThanOrEqualTo(root.get("endTime"), endDateTime)
 					)
 				)
 			);
-			// 동적으로 필드 비교
+
 			if (content != null && field != null) {
 				if ("classification".equals(field)) {
-					// Enum 필드 처리
 					Expression<String> enumAsString = root.get(field).as(String.class);
 					predicates.add(
 						criteriaBuilder.like(criteriaBuilder.lower(enumAsString), "%" + content.toLowerCase() + "%")
 					);
 				} else {
-					// 일반 String 필드 처리
 					Path<String> dynamicField = root.get(field);
 					predicates.add(
 						criteriaBuilder.like(criteriaBuilder.lower(dynamicField), "%" + content.toLowerCase() + "%")

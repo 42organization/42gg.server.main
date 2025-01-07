@@ -63,7 +63,6 @@ public class TotalScheduleAdminService {
 	public TotalScheduleAdminSearchListResDto searchTotalScheduleAdminList(TotalScheduleAdminSearchReqDto reqDto) {
 		dateTimeErrorCheck(reqDto.getStartTime(), reqDto.getEndTime());
 
-		// 필드 매핑
 		Map<String, Function<PublicSchedule, String>> fieldExtractor = Map.of(
 			"title", PublicSchedule::getTitle,
 			"content", PublicSchedule::getContent,
@@ -71,13 +70,11 @@ public class TotalScheduleAdminService {
 			"classification", schedule -> schedule.getClassification().name()
 		);
 
-		// 매핑된 필드 추출 로직
 		Function<PublicSchedule, String> extractor = fieldExtractor.get(reqDto.getType());
 		if (extractor == null) {
 			throw new IllegalArgumentException("Invalid type: " + reqDto.getType());
 		}
 
-		// Repository에서 조건으로 검색
 		Specification<PublicSchedule> specification = TotalScheduleAdminSpecification.searchByField(
 			reqDto.getContent(),
 			reqDto.getStartTime(),
