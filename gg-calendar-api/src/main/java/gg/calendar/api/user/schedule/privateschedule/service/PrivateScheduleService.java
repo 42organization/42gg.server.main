@@ -85,6 +85,9 @@ public class PrivateScheduleService {
 		return PrivateScheduleDetailResDto.toDto(privateSchedule, scheduleGroup);
 	}
 
+	// public List<PrivateSchedulePeriodResDto> getPrivateSchedulePeriod(UserDto userDto, Long privateScheduleId) {
+	// }
+
 	public void validateDetailClassification(DetailClassification classification) {
 		if (classification != DetailClassification.PRIVATE_SCHEDULE) {
 			throw new ForbiddenException(ErrorCode.CLASSIFICATION_NO_PRIVATE);
