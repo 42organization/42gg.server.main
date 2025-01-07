@@ -26,9 +26,21 @@ public class TotalScheduleAdminSpecification {
 			LocalDateTime endDateTime = endTime.atTime(LocalTime.MAX); // 23:59:59
 
 			// 필수 조건
-			predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("startTime"), startDateTime));
-			predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("endTime"), endDateTime));
-
+			// predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("startTime"), startDateTime));
+			// predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("endTime"), endDateTime));
+			predicates.add(
+				criteriaBuilder.or(
+					criteriaBuilder.and(
+						criteriaBuilder.lessThanOrEqualTo(root.get("startTime"), endDateTime),  // 데이터 시작일이 요청 종료일 이전
+						criteriaBuilder.greaterThanOrEqualTo(root.get("endTime"), startDateTime)  // 데이터 종료일이 요청 시작일 이후
+					),
+					criteriaBuilder.and(
+						criteriaBuilder.greaterThanOrEqualTo(root.get("startTime"), startDateTime),
+						// 데이터 시작일이 요청 시작일 이후
+						criteriaBuilder.lessThanOrEqualTo(root.get("endTime"), endDateTime)  // 데이터 종료일이 요청 종료일 이전
+					)
+				)
+			);
 			// 동적으로 필드 비교
 			if (content != null && field != null) {
 				if ("classification".equals(field)) {
