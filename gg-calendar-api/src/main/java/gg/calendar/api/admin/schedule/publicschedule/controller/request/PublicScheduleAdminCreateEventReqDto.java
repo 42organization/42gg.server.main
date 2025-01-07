@@ -21,8 +21,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PublicScheduleAdminCreateEventReqDto {
 
-	private DetailClassification classification;
-
 	@NotNull
 	private EventTag eventTag;
 
@@ -50,7 +48,6 @@ public class PublicScheduleAdminCreateEventReqDto {
 	public PublicScheduleAdminCreateEventReqDto(EventTag eventTag, String title, String content, String link,
 		ScheduleStatus status, LocalDateTime startTime,
 		LocalDateTime endTime) {
-		this.classification = DetailClassification.EVENT;
 		this.eventTag = eventTag;
 		this.title = title;
 		this.content = content;

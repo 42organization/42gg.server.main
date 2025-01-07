@@ -18,8 +18,6 @@ public class ListResponseDto<T> {
 	}
 
 	public static <T> ListResponseDto<T> toDto(List<T> content) {
-		return ListResponseDto.<T>builder()
-			.content(content)
-			.build();
+		return ListResponseDto.<T>builder().content(content).build();
 	}
 }

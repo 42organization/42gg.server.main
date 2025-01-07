@@ -2,6 +2,7 @@ package gg.calendar.api.user.schedule.publicschedule.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateEventReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateJobReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicSchedulePeriodRetrieveResDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
@@ -19,6 +21,7 @@ import gg.data.user.User;
 import gg.repo.calendar.PrivateScheduleRepository;
 import gg.repo.calendar.PublicScheduleRepository;
 import gg.repo.user.UserRepository;
+import gg.utils.dto.ListResponseDto;
 import gg.utils.exception.ErrorCode;
 import gg.utils.exception.custom.ForbiddenException;
 import gg.utils.exception.custom.InvalidParameterException;
@@ -87,6 +90,15 @@ public class PublicScheduleService {
 			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
 		checkAuthor(publicRetrieveSchedule.getAuthor(), user);
 		return publicRetrieveSchedule;
+	}
+
+	public ListResponseDto<PublicSchedulePeriodRetrieveResDto> retrievePublicSchedulePeriod(LocalDateTime start,
+		LocalDateTime end, DetailClassification classification) {
+		validateTimeRange(start, end);
+		List<PublicSchedule> classfiSchedules = publicScheduleRepository.findByEndTimeGreaterThanEqualAndStartTimeLessThanEqualAndClassification(
+			start, end, classification);
+		return ListResponseDto.toDto(
+			classfiSchedules.stream().map(PublicSchedulePeriodRetrieveResDto::toDto).collect(Collectors.toList()));
 	}
 
 	private void checkAuthor(String author, User user) {

@@ -31,6 +31,8 @@ public class TotalScheduleAdminResDto {
 
 	private String title;
 
+	private String content;
+
 	private LocalDateTime startTime;
 
 	private LocalDateTime endTime;
@@ -50,6 +52,7 @@ public class TotalScheduleAdminResDto {
 		this.techTag = publicSchedule.getTechTag();
 		this.author = publicSchedule.getAuthor();
 		this.title = publicSchedule.getTitle();
+		this.content = publicSchedule.getContent();
 		this.startTime = publicSchedule.getStartTime();
 		this.endTime = publicSchedule.getEndTime();
 		this.link = publicSchedule.getLink();
@@ -61,7 +64,8 @@ public class TotalScheduleAdminResDto {
 	public String toString() {
 		return "TotalScheduleAdminResDto [id=" + id + ", classification=" + classification + ", eventTag=" + eventTag
 			+ ", jobTag=" + jobTag + ", techTag=" + techTag + ", author=" + author + ", title=" + title
-			+ ", startTime=" + startTime + ", endTime=" + endTime + ", link=" + link + ", sharedCount=" + sharedCount
+			+ ", content=" + content + ", startTime=" + startTime + ", endTime=" + endTime + ", link=" + link
+			+ ", sharedCount=" + sharedCount
 			+ ", status=" + status + "]";
 	}
 }

@@ -10,15 +10,16 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
-import gg.data.calendar.type.EventTag;
+import gg.data.calendar.type.JobTag;
 import gg.data.calendar.type.ScheduleStatus;
+import gg.data.calendar.type.TechTag;
 import gg.utils.annotation.UnitTest;
 
 @UnitTest
-public class PublicScheduleUpdateResDtoTest {
+public class PublicSchedulePeriodRetrieveResDtoTest {
 
 	@Test
-	@DisplayName("PublicSchedule Entity를 ResponseDto로 변환 성공")
+	@DisplayName("PublicSchedulePeriodRetrieveResDto 생성자 테스트")
 	void toDtoSuccess() {
 		// given
 		LocalDateTime startTime = LocalDateTime.now().plusDays(1);
@@ -26,31 +27,31 @@ public class PublicScheduleUpdateResDtoTest {
 
 		PublicSchedule schedule = PublicSchedule.builder()
 			.classification(DetailClassification.JOB_NOTICE)
-			.eventTag(EventTag.INSTRUCTION)
+			.jobTag(JobTag.EXPERIENCED)
+			.techTag(TechTag.NETWORK)
 			.author("testUser")
 			.title("Test Title")
 			.content("Test Content")
-			.link("http://test.com")
+			.link("https://test.com")
 			.startTime(startTime)
 			.endTime(endTime)
 			.status(ScheduleStatus.ACTIVATE)
 			.build();
 		ReflectionTestUtils.setField(schedule, "id", 1L);
-		// when
-		PublicScheduleUpdateResDto responseDto = PublicScheduleUpdateResDto.toDto(schedule);
 
-		// then
-		assertAll(
-			() -> assertEquals(1L, responseDto.getId()),
+		// when
+		PublicSchedulePeriodRetrieveResDto responseDto = PublicSchedulePeriodRetrieveResDto.toDto(schedule);
+
+		//then
+		assertAll(() -> assertEquals(1L, responseDto.getId()),
 			() -> assertEquals(DetailClassification.JOB_NOTICE, responseDto.getClassification()),
-			() -> assertEquals(EventTag.INSTRUCTION, responseDto.getEventTag()),
+			() -> assertEquals(JobTag.EXPERIENCED, responseDto.getJobTag()),
+			() -> assertEquals(TechTag.NETWORK, responseDto.getTechTag()),
 			() -> assertEquals("testUser", responseDto.getAuthor()),
 			() -> assertEquals("Test Title", responseDto.getTitle()),
 			() -> assertEquals("Test Content", responseDto.getContent()),
-			() -> assertEquals("http://test.com", responseDto.getLink()),
+			() -> assertEquals("https://test.com", responseDto.getLink()),
 			() -> assertEquals(startTime.toString(), responseDto.getStartTime()),
-			() -> assertEquals(endTime.toString(), responseDto.getEndTime()),
-			() -> assertEquals("ACTIVATE", responseDto.getStatus())
-		);
+			() -> assertEquals(endTime.toString(), responseDto.getEndTime()));
 	}
 }
