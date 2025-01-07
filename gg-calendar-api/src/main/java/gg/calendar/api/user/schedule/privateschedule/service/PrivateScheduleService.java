@@ -93,6 +93,7 @@ public class PrivateScheduleService {
 
 	public List<PrivateSchedulePeriodResDto> getPrivateSchedulePeriod(UserDto userDto, LocalDateTime startTime,
 		LocalDateTime endTime) {
+		validateTimeRange(startTime, endTime);
 		User user = userRepository.getById(userDto.getId());
 		List<PrivateSchedule> privateSchedules = privateScheduleRepository.findOverlappingSchedulesByUser(startTime,
 			endTime, user);
