@@ -15,6 +15,7 @@ import javax.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -88,39 +89,29 @@ class TotalScheduleAdminControllerTest {
 		}
 
 		private Stream<Arguments> invalidInput() {
-			return Stream.of(Arguments.of(new PageRequestDto(0, 10)),
-				Arguments.of(new PageRequestDto(null, null)));
+			return Stream.of(Arguments.of(new PageRequestDto(0, 10)), Arguments.of(new PageRequestDto(null, null)));
 		}
 
 		private Stream<Arguments> inputSearchParam() {
-			return Stream.of(
-				Arguments.of(new TotalScheduleAdminSearchReqDto("title", "meeting", LocalDate.now(),
-					LocalDate.now().plusDays(5))),
-				Arguments.of(new TotalScheduleAdminSearchReqDto("content", "urgent", LocalDate.now().plusDays(2),
-					LocalDate.now().plusDays(5))),
-				Arguments.of(
+			return Stream.of(Arguments.of(
+					new TotalScheduleAdminSearchReqDto("title", "meet", LocalDate.now(), LocalDate.now().plusDays(5))),
+				Arguments.of(new TotalScheduleAdminSearchReqDto("content", "test", LocalDate.now().plusDays(2),
+					LocalDate.now().plusDays(5))), Arguments.of(
 					new TotalScheduleAdminSearchReqDto("classification", "PRIVATE_SCHEDULE", LocalDate.now(),
-						LocalDate.now().plusDays(5))),
-				Arguments.of(
+						LocalDate.now().plusDays(5))), Arguments.of(
 					new TotalScheduleAdminSearchReqDto("classification", "EVENT", LocalDate.now(),
-						LocalDate.now().plusDays(5))),
-				Arguments.of(
+						LocalDate.now().plusDays(5))), Arguments.of(
 					new TotalScheduleAdminSearchReqDto("classification", "JOB_NOTICE", LocalDate.now(),
-						LocalDate.now().plusDays(5)))
-			);
+						LocalDate.now().plusDays(5))));
 		}
 
 		private Stream<Arguments> inputSearchParamEndBeforeStart() {
-			return Stream.of(
-				Arguments.of(new TotalScheduleAdminSearchReqDto("title", "meeting", LocalDate.now().plusDays(5),
-					LocalDate.now())),
+			return Stream.of(Arguments.of(
+					new TotalScheduleAdminSearchReqDto("title", "meet", LocalDate.now().plusDays(5), LocalDate.now())),
 				Arguments.of(new TotalScheduleAdminSearchReqDto("content", "urgent", LocalDate.now().plusDays(5),
-					LocalDate.now().plusDays(2))),
-				Arguments.of(
+					LocalDate.now().plusDays(2))), Arguments.of(
 					new TotalScheduleAdminSearchReqDto("classification", "PRIVATE_SCHEDULE",
-						LocalDate.now().plusDays(5),
-						LocalDate.now()))
-			);
+						LocalDate.now().plusDays(5), LocalDate.now())));
 		}
 
 		@ParameterizedTest
@@ -206,8 +197,7 @@ class TotalScheduleAdminControllerTest {
 
 			// when
 			String response = mockMvc.perform(
-					get("/admin/calendar").header("Authorization",
-						"Bearer " + accessToken).params(params))
+					get("/admin/calendar").header("Authorization", "Bearer " + accessToken).params(params))
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andReturn()
@@ -240,8 +230,7 @@ class TotalScheduleAdminControllerTest {
 
 			// when
 			String response = mockMvc.perform(
-					get("/admin/calendar").header("Authorization",
-						"Bearer " + accessToken).params(params))
+					get("/admin/calendar").header("Authorization", "Bearer " + accessToken).params(params))
 				.andDo(print())
 				.andExpect(status().isBadRequest())
 				.andReturn()
@@ -257,8 +246,8 @@ class TotalScheduleAdminControllerTest {
 		@DisplayName("Admin TotalSchedule 상세 검색 테스트 - 성공")
 		void getTotalAdminSearchTestSuccess(TotalScheduleAdminSearchReqDto reqDto) throws Exception {
 			// given
-			publicScheduleAdminMockData.cratePublicScheduleArgumentsEvent(20, "42GG", "meeting");
-			publicScheduleAdminMockData.cratePublicScheduleArgumentsJob(10, "TEST", "urgent");
+			publicScheduleAdminMockData.cratePublicScheduleArgumentsEvent(20, "42GG", "meet");
+			publicScheduleAdminMockData.cratePublicScheduleArgumentsJob(10, "TEST", "test");
 			privateScheduleAdminMockData.createPrivateSchedules(5, user);
 
 			MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -269,8 +258,7 @@ class TotalScheduleAdminControllerTest {
 
 			// when
 			String response = mockMvc.perform(
-					get("/admin/calendar/search/").header("Authorization",
-						"Bearer " + accessToken).params(params))
+					get("/admin/calendar/search/").header("Authorization", "Bearer " + accessToken).params(params))
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andReturn()
@@ -294,7 +282,7 @@ class TotalScheduleAdminControllerTest {
 		@DisplayName("Admin TotalSchedule 상세 검색 테스트 - 실패 : 시작 날짜가 끝나는 날짜보다 더 큰 경우")
 		void getTotalAdminSearchTestFailEndBeforeStart(TotalScheduleAdminSearchReqDto reqDto) throws Exception {
 			// given
-			publicScheduleAdminMockData.cratePublicScheduleArgumentsEvent(20, "42GG", "meeting");
+			publicScheduleAdminMockData.cratePublicScheduleArgumentsEvent(20, "42GG", "meet");
 			publicScheduleAdminMockData.cratePublicScheduleArgumentsJob(10, "TEST", "urgent");
 			privateScheduleAdminMockData.createPrivateSchedules(5, user);
 
@@ -306,8 +294,7 @@ class TotalScheduleAdminControllerTest {
 
 			// when
 			String response = mockMvc.perform(
-					get("/admin/calendar/search/").header("Authorization",
-						"Bearer " + accessToken).params(params))
+					get("/admin/calendar/search/").header("Authorization", "Bearer " + accessToken).params(params))
 				.andDo(print())
 				.andExpect(status().isBadRequest())
 				.andReturn()
@@ -320,6 +307,33 @@ class TotalScheduleAdminControllerTest {
 			TotalScheduleAdminSearchListResDto result = objectMapper.readValue(response,
 				TotalScheduleAdminSearchListResDto.class);
 			assertNull(result.getTotalScheduleAdminResDtoList());
+		}
+
+		@Test
+		@DisplayName("Admin TotalSchedule 전체 리스트 조회 테스트 - 성공")
+		void getTotalAdminTotalListTestSuccess() throws Exception {
+			// given
+			publicScheduleAdminMockData.createPublicScheduleEvent(20);
+			publicScheduleAdminMockData.createPublicScheduleJob(10);
+			publicScheduleAdminMockData.createPublicSchedulePrivate(5);
+
+			// when
+			String response = mockMvc.perform(
+					get("/admin/calendar/total").header("Authorization", "Bearer " + accessToken))
+				.andExpect(status().isOk())
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
+
+			// then
+			log.info("response :{}", response);
+
+			TotalScheduleAdminSearchListResDto result = objectMapper.readValue(response,
+				TotalScheduleAdminSearchListResDto.class);
+			for (TotalScheduleAdminResDto dto : result.getTotalScheduleAdminResDtoList()) {
+				System.out.println(dto.toString());
+			}
+			assertThat(result.getTotalScheduleAdminResDtoList().size()).isEqualTo(35);
 		}
 
 	}

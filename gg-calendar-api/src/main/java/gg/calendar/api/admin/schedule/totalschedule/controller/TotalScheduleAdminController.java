@@ -57,4 +57,10 @@ public class TotalScheduleAdminController {
 		return ResponseEntity.ok(scheduleList);
 	}
 
+	@GetMapping("/total")
+	public ResponseEntity<TotalScheduleAdminSearchListResDto> totalScheduleAdminList() {
+		TotalScheduleAdminSearchListResDto scheduleList = totalScheduleAdminService.totalScheduleAdminList();
+
+		return ResponseEntity.ok(scheduleList);
+	}
 }
