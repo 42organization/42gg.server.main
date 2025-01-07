@@ -21,7 +21,6 @@ import gg.data.user.User;
 import gg.repo.calendar.PrivateScheduleRepository;
 import gg.repo.calendar.PublicScheduleRepository;
 import gg.repo.user.UserRepository;
-import gg.utils.dto.ListResponseDto;
 import gg.utils.exception.ErrorCode;
 import gg.utils.exception.custom.ForbiddenException;
 import gg.utils.exception.custom.InvalidParameterException;
@@ -92,13 +91,15 @@ public class PublicScheduleService {
 		return publicRetrieveSchedule;
 	}
 
-	public ListResponseDto<PublicSchedulePeriodRetrieveResDto> retrievePublicSchedulePeriod(LocalDateTime start,
+	public List<PublicSchedulePeriodRetrieveResDto> retrievePublicSchedulePeriod(LocalDateTime start,
 		LocalDateTime end, DetailClassification classification) {
 		validateTimeRange(start, end);
-		List<PublicSchedule> classfiSchedules = publicScheduleRepository.findByEndTimeGreaterThanEqualAndStartTimeLessThanEqualAndClassification(
-			start, end, classification);
-		return ListResponseDto.toDto(
-			classfiSchedules.stream().map(PublicSchedulePeriodRetrieveResDto::toDto).collect(Collectors.toList()));
+		List<PublicSchedule> classSchedules = publicScheduleRepository
+			.findByEndTimeGreaterThanEqualAndStartTimeLessThanEqualAndClassification(
+				start, end, classification);
+		return classSchedules.stream()
+			.map(PublicSchedulePeriodRetrieveResDto::toDto)
+			.collect(Collectors.toList());
 	}
 
 	private void checkAuthor(String author, User user) {
