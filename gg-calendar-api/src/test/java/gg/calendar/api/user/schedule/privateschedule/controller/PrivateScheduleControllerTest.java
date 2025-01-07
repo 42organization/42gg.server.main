@@ -4,7 +4,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
@@ -24,6 +26,7 @@ import gg.calendar.api.user.schedule.privateschedule.PrivateScheduleMockData;
 import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleCreateReqDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.request.PrivateScheduleUpdateReqDto;
 import gg.calendar.api.user.schedule.privateschedule.controller.response.PrivateScheduleDetailResDto;
+import gg.calendar.api.user.schedule.privateschedule.controller.response.PrivateSchedulePeriodResDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.ScheduleGroup;
@@ -33,6 +36,7 @@ import gg.data.user.User;
 import gg.repo.calendar.PrivateScheduleRepository;
 import gg.utils.TestDataUtils;
 import gg.utils.annotation.IntegrationTest;
+import gg.utils.dto.ListResponseDto;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -442,6 +446,71 @@ public class PrivateScheduleControllerTest {
 			mockMvc.perform(get("/calendar/private/" + privateSchedule.getId())
 					.header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
+		}
+	}
+
+	@Nested
+	@DisplayName("PrivateSchedule 기간조회")
+	class PeriodPrivateSchedule {
+		@Test
+		@DisplayName("조회 성공 200")
+		void success() throws Exception {
+			//given
+			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
+			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
+				DetailClassification.PRIVATE_SCHEDULE);
+			PrivateSchedule privateSchedule1 = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
+				scheduleGroup.getId());
+			PrivateSchedule privateSchedule2 = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
+				scheduleGroup.getId());
+			LocalDate start = LocalDate.now().minusDays(10);
+			LocalDate end = LocalDate.now().plusDays(10);
+			//when
+			String response = mockMvc.perform(get("/calendar/private")
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON)
+					.param("start", start.toString())
+					.param("end", end.toString()))
+				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+			ListResponseDto<PrivateSchedulePeriodResDto> dto = objectMapper.readValue(response, ListResponseDto.class);
+			//then
+			Assertions.assertThat(dto.getContent().size()).isEqualTo(2);
+			Assertions.assertThat(publicSchedule.getStartTime().isBefore(end.atTime(LocalTime.MAX))).isEqualTo(true);
+			Assertions.assertThat(publicSchedule.getEndTime().isAfter(start.atStartOfDay())).isEqualTo(true);
+		}
+
+		@Test
+		@DisplayName("종료 날짜가 시작 날짜보다 빠른 경우 400")
+		void endTimeBeforeStartTime() throws Exception {
+			//given
+			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
+				DetailClassification.PRIVATE_SCHEDULE);
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
+				0L);
+			//when&then
+			mockMvc.perform(get("/calendar/private")
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON)
+					.param("start", LocalDate.now().plusDays(10).toString())
+					.param("end", LocalDate.now().toString()))
+				.andExpect(status().isBadRequest());
+		}
+
+		@Test
+		@DisplayName("스케줄 그룹이 없는 경우 404")
+		void notFoundScheduleGroup() throws Exception {
+			//given
+			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
+				DetailClassification.PRIVATE_SCHEDULE);
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
+				0L);
+			//when&then
+			mockMvc.perform(get("/calendar/private")
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON)
+					.param("start", LocalDate.now().toString())
+					.param("end", LocalDate.now().plusDays(10).toString()))
 				.andExpect(status().isNotFound());
 		}
 	}
