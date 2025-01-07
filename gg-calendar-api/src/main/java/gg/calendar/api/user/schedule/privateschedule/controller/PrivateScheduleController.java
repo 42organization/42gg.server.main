@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -72,7 +73,9 @@ public class PrivateScheduleController {
 
 	@GetMapping
 	public ResponseEntity<ListResponseDto<PrivateSchedulePeriodResDto>> privateSchedulePeriodGet(
-		@Login @Parameter(hidden = true) UserDto userDto, @RequestParam LocalDate start, @RequestParam LocalDate end) {
+		@Login @Parameter(hidden = true) UserDto userDto,
+		@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
+		@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
 		LocalDateTime startTime = start.atStartOfDay();
 		LocalDateTime endTime = end.atTime(LocalTime.MAX);
 

@@ -98,7 +98,7 @@ public class PrivateScheduleService {
 		List<PrivateSchedule> privateSchedules = privateScheduleRepository.findOverlappingSchedulesByUser(startTime,
 			endTime, user);
 		Map<Long, ScheduleGroup> scheduleGroups = scheduleGroupRepository.findByUserId(userDto.getId()).stream()
-			.collect(Collectors.toMap(ScheduleGroup::getId, Function.identity(), (existing, replacement) -> existing));
+			.collect(Collectors.toMap(ScheduleGroup::getId, Function.identity()));
 		List<PrivateSchedulePeriodResDto> response = new ArrayList<>();
 
 		for (PrivateSchedule privateSchedule : privateSchedules) {
