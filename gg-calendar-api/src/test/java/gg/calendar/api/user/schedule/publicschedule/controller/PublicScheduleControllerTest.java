@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -907,10 +908,14 @@ public class PublicScheduleControllerTest {
 			//given
 			mockData.createPublicScheduleEvent(7);
 			DetailClassification detailClassification = DetailClassification.EVENT;
+			LocalDateTime start = LocalDateTime.now().plusDays(0);
+			LocalDateTime end = LocalDateTime.now().plusDays(7);
 			//when
 			mockMvc.perform(
 					get("/calendar/public/period/{detail_classification}", detailClassification).header("Authorization",
-						"Bearer " + accessToken).param("start", "2025-01-01").param("end", "2025-01-31"))
+							"Bearer " + accessToken)
+						.param("start", start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+						.param("end", end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))))
 				.andExpect(status().isOk())
 				.andDo(print());
 
@@ -926,10 +931,13 @@ public class PublicScheduleControllerTest {
 			//given
 			mockData.createPublicScheduleJob(7);
 			DetailClassification detailClassification = DetailClassification.JOB_NOTICE;
+			LocalDateTime start = LocalDateTime.now().plusDays(0);
+			LocalDateTime end = LocalDateTime.now().plusDays(7);
 			//when
 			mockMvc.perform(
 					get("/calendar/public/period/{detail_classification}", detailClassification).header("Authorization",
-						"Bearer " + accessToken).param("start", "2025-01-01").param("end", "2025-01-31"))
+							"Bearer " + accessToken).param("start", start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+						.param("end", end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))))
 				.andExpect(status().isOk())
 				.andDo(print());
 			//then
@@ -944,10 +952,13 @@ public class PublicScheduleControllerTest {
 			//given
 			mockData.createPublicScheduleEvent(7);
 			DetailClassification detailClassification = DetailClassification.EVENT;
+			LocalDateTime start = LocalDateTime.now().plusDays(0);
+			LocalDateTime end = LocalDateTime.now().minusDays(7);
 			//when & then
 			mockMvc.perform(
 					get("/calendar/public/period/{detail_classification}", detailClassification).header("Authorization",
-						"Bearer " + accessToken).param("start", "2025-01-01").param("end", "2024-01-31"))
+							"Bearer " + accessToken).param("start", start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+						.param("end", end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))))
 				.andExpect(status().isBadRequest())
 				.andDo(print());
 		}
@@ -957,9 +968,12 @@ public class PublicScheduleControllerTest {
 		void retrievePublicScheduleFaultDetailClassification() throws Exception {
 			// given
 			mockData.createPublicScheduleEvent(7);
+			LocalDateTime start = LocalDateTime.now().plusDays(0);
+			LocalDateTime end = LocalDateTime.now().plusDays(7);
 			//when & then
 			mockMvc.perform(get("/calendar/public/period/{detail_classification}", "wrong").header("Authorization",
-					"Bearer " + accessToken).param("start", "2025-01-01").param("end", "2025-01-31"))
+						"Bearer " + accessToken).param("start", start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+					.param("end", end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))))
 				.andExpect(status().isBadRequest())
 				.andExpect(result -> {
 					// 에러 응답의 세부 내용 출력
@@ -975,10 +989,13 @@ public class PublicScheduleControllerTest {
 			// given
 			mockData.createPublicScheduleEvent(7);
 			DetailClassification detailClassification = DetailClassification.EVENT;
+			LocalDateTime start = LocalDateTime.now().plusDays(0);
+			LocalDateTime end = LocalDateTime.now().plusDays(7);
 			//when & then
 			mockMvc.perform(
 					get("/calendar/public/period/{detail_classification}", detailClassification).header("Authorization",
-						"Bearer " + accessToken).param("start", "2025/01/01").param("end", "2025/01/31"))
+							"Bearer " + accessToken).param("start", start.format(DateTimeFormatter.ofPattern("yyyy/MM/dd")))
+						.param("end", end.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))))
 				.andExpect(status().isBadRequest())
 				.andDo(print());
 		}
