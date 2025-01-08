@@ -5,10 +5,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import gg.auth.UserDto;
 import gg.calendar.api.user.custom.controller.request.CalendarCustomCreateReqDto;
+import gg.calendar.api.user.custom.controller.request.CalendarCustomUpdateReqDto;
+import gg.calendar.api.user.custom.controller.response.CalendarCustomUpdateResDto;
 import gg.data.calendar.ScheduleGroup;
 import gg.data.user.User;
 import gg.repo.calendar.ScheduleGroupRepository;
 import gg.repo.user.UserRepository;
+import gg.utils.exception.ErrorCode;
+import gg.utils.exception.custom.NotExistException;
 import lombok.RequiredArgsConstructor;
 
 @Transactional(readOnly = true)
@@ -23,5 +27,14 @@ public class CalendarCustomService {
 		User user = userRepository.getById(userDto.getId());
 		ScheduleGroup scheduleGroup = CalendarCustomCreateReqDto.toEntity(user, calendarCustomCreateReqDto);
 		scheduleGroupRepository.save(scheduleGroup);
+	}
+
+	@Transactional
+	public CalendarCustomUpdateResDto updateScheduleGroup(UserDto userDto,
+		CalendarCustomUpdateReqDto calendarCustomUpdateReqDto, Long scheduleGroupId) {
+		ScheduleGroup scheduleGroup = scheduleGroupRepository.findByIdAndUserId(scheduleGroupId, userDto.getId())
+			.orElseThrow(() -> new NotExistException(ErrorCode.SCHEDULE_GROUP_NOT_FOUND));
+		scheduleGroup.update(calendarCustomUpdateReqDto.getTitle(), calendarCustomUpdateReqDto.getBackgroundColor());
+		return CalendarCustomUpdateResDto.toDto(scheduleGroup);
 	}
 }
