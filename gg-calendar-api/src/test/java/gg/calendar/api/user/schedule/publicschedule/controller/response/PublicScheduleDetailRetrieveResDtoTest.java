@@ -28,7 +28,7 @@ public class PublicScheduleDetailRetrieveResDtoTest {
 			.author("testUser")
 			.title("Test Title")
 			.content("Test Content")
-			.link("http://test.com")
+			.link("https://test.com")
 			.startTime(startTime)
 			.endTime(endTime)
 			.build();
