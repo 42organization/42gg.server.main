@@ -44,4 +44,9 @@ public class ScheduleGroup extends BaseTimeEntity {
 		this.title = title;
 		this.backgroundColor = backgroundColor;
 	}
+
+	public void update(String title, String backgroundColor) {
+		this.title = title;
+		this.backgroundColor = backgroundColor;
+	}
 }
