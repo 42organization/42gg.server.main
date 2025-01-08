@@ -18,6 +18,7 @@ public class CalendarCustomService {
 	private final ScheduleGroupRepository scheduleGroupRepository;
 	private final UserRepository userRepository;
 
+	@Transactional
 	public void createScheduleGroup(UserDto userDto, CalendarCustomCreateReqDto calendarCustomCreateReqDto) {
 		User user = userRepository.getById(userDto.getId());
 		ScheduleGroup scheduleGroup = CalendarCustomCreateReqDto.toEntity(user, calendarCustomCreateReqDto);
