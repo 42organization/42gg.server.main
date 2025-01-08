@@ -85,7 +85,7 @@ public class CalendarCustomControllerTest {
 
 		@Test
 		@DisplayName("잘못된 색상코드(hex code)가 들어온 경우 400")
-		void notFoundGroup() throws Exception {
+		void invalidHexColorCode() throws Exception {
 			//given
 			CalendarCustomCreateReqDto reqDto = CalendarCustomCreateReqDto.builder()
 				.title("공부")
@@ -117,15 +117,16 @@ public class CalendarCustomControllerTest {
 					.header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(reqDto)))
-				.andExpect(status().isCreated());
+				.andExpect(status().isOk());
 			//then
-			Assertions.assertThat(scheduleGroup.getTitle()).isEqualTo(reqDto.getTitle());
-			Assertions.assertThat(scheduleGroup.getBackgroundColor()).isEqualTo(reqDto.getBackgroundColor());
+			ScheduleGroup updated = scheduleGroupRepository.findById(scheduleGroup.getId()).orElseThrow();
+			Assertions.assertThat(updated.getTitle()).isEqualTo(reqDto.getTitle());
+			Assertions.assertThat(updated.getBackgroundColor()).isEqualTo(reqDto.getBackgroundColor());
 		}
 
 		@Test
 		@DisplayName("잘못된 색상코드(hex code)가 들어온 경우 400")
-		void notFoundGroup() throws Exception {
+		void invalidHexColorCode() throws Exception {
 			//given
 			ScheduleGroup scheduleGroup = calendarCustomMockData.createScheduleGroup(user);
 			CalendarCustomUpdateReqDto reqDto = CalendarCustomUpdateReqDto.builder()
@@ -138,6 +139,23 @@ public class CalendarCustomControllerTest {
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(reqDto)))
 				.andExpect(status().isBadRequest());
+		}
+
+		@Test
+		@DisplayName("스케줄 그룹이 없는 경우 404")
+		void notFoundGroup() throws Exception {
+			//given
+			ScheduleGroup scheduleGroup = calendarCustomMockData.createScheduleGroup(user);
+			CalendarCustomUpdateReqDto reqDto = CalendarCustomUpdateReqDto.builder()
+				.title("공부")
+				.backgroundColor("#AAAAAA")
+				.build();
+			//when&then
+			mockMvc.perform(put("/calendar/custom/" + scheduleGroup.getId() + 12341234)
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(reqDto)))
+				.andExpect(status().isNotFound());
 		}
 	}
 }
