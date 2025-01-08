@@ -19,8 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import gg.calendar.api.user.custom.CalendarCustomMockData;
 import gg.calendar.api.user.custom.controller.request.CalendarCustomCreateReqDto;
-import gg.calendar.api.user.schedule.privateschedule.PrivateScheduleMockData;
+import gg.calendar.api.user.custom.controller.request.CalendarCustomUpdateReqDto;
 import gg.data.calendar.ScheduleGroup;
 import gg.data.user.User;
 import gg.repo.calendar.ScheduleGroupRepository;
@@ -43,7 +44,7 @@ public class CalendarCustomControllerTest {
 	private ScheduleGroupRepository scheduleGroupRepository;
 
 	@Autowired
-	private PrivateScheduleMockData privateScheduleMockData;
+	private CalendarCustomMockData calendarCustomMockData;
 
 	@Autowired
 	private TestDataUtils testDataUtils;
@@ -92,6 +93,47 @@ public class CalendarCustomControllerTest {
 				.build();
 			//when&then
 			mockMvc.perform(post("/calendar/custom")
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(reqDto)))
+				.andExpect(status().isBadRequest());
+		}
+	}
+
+	@Nested
+	@DisplayName("ScheduleGroup 수정하기")
+	class UpdatePrivateSchedule {
+		@Test
+		@DisplayName("성공 200")
+		void success() throws Exception {
+			//given
+			ScheduleGroup scheduleGroup = calendarCustomMockData.createScheduleGroup(user);
+			CalendarCustomUpdateReqDto reqDto = CalendarCustomUpdateReqDto.builder()
+				.title("공부")
+				.backgroundColor("#AAAAAA")
+				.build();
+			//when
+			mockMvc.perform(put("/calendar/custom/" + scheduleGroup.getId())
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(reqDto)))
+				.andExpect(status().isCreated());
+			//then
+			Assertions.assertThat(scheduleGroup.getTitle()).isEqualTo(reqDto.getTitle());
+			Assertions.assertThat(scheduleGroup.getBackgroundColor()).isEqualTo(reqDto.getBackgroundColor());
+		}
+
+		@Test
+		@DisplayName("잘못된 색상코드(hex code)가 들어온 경우 400")
+		void notFoundGroup() throws Exception {
+			//given
+			ScheduleGroup scheduleGroup = calendarCustomMockData.createScheduleGroup(user);
+			CalendarCustomUpdateReqDto reqDto = CalendarCustomUpdateReqDto.builder()
+				.title("공부")
+				.backgroundColor("잘못된 색상 코드")
+				.build();
+			//when&then
+			mockMvc.perform(put("/calendar/custom/" + scheduleGroup.getId())
 					.header("Authorization", "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(reqDto)))
