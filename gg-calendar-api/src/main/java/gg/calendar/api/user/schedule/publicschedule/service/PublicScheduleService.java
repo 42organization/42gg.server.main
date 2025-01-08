@@ -105,9 +105,8 @@ public class PublicScheduleService {
 
 	@Transactional
 	public void addPublicScheduleToPrivateSchedule(Long scheduleId, Long groupId, UserDto userDto) {
-		User user = userRepository.findById(userDto.getId())
-			.orElseThrow(() -> new NotExistException(ErrorCode.USER_NOT_FOUND));
-		Long userId = user.getId();
+		User user = userRepository.getById(userDto.getId());
+		Long userId = userDto.getId();
 		PublicSchedule publicSchedule = publicScheduleRepository.findById(scheduleId)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
 		scheduleGroupRepository.findByIdAndUserId(groupId, userId)

@@ -1012,13 +1012,57 @@ public class PublicScheduleControllerTest {
 			publicSchedule = publicScheduleRepository.save(publicSchedule);
 			// when
 			mockMvc.perform(
-					post("/calendar/public/{id}/{groupId}", publicSchedule.getId(), scheduleGroup.getId())
-						.header("Authorization", "Bearer " + accessToken))
-				.andExpect(status().isCreated())
-				.andDo(print());
+				post("/calendar/public/{id}/{groupId}", publicSchedule.getId(), scheduleGroup.getId()).header(
+					"Authorization", "Bearer " + accessToken)).andExpect(status().isCreated()).andDo(print());
 
 			// then
 			assertThat(privateScheduleRepository.findAll()).hasSize(1);
+		}
+
+		@Test
+		@DisplayName("[404]공개일정을 개인일정으로 가져오기 실패 - 없는 일정일 때")
+		void addPublicToPrivateFailNotExist() throws Exception {
+			// given
+			ScheduleGroup scheduleGroup = ScheduleGroup.builder()
+				.user(user)
+				.title("TEST")
+				.backgroundColor("#FFFFFF")
+				.build();
+			scheduleGroupRepository.save(scheduleGroup);
+			// when
+			mockMvc.perform(
+					post("/calendar/public/{id}/{groupId}", 99999, scheduleGroup.getId()).header("Authorization",
+						"Bearer " + accessToken))
+				.andExpect(status().isNotFound()).andDo(print());
+
+			// then
+			assertThat(privateScheduleRepository.findAll()).isEmpty();
+			assertThat(publicScheduleRepository.findAll()).isEmpty();
+
+		}
+
+		@Test
+		@DisplayName("[404]공개일정을 개인일정으로 가져오기 실패 - 없는 그룹일 때")
+		void addPublicToPrivateFailNotExistGroup() throws Exception {
+			// given
+			PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity(user.getIntraId(),
+				PublicScheduleCreateEventReqDto.builder()
+					.author(user.getIntraId())
+					.title("Original Title")
+					.content("Original Content")
+					.link("https://original.com")
+					.startTime(LocalDateTime.now())
+					.endTime(LocalDateTime.now().plusDays(1))
+					.build());
+			publicSchedule = publicScheduleRepository.save(publicSchedule);
+			// when
+			mockMvc.perform(
+					post("/calendar/public/{id}/{groupId}", publicSchedule.getId(), 1).header("Authorization",
+						"Bearer " + accessToken))
+				.andExpect(status().isNotFound()).andDo(print());
+			// then
+			assertThat(privateScheduleRepository.findAll()).isEmpty();
+			assertThat(scheduleGroupRepository.findAll()).isEmpty();
 		}
 	}
 }
