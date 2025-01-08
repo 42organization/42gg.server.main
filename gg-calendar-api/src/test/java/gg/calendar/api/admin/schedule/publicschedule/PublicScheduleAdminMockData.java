@@ -86,4 +86,54 @@ public class PublicScheduleAdminMockData {
 			publicScheduleAdminRepository.save(publicSchedule);
 		}
 	}
+
+	public void cratePublicScheduleArgumentsEvent(int size, String author, String title) {
+		for (int i = 0; i < size; i++) {
+			PublicSchedule publicSchedule = PublicSchedule.builder()
+				.classification(DetailClassification.EVENT)
+				.eventTag(EventTag.JOB_FORUM)
+				.author(author)
+				.title(title + " " + i)
+				.content("TEST EVENT")
+				.link("https://gg.42seoul.kr")
+				.status(ScheduleStatus.ACTIVATE)
+				.startTime(LocalDateTime.now().plusDays(i))
+				.endTime(LocalDateTime.now().plusDays(i + 1))
+				.build();
+			publicScheduleAdminRepository.save(publicSchedule);
+		}
+	}
+
+	public void cratePublicScheduleArgumentsJob(int size, String author, String content) {
+		for (int i = 0; i < size; i++) {
+			PublicSchedule publicSchedule = PublicSchedule.builder()
+				.classification(DetailClassification.JOB_NOTICE)
+				.jobTag(JobTag.EXPERIENCED)
+				.author(author)
+				.title("TEST " + i)
+				.content(content + " " + i)
+				.link("https://gg.42seoul.kr")
+				.status(ScheduleStatus.ACTIVATE)
+				.startTime(LocalDateTime.now().plusDays(i))
+				.endTime(LocalDateTime.now().plusDays(i + 1))
+				.build();
+			publicScheduleAdminRepository.save(publicSchedule);
+		}
+	}
+
+	public void cratePublicScheduleArgumentsPrivate(int size, String author, String title) {
+		for (int i = 0; i < size; i++) {
+			PublicSchedule publicSchedule = PublicSchedule.builder()
+				.classification(DetailClassification.PRIVATE_SCHEDULE)
+				.author(author)
+				.title(title + " " + i)
+				.content("TEST Private")
+				.link("https://gg.42seoul.kr")
+				.status(ScheduleStatus.ACTIVATE)
+				.startTime(LocalDateTime.now().plusDays(i))
+				.endTime(LocalDateTime.now().plusDays(i + 1))
+				.build();
+			publicScheduleAdminRepository.save(publicSchedule);
+		}
+	}
 }
