@@ -22,11 +22,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import gg.calendar.api.user.custom.CalendarCustomMockData;
 import gg.calendar.api.user.custom.controller.request.CalendarCustomCreateReqDto;
 import gg.calendar.api.user.custom.controller.request.CalendarCustomUpdateReqDto;
+import gg.calendar.api.user.custom.controller.response.CalendarCustomViewResDto;
 import gg.data.calendar.ScheduleGroup;
 import gg.data.user.User;
 import gg.repo.calendar.ScheduleGroupRepository;
 import gg.utils.TestDataUtils;
 import gg.utils.annotation.IntegrationTest;
+import gg.utils.dto.ListResponseDto;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -156,6 +158,41 @@ public class CalendarCustomControllerTest {
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(reqDto)))
 				.andExpect(status().isNotFound());
+		}
+	}
+
+	@Nested
+	@DisplayName("ScheduleGroup 목록 조회하기")
+	class GetPrivateScheduleView {
+		@Test
+		@DisplayName("목록 조회 성공 200")
+		void success() throws Exception {
+			//given
+			ScheduleGroup scheduleGroup1 = calendarCustomMockData.createScheduleGroup(user);
+			ScheduleGroup scheduleGroup2 = calendarCustomMockData.createScheduleGroup(user);
+			//when
+			String response = mockMvc.perform(get("/calendar/custom")
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+			ListResponseDto<CalendarCustomViewResDto> dto = objectMapper.readValue(response, ListResponseDto.class);
+			//then
+			Assertions.assertThat(dto.getContent().size()).isEqualTo(2);
+		}
+
+		@Test
+		@DisplayName("빈 목록 반환 200")
+		void empty() throws Exception {
+			//given
+			//스케줄 그룹 생성 X
+			//when
+			String response = mockMvc.perform(get("/calendar/custom")
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+			ListResponseDto<CalendarCustomViewResDto> dto = objectMapper.readValue(response, ListResponseDto.class);
+			//then
+			Assertions.assertThat(dto.getContent().size()).isEqualTo(0);
 		}
 	}
 }
