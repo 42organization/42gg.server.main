@@ -95,10 +95,11 @@ public class PublicScheduleService {
 	public ListResponseDto<PublicSchedulePeriodRetrieveResDto> retrievePublicSchedulePeriod(LocalDateTime start,
 		LocalDateTime end, DetailClassification classification) {
 		validateTimeRange(start, end);
-		List<PublicSchedule> classfiSchedules = publicScheduleRepository.findByEndTimeGreaterThanEqualAndStartTimeLessThanEqualAndClassification(
-			start, end, classification);
+		List<PublicSchedule> classSchedules = publicScheduleRepository
+			.findByEndTimeGreaterThanEqualAndStartTimeLessThanEqualAndClassification(start, end, classification);
+
 		return ListResponseDto.toDto(
-			classfiSchedules.stream().map(PublicSchedulePeriodRetrieveResDto::toDto).collect(Collectors.toList()));
+			classSchedules.stream().map(PublicSchedulePeriodRetrieveResDto::toDto).collect(Collectors.toList()));
 	}
 
 	private void checkAuthor(String author, User user) {
