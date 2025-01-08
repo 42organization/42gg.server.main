@@ -4,7 +4,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import gg.data.calendar.ScheduleGroup;
+import gg.data.user.User;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,4 +22,18 @@ public class CalendarCustomCreateReqDto {
 	@NotNull
 	@Pattern(regexp = HEX_COLOR_PATTERN)
 	private String backgroundColor;
+
+	@Builder
+	private CalendarCustomCreateReqDto(String title, String backgroundColor) {
+		this.title = title;
+		this.backgroundColor = backgroundColor;
+	}
+
+	public static ScheduleGroup toEntity(User user, CalendarCustomCreateReqDto calendarCustomCreateReqDto) {
+		return ScheduleGroup.builder()
+			.user(user)
+			.title(calendarCustomCreateReqDto.title)
+			.backgroundColor(calendarCustomCreateReqDto.backgroundColor)
+			.build();
+	}
 }
