@@ -8,6 +8,7 @@ import gg.calendar.api.user.schedule.privateschedule.controller.request.Imported
 import gg.calendar.api.user.schedule.privateschedule.controller.response.ImportedScheduleUpdateResDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.ScheduleGroup;
+import gg.data.calendar.type.DetailClassification;
 import gg.repo.calendar.PrivateScheduleRepository;
 import gg.repo.calendar.ScheduleGroupRepository;
 import gg.utils.exception.ErrorCode;
@@ -40,6 +41,7 @@ public class ImportedScheduleService {
 		PrivateSchedule privateSchedule = privateScheduleRepository.findById(privateScheduleId)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PRIVATE_SCHEDULE_NOT_FOUND));
 		validateAuthor(userDto.getIntraId(), privateSchedule.getUser().getIntraId());
+		validateDetailClassification(privateSchedule.getPublicSchedule().getClassification());
 
 		privateSchedule.delete();
 	}
@@ -47,6 +49,12 @@ public class ImportedScheduleService {
 	public void validateAuthor(String intraId, String author) {
 		if (!intraId.equals(author)) {
 			throw new ForbiddenException(ErrorCode.CALENDAR_AUTHOR_NOT_MATCH);
+		}
+	}
+
+	public void validateDetailClassification(DetailClassification classification) {
+		if (classification == DetailClassification.PRIVATE_SCHEDULE) {
+			throw new ForbiddenException(ErrorCode.CLASSIFICATION_NO_PRIVATE);
 		}
 	}
 }
