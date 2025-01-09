@@ -20,8 +20,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PublicScheduleCreateJobReqDto {
 
-	private DetailClassification classification;
-
 	@NotNull
 	private JobTag jobTag;
 
