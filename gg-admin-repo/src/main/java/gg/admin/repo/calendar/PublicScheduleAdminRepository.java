@@ -1,6 +1,8 @@
 package gg.admin.repo.calendar;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,4 +22,6 @@ public interface PublicScheduleAdminRepository extends JpaRepository<PublicSched
 	Page<PublicSchedule> findAllByClassification(DetailClassification detailClassification, Pageable pageable);
 
 	List<PublicSchedule> findAll();
+	
+	Optional<PublicSchedule> findByTitleAndCreatedAtBetween(String name, LocalDateTime start, LocalDateTime end);
 }
