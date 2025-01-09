@@ -3,6 +3,7 @@ package gg.calendar.api.user.custom.controller.request;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import gg.data.calendar.ScheduleGroup;
 import gg.data.user.User;
@@ -17,6 +18,7 @@ public class CalendarCustomCreateReqDto {
 	private static final String HEX_COLOR_PATTERN = "^#[A-Fa-f0-9]{6}$";
 
 	@NotBlank
+	@Size(max = 50)
 	private String title;
 
 	@NotNull
