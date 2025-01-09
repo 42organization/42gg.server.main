@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,5 +53,12 @@ public class CalendarCustomController {
 		@Login @Parameter(hidden = true) UserDto userDto) {
 		List<CalendarCustomViewResDto> response = calendarCustomService.getScheduleGroupView(userDto);
 		return ResponseEntity.status(HttpStatus.OK).body(ListResponseDto.toDto(response));
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> scheduleGroupDelete(@Login @Parameter(hidden = true) UserDto userDto,
+		@PathVariable Long id) {
+		calendarCustomService.deleteScheduleGroup(userDto, id);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }
