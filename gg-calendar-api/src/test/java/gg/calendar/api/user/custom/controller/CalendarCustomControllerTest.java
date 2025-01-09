@@ -195,4 +195,47 @@ public class CalendarCustomControllerTest {
 			Assertions.assertThat(dto.getContent().size()).isEqualTo(0);
 		}
 	}
+
+	@Nested
+	@DisplayName("ScheduleGroup 삭제하기")
+	class DeletePrivateSchedule {
+		@Test
+		@DisplayName("성공 204")
+		void success() throws Exception {
+			//given
+			ScheduleGroup scheduleGroup = calendarCustomMockData.createScheduleGroup(user);
+			//when
+			mockMvc.perform(delete("/calendar/custom/" + scheduleGroup.getId())
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNoContent());
+			List<ScheduleGroup> empty = scheduleGroupRepository.findAll();
+			//then
+			Assertions.assertThat(empty.size()).isEqualTo(0);
+		}
+
+		@Test
+		@DisplayName("잘못된 아이디인 경우 400")
+		void invalidId() throws Exception {
+			//given
+			ScheduleGroup scheduleGroup = calendarCustomMockData.createScheduleGroup(user);
+			//when&then
+			mockMvc.perform(delete("/calendar/custom/" + "잘못된 아이디")
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest());
+		}
+
+		@Test
+		@DisplayName("스케줄 그룹이 없는 경우 404")
+		void notFoundGroup() throws Exception {
+			//given
+			ScheduleGroup scheduleGroup = calendarCustomMockData.createScheduleGroup(user);
+			//when&then
+			mockMvc.perform(delete("/calendar/custom/" + scheduleGroup.getId() + 12341234)
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
+		}
+	}
 }

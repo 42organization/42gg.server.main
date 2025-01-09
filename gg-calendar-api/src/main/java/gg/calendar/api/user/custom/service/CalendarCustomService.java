@@ -48,4 +48,11 @@ public class CalendarCustomService {
 			.map(CalendarCustomViewResDto::toDto)
 			.collect(Collectors.toList());
 	}
+
+	@Transactional
+	public void deleteScheduleGroup(UserDto userDto, Long scheduleGroupId) {
+		ScheduleGroup scheduleGroup = scheduleGroupRepository.findByIdAndUserId(scheduleGroupId, userDto.getId())
+			.orElseThrow(() -> new NotExistException(ErrorCode.SCHEDULE_GROUP_NOT_FOUND));
+		scheduleGroupRepository.delete(scheduleGroup);
+	}
 }
