@@ -160,7 +160,7 @@ public class ImportedScheduleControllerTest {
 			//given
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
 			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
-				DetailClassification.PRIVATE_SCHEDULE);
+				DetailClassification.EVENT);
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
 				scheduleGroup.getId());
 			//when
@@ -180,8 +180,27 @@ public class ImportedScheduleControllerTest {
 			User other = testDataUtils.createNewUser("other");
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
 			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
-				DetailClassification.PRIVATE_SCHEDULE);
+				DetailClassification.EVENT);
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(other, publicSchedule,
+				scheduleGroup.getId());
+			//when
+			mockMvc.perform(patch("/calendar/private/imported/" + privateSchedule.getId())
+					.header("Authorization", "Bearer " + accessToken)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isForbidden());
+			//then
+			Assertions.assertThat(privateSchedule.getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+			Assertions.assertThat(privateSchedule.getPublicSchedule().getStatus()).isEqualTo(ScheduleStatus.ACTIVATE);
+		}
+
+		@Test
+		@DisplayName("가져온 일정이 아닌 일정을 삭제하는 경우 403")
+		void invalidDetailClassification() throws Exception {
+			//given
+			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
+			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
+				DetailClassification.PRIVATE_SCHEDULE);
+			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
 				scheduleGroup.getId());
 			//when
 			mockMvc.perform(patch("/calendar/private/imported/" + privateSchedule.getId())
@@ -199,7 +218,7 @@ public class ImportedScheduleControllerTest {
 			//given
 			ScheduleGroup scheduleGroup = privateScheduleMockData.createScheduleGroup(user);
 			PublicSchedule publicSchedule = privateScheduleMockData.createPublicSchedule(user.getIntraId(),
-				DetailClassification.PRIVATE_SCHEDULE);
+				DetailClassification.EVENT);
 			PrivateSchedule privateSchedule = privateScheduleMockData.createPrivateSchedule(user, publicSchedule,
 				scheduleGroup.getId());
 			//when
