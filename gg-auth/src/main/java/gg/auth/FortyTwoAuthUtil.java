@@ -70,7 +70,6 @@ public class FortyTwoAuthUtil {
 		if (Objects.isNull(response) || response.isEmpty()) {
 			throw new NotExistException(ErrorCode.AUTH_NOT_FOUND);
 		}
-		System.out.println("Token " + (String)response.get("access_token"));
 		return ((String)response.get("access_token"));
 	}
 

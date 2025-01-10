@@ -20,7 +20,6 @@ public class FortyTwoEventsRegisterService {
 
 	@Transactional
 	public void registerFortyTwoEvents(List<FortyTwoEventsResponse> events) {
-
 		for (FortyTwoEventsResponse event : events) {
 			Optional<PublicSchedule> ps = publicScheduleAdminRepository.findByTitleAndCreatedAtBetween(
 				event.getName(),

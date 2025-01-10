@@ -76,4 +76,16 @@ public class PrivateSchedule extends BaseTimeEntity {
 		this.status = ScheduleStatus.DELETE;
 		this.getPublicSchedule().delete();
 	}
+
+	public void deActivate() {
+		this.status = ScheduleStatus.DEACTIVATE;
+	}
+
+	@Override
+	public String toString() {
+		return "PrivateSchedule [id=" + id + ", user=" + user + ", publicSchedule=" + publicSchedule.toString()
+			+ ", alarm="
+			+ alarm
+			+ ", groupId=" + groupId + ", status=" + status + "]";
+	}
 }

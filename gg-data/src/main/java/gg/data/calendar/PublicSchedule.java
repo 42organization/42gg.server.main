@@ -129,6 +129,11 @@ public class PublicSchedule {
 		this.modifiedAt = LocalDateTime.now();
 	}
 
+	public void deActivate() {
+		this.status = ScheduleStatus.DEACTIVATE;
+		this.modifiedAt = LocalDateTime.now();
+	}
+
 	@Override
 	public String toString() {
 		return "PublicSchedule [id=" + id + ", classification=" + classification + ", eventTag=" + eventTag
