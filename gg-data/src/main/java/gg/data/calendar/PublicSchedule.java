@@ -10,7 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import gg.data.BaseTimeEntity;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
@@ -24,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PublicSchedule extends BaseTimeEntity {
+public class PublicSchedule {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -68,6 +67,12 @@ public class PublicSchedule extends BaseTimeEntity {
 	@Column(nullable = false)
 	private LocalDateTime endTime;
 
+	@Column(nullable = false)
+	private LocalDateTime createdAt;
+
+	@Column(nullable = false)
+	private LocalDateTime modifiedAt;
+
 	@Builder
 	private PublicSchedule(DetailClassification classification, EventTag eventTag, JobTag jobTag, TechTag techTag,
 		String author, String title, String content, String link, ScheduleStatus status, LocalDateTime startTime,
@@ -84,6 +89,25 @@ public class PublicSchedule extends BaseTimeEntity {
 		this.sharedCount = 0;
 		this.startTime = startTime;
 		this.endTime = endTime;
+		this.createdAt = LocalDateTime.now();
+		this.modifiedAt = LocalDateTime.now();
+	}
+
+	// 42서울 행사 생성자
+	public PublicSchedule(EventTag eventTag,
+		String title, String content, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime createdAt,
+		LocalDateTime modifiedAt) {
+		this.classification = DetailClassification.EVENT;
+		this.eventTag = eventTag;
+		this.author = "42GG";
+		this.title = title;
+		this.content = content;
+		this.status = ScheduleStatus.ACTIVATE;
+		this.sharedCount = 0;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.createdAt = createdAt;
+		this.modifiedAt = modifiedAt;
 	}
 
 	public void update(DetailClassification classification, EventTag eventTag, JobTag jobTag, TechTag techTag,
@@ -97,10 +121,26 @@ public class PublicSchedule extends BaseTimeEntity {
 		this.link = link;
 		this.startTime = startTime;
 		this.endTime = endTime;
+		this.modifiedAt = LocalDateTime.now();
 	}
 
 	public void delete() {
 		this.status = ScheduleStatus.DELETE;
+		this.modifiedAt = LocalDateTime.now();
+	}
+
+	public void deActivate() {
+		this.status = ScheduleStatus.DEACTIVATE;
+		this.modifiedAt = LocalDateTime.now();
+	}
+
+	@Override
+	public String toString() {
+		return "PublicSchedule [id=" + id + ", classification=" + classification + ", eventTag=" + eventTag
+			+ ", jobTag="
+			+ jobTag + ", techTag=" + techTag + ", author=" + author + ", title=" + title + ", content=" + content
+			+ ", link=" + link + ", status=" + status + ", sharedCount=" + sharedCount + ", startTime=" + startTime
+			+ ", endTime=" + endTime + ", createdAt=" + getCreatedAt() + ", modifiedAt=" + getModifiedAt() + "]";
 	}
 
 	public void incrementSharedCount() {

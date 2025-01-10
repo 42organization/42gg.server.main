@@ -7,6 +7,7 @@ import gg.data.calendar.ScheduleGroup;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.JobTag;
+import gg.data.calendar.type.ScheduleStatus;
 import gg.data.calendar.type.TechTag;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -39,6 +40,8 @@ public class PrivateScheduleAdminDetailResDto {
 
 	private String groupBackgroundColor;
 
+	private ScheduleStatus status;
+
 	private boolean isAlarm;
 
 	private LocalDateTime startTime;
@@ -56,6 +59,7 @@ public class PrivateScheduleAdminDetailResDto {
 		this.title = privateSchedule.getPublicSchedule().getTitle();
 		this.content = privateSchedule.getPublicSchedule().getContent();
 		this.link = privateSchedule.getPublicSchedule().getLink();
+		this.status = privateSchedule.getPublicSchedule().getStatus();
 		this.groupTitle = scheduleGroup.getTitle();
 		this.groupBackgroundColor = scheduleGroup.getBackgroundColor();
 		this.isAlarm = privateSchedule.isAlarm();
