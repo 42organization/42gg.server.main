@@ -1,5 +1,6 @@
 package gg.calendar.api.admin.util.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,14 +24,20 @@ public class ScheduleCheckService {
 	private final PublicScheduleAdminRepository publicScheduleAdminRepository;
 	private final PrivateScheduleAdminRepository privateScheduleAdminRepository;
 
-	private static final String Schedule_MESSAGE = "파티요정🧚으로부터 편지가 도착했습니다.\n"
-		+ "TEST\n";
+	private static final String SCHEDULE_MESSAGE_D_DAY = "일정요정🧚으로부터 알림이 도착했습니다.\n"
+		+ "오늘의 일정을 확인해보세요!\n";
+
+	private static final String SCHEDULE_MESSAGE_BEFORE_D_DAY = "일정요정🧚으로부터 알림이 도착했습니다.\n"
+		+ "내일의 일정을 확인해보세요!\n";
 
 	private final MessageSender messageSender;
 
 	@Transactional(readOnly = true)
-	public void sendScheduleNotifications(User user) {
-		messageSender.send(user.getIntraId(), Schedule_MESSAGE);
+	public void sendScheduleNotifications(User user, String message, PrivateSchedule schedule) {
+		String msg = message + "일정 : " + schedule.getPublicSchedule().getTitle() + "\n설명 : "
+			+ schedule.getPublicSchedule().getContent() + "\n\n일정 상세 링크 : " + schedule.getPublicSchedule().getLink()
+			+ "\n\n캘린더 바로가기 : https://gg.42seoul.kr/calendar";
+		messageSender.send(user.getIntraId(), msg);
 	}
 
 	@Transactional
@@ -50,22 +57,22 @@ public class ScheduleCheckService {
 		LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
 		log.info("Start Of Day : {}", startOfDay);
 		log.info("End Of Day : {}", endOfDay);
-		List<PrivateSchedule> schedules = privateScheduleAdminRepository.findSchedulesWithAlarmWithStatus(startOfDay,
-			endOfDay, ScheduleStatus.ACTIVATE);
+		List<PrivateSchedule> schedules = privateScheduleAdminRepository.findSchedulesWithAlarmForBothDays(startOfDay,
+			endOfDay, startOfDay.plusDays(1), endOfDay.plusDays(1), ScheduleStatus.ACTIVATE);
 		// 알림보내는 로직
 		for (PrivateSchedule schedule : schedules) {
-			log.info("Send D-Day Alarm Schedule : {}", schedule.toString());
+			LocalDateTime endTime = schedule.getPublicSchedule().getEndTime();
+			LocalDate today = LocalDate.now();
+			LocalDate scheduleDay = endTime.toLocalDate();
 			User user = schedule.getUser();
-			sendScheduleNotifications(user);
+			if (scheduleDay.isEqual(today)) {
+				log.info("D-Day Alarm for Schedule: {}", schedule.toString());
+				sendScheduleNotifications(user, SCHEDULE_MESSAGE_D_DAY, schedule);
+			} else {
+				log.info("D-Day-1 Alarm for Schedule: {}", schedule.toString());
+				sendScheduleNotifications(user, SCHEDULE_MESSAGE_BEFORE_D_DAY, schedule);
+			}
 		}
 
-		List<PrivateSchedule> nextSchedules = privateScheduleAdminRepository.findSchedulesWithAlarmWithStatus(
-			startOfDay.plusDays(1), endOfDay.plusDays(1), ScheduleStatus.ACTIVATE);
-		// 디데이-1 알림보내는 로직
-		for (PrivateSchedule schedule : nextSchedules) {
-			log.info("Send D-Day-1 Alarm Schedule : {}", schedule.toString());
-			User user = schedule.getUser();
-			sendScheduleNotifications(user);
-		}
 	}
 }

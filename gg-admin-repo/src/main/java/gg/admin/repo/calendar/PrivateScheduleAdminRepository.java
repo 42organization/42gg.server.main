@@ -19,10 +19,12 @@ public interface PrivateScheduleAdminRepository extends JpaRepository<PrivateSch
 	List<PrivateSchedule> findByPublicScheduleId(Long publicScheduleId);
 
 	@Query("SELECT ps FROM PrivateSchedule ps " + "JOIN ps.publicSchedule p " + "WHERE ps.alarm = true "
-		+ "AND ps.status = :status "
-		+ "AND p.endTime BETWEEN :startOfDay AND :endOfDay")
-	List<PrivateSchedule> findSchedulesWithAlarmWithStatus(@Param("startOfDay") LocalDateTime startOfDay,
+		+ "AND ps.status = :status " + "AND (p.endTime BETWEEN :startOfDay AND :endOfDay OR "
+		+ "p.endTime BETWEEN :nextStartOfDay AND :nextEndOfDay)")
+	List<PrivateSchedule> findSchedulesWithAlarmForBothDays(@Param("startOfDay") LocalDateTime startOfDay,
 		@Param("endOfDay") LocalDateTime endOfDay,
+		@Param("nextStartOfDay") LocalDateTime nextStartOfDay,
+		@Param("nextEndOfDay") LocalDateTime nextEndOfDay,
 		@Param("status") ScheduleStatus status);
 
 	@Modifying

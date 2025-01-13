@@ -26,6 +26,7 @@ public class EventScheduler extends AbstractScheduler {
 		this.fortyTwoEventsRegisterService = fortyTwoEventsRegisterService;
 		this.scheduleCheckService = scheduleCheckService;
 		this.setCron("0 0/1 * * * *");
+		// this.setCron("0 0 0 * * *");
 	}
 
 	@Override
