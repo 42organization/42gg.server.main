@@ -3,15 +3,19 @@ package gg.pingpong.api.global.scheduler;
 import org.springframework.stereotype.Component;
 
 import gg.calendar.api.user.fortytwoevent.service.FortyTwoEventService;
+import gg.calendar.api.user.fortytwoevent.service.ScheduleCheckService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class FortyTwoEventScheduler extends AbstractScheduler {
+public class CalendarEventScheduler extends AbstractScheduler {
 	private final FortyTwoEventService fortyTwoEventService;
+	private final ScheduleCheckService scheduleCheckService;
 
-	public FortyTwoEventScheduler(FortyTwoEventService fortyTwoEventService) {
+	public CalendarEventScheduler(FortyTwoEventService fortyTwoEventService,
+		ScheduleCheckService scheduleCheckService) {
 		this.fortyTwoEventService = fortyTwoEventService;
+		this.scheduleCheckService = scheduleCheckService;
 		// this.setCron("0 0 0 * * *");
 		this.setCron("0 * * * * *");
 	}
@@ -21,7 +25,8 @@ public class FortyTwoEventScheduler extends AbstractScheduler {
 		return () -> {
 			log.info("FortyTwo Event Scheduler Started");
 			fortyTwoEventService.checkEvent();
-			log.info("getEvents() method was called successfully.");
+			log.info("Schedule check service deactivate Expired Schedules!");
+			scheduleCheckService.deactivateExpiredSchedules();
 		};
 	}
 }
