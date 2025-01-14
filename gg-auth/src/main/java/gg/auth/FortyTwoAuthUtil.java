@@ -23,17 +23,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import gg.auth.config.ScheduleConfig;
 import gg.utils.exception.ErrorCode;
 import gg.utils.exception.custom.NotExistException;
 import gg.utils.exception.user.TokenNotValidException;
 import gg.utils.external.ApiUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class FortyTwoAuthUtil {
 	private final ApiUtil apiUtil;
 	private final OAuth2AuthorizedClientService authorizedClientService;
+	private final ScheduleConfig scheduleConfig;
 
 	public String getAccessToken() {
 		Authentication authentication = getAuthenticationFromContext();
@@ -60,6 +64,32 @@ public class FortyTwoAuthUtil {
 		authorizedClientService.saveAuthorizedClient(newClient, authentication);
 
 		return newClient.getAccessToken().getTokenValue();
+	}
+
+	/* 42event client credential token */
+	public String getClientCredentialToken() {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		params.add("grant_type", "client_credentials");
+		params.add("client_id", scheduleConfig.getClientId());
+		params.add("client_secret", scheduleConfig.getClientSecret());
+
+		try {
+			Map<String, Object> response = apiUtil.apiCall(
+				scheduleConfig.getTokenUri(),
+				Map.class,
+				headers,
+				params,
+				HttpMethod.POST
+			);
+			log.info("Raw Api Response : {}", response);
+			// System.out.println("Response : " + response);
+			return (String)response.get("access_token");
+		} catch (Exception e) {
+			throw new TokenNotValidException();
+		}
 	}
 
 	private Authentication getAuthenticationFromContext() {

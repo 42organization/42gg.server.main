@@ -96,7 +96,6 @@ public class ApiUtil {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setBearerAuth(accessToken);
 		headers.setContentType(MediaType.APPLICATION_JSON);
-
 		return apiCall(url, responseType, headers, HttpMethod.GET);
 	}
 }

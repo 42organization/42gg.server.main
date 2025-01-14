@@ -18,4 +18,6 @@ public interface PublicScheduleRepository extends JpaRepository<PublicSchedule, 
 
 	List<PublicSchedule> findByEndTimeGreaterThanEqualAndStartTimeLessThanEqualAndClassification(
 		LocalDateTime startTime, LocalDateTime endTime, DetailClassification classification);
+
+	boolean existsByTitleAndStartTime(String title, LocalDateTime beginAt);
 }

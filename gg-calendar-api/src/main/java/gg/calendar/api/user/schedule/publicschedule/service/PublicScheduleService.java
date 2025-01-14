@@ -90,7 +90,7 @@ public class PublicScheduleService {
 		User user = userRepository.getById(userId);
 		PublicSchedule publicRetrieveSchedule = publicScheduleRepository.findById(scheduleId)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
-		checkAuthor(publicRetrieveSchedule.getAuthor(), user);
+		// checkAuthor(publicRetrieveSchedule.getAuthor(), user);
 		return publicRetrieveSchedule;
 	}
 
