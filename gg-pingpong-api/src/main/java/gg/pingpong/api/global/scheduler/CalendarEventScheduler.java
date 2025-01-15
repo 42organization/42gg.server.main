@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import gg.calendar.api.user.fortytwoevent.service.FortyTwoEventService;
 import gg.calendar.api.user.fortytwoevent.service.ScheduleCheckService;
+import gg.calendar.api.user.fortytwoevent.service.ScheduleNotiService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -11,11 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 public class CalendarEventScheduler extends AbstractScheduler {
 	private final FortyTwoEventService fortyTwoEventService;
 	private final ScheduleCheckService scheduleCheckService;
+	private final ScheduleNotiService scheduleNotiService;
 
 	public CalendarEventScheduler(FortyTwoEventService fortyTwoEventService,
-		ScheduleCheckService scheduleCheckService) {
+		ScheduleCheckService scheduleCheckService, ScheduleNotiService scheduleNotiService) {
 		this.fortyTwoEventService = fortyTwoEventService;
 		this.scheduleCheckService = scheduleCheckService;
+		this.scheduleNotiService = scheduleNotiService;
 		// this.setCron("0 0 0 * * *");
 		this.setCron("0 * * * * *");
 	}
@@ -27,6 +30,7 @@ public class CalendarEventScheduler extends AbstractScheduler {
 			fortyTwoEventService.checkEvent();
 			log.info("Schedule check service deactivate Expired Schedules!");
 			scheduleCheckService.deactivateExpiredSchedules();
+			scheduleNotiService.sendScheduleNotifications();
 		};
 	}
 }
