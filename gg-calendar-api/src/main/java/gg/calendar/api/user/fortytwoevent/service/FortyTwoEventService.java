@@ -64,12 +64,23 @@ public class FortyTwoEventService {
 	}
 
 	private EventTag determineEventTag(FortyTwoEventResponse eventResponse) {
-		return switch (eventResponse.getKind()) {
-			case "pedago", "rush", "piscine", "partnership", "event", "meet", "hackathon" -> EventTag.OFFICIAL_EVENT;
-			case "meet_up" -> EventTag.WENDS_FORUM;
-			case "conference" -> EventTag.INSTRUCTION;
-			default -> EventTag.ETC;
-		};
+		String kind = eventResponse.getKind();
+		switch (kind) {
+			case "pedago":
+			case "rush":
+			case "piscine":
+			case "partnership":
+			case "event":
+			case "meet":
+			case "hackathon":
+				return EventTag.OFFICIAL_EVENT;
+			case "meet_up":
+				return EventTag.WENDS_FORUM;
+			case "conference":
+				return EventTag.INSTRUCTION;
+			default:
+				return EventTag.ETC;
+		}
 	}
 }
 
