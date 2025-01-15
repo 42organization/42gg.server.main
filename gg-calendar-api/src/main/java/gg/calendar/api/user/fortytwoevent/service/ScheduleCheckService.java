@@ -21,6 +21,6 @@ public class ScheduleCheckService {
 		publicScheduleRepository.updateExpiredPublicSchedules(ScheduleStatus.DEACTIVATE,
 			ScheduleStatus.ACTIVATE,
 			LocalDateTime.now());
-		privateScheduleRepository.updateRelatedPrivateSchedules(ScheduleStatus.DEACTIVATE, ScheduleStatus.ACTIVATE);
+		privateScheduleRepository.updateRelatedPrivateSchedules(ScheduleStatus.DEACTIVATE, ScheduleStatus.DEACTIVATE);
 	}
 }

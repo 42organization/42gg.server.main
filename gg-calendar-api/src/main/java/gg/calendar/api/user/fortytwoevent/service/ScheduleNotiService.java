@@ -33,14 +33,14 @@ public class ScheduleNotiService {
 		LocalDateTime startOfDay = LocalDateTime.now().toLocalDate().atStartOfDay();
 		LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
 		LocalDateTime startDday = startOfDay.plusDays(1);
-		LocalDateTime endDday = startOfDay.plusDays(1);
-
-		log.info("startofday: {}", startOfDay);
-		log.info("endtofday: {}", endOfDay);
+		LocalDateTime endDday = endOfDay.plusDays(1);
 
 		List<PrivateSchedule> alarmSchedule = privateScheduleRepository.findSchedulesWithAlarmForBothDays(startOfDay,
 			endOfDay, startDday, endDday, ScheduleStatus.ACTIVATE);
-		log.info("영역전개");
+		log.info("startofday: {}", startOfDay);
+		log.info("endtofday: {}", endOfDay);
+		log.info("startDday: {}", startDday);
+		log.info("endDday: {}", endDday);
 		for (PrivateSchedule schedule : alarmSchedule) {
 			log.info("schedule, getID: {}", schedule.getId());
 			String message = schedule.getPublicSchedule().getEndTime()
