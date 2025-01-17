@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import gg.admin.repo.calendar.PublicScheduleAdminRepository;
 import gg.calendar.api.admin.schedule.totalschedule.controller.request.TotalScheduleAdminSearchReqDto;
 import gg.calendar.api.admin.schedule.totalschedule.controller.response.TotalScheduleAdminResDto;
-import gg.calendar.api.admin.schedule.totalschedule.controller.response.TotalScheduleAdminSearchListResDto;
 import gg.calendar.api.admin.util.TotalScheduleAdminSpecification;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
@@ -60,7 +59,7 @@ public class TotalScheduleAdminService {
 		return PageResponseDto.of(publicSchedules.getTotalElements(), publicScheduleList);
 	}
 
-	public TotalScheduleAdminSearchListResDto searchTotalScheduleAdminList(TotalScheduleAdminSearchReqDto reqDto) {
+	public List<TotalScheduleAdminResDto> searchTotalScheduleAdminList(TotalScheduleAdminSearchReqDto reqDto) {
 		dateTimeErrorCheck(reqDto.getStartTime(), reqDto.getEndTime());
 
 		Map<String, Function<PublicSchedule, String>> fieldExtractor = Map.of(
@@ -83,20 +82,17 @@ public class TotalScheduleAdminService {
 		);
 
 		List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll(specification);
-		return TotalScheduleAdminSearchListResDto.builder()
-			.schedules(schedules.stream()
-				.map(TotalScheduleAdminResDto::new)
-				.collect(Collectors.toList()))
-			.build();
+		return schedules.stream()
+			.map(TotalScheduleAdminResDto::new)
+			.collect(Collectors.toList());
 	}
 
-	public TotalScheduleAdminSearchListResDto totalScheduleAdminList() {
+	public List<TotalScheduleAdminResDto> totalScheduleAdminList() {
 		List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll();
-		return TotalScheduleAdminSearchListResDto.builder()
-			.schedules(schedules.stream()
-				.map(TotalScheduleAdminResDto::new)
-				.collect(Collectors.toList()))
-			.build();
+
+		return schedules.stream()
+			.map(TotalScheduleAdminResDto::new)
+			.collect(Collectors.toList());
 	}
 
 	private void dateTimeErrorCheck(LocalDate startTime, LocalDate endTime) {
