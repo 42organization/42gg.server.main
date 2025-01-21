@@ -2,8 +2,6 @@ package gg.admin.repo.calendar;
 
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -17,7 +15,7 @@ public interface PublicScheduleAdminRepository extends JpaRepository<PublicSched
 
 	List<PublicSchedule> findByAuthor(String author);
 
-	Page<PublicSchedule> findAllByClassification(DetailClassification detailClassification, Pageable pageable);
+	List<PublicSchedule> findAllByClassification(DetailClassification detailClassification);
 
 	List<PublicSchedule> findAll();
 }
