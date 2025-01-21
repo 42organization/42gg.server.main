@@ -49,7 +49,7 @@ public class TotalScheduleRetrieveResDtoTest {
 			() -> assertEquals("testUser", responseDto.getAuthor()),
 			() -> assertEquals("Test Title", responseDto.getTitle()),
 			() -> assertEquals("Test Content", responseDto.getContent()),
-			() -> assertEquals("http://test.com", responseDto.getLink()),
+			() -> assertEquals("https://test.com", responseDto.getLink()),
 			() -> assertEquals(startTime.toString(), responseDto.getStartTime()),
 			() -> assertEquals(endTime.toString(), responseDto.getEndTime()),
 			() -> assertEquals("ACTIVATE", responseDto.getStatus()));
