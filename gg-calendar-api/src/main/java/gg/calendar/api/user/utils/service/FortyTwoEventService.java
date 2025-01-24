@@ -14,9 +14,7 @@ import gg.data.calendar.type.EventTag;
 import gg.data.calendar.type.ScheduleStatus;
 import gg.repo.calendar.PublicScheduleRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor

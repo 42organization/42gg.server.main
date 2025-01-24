@@ -18,8 +18,7 @@ public class ScheduleCheckService {
 	private final PrivateScheduleRepository privateScheduleRepository;
 
 	public void deactivateExpiredSchedules() {
-		publicScheduleRepository.updateExpiredPublicSchedules(ScheduleStatus.DEACTIVATE,
-			ScheduleStatus.ACTIVATE,
+		publicScheduleRepository.updateExpiredPublicSchedules(ScheduleStatus.DEACTIVATE, ScheduleStatus.ACTIVATE,
 			LocalDateTime.now());
 		privateScheduleRepository.updateRelatedPrivateSchedules(ScheduleStatus.DEACTIVATE, ScheduleStatus.DEACTIVATE);
 	}
