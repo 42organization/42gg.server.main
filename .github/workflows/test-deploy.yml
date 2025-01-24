@@ -1,21 +1,9 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
-
 name: test-deploy
 
 on:
   push:
-    branches: [ dev ]
+    branches: [ dev, 1151-feature-42api-모니터링스레드에작업 ]
   workflow_dispatch:
-
-env:
-  DOCKER_USER: ${{ secrets.DOCKER_USER }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  IMAGE_NAME: wken5577/test-migrate-server
 
 permissions:
   contents: read
@@ -41,52 +29,8 @@ jobs:
           echo "${{ secrets.MIGRATE_APPLICATION_YML }}" | base64 -d > application.yml
         shell: bash
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ env.DOCKER_USER }}
-          password: ${{ env.DOCKER_PASSWORD }}
-
       - name: Test with Gradle
         run: ./gradlew clean test
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
-
-      - name: build new docker image as latest tag
-        run: |
-          docker build -t ${{ env.IMAGE_NAME }}:latest .
-          docker push ${{ env.IMAGE_NAME }}:latest
-
-      - name: Create the configuration file
-        run: |
-          cat << EOF > config.json
-          {
-          "AutoScalingGroupName": "gg-dev",
-          "DesiredConfiguration": {
-           "LaunchTemplate": {
-             "LaunchTemplateId": "${{ secrets.DEV_LAUNCH_TEMPLATE_ID }}",
-             "Version": "\$Latest"
-           }
-          },
-          "Preferences": {
-           "MinHealthyPercentage": 100,
-           "MaxHealthyPercentage": 110,
-           "InstanceWarmup": 300,
-           "ScaleInProtectedInstances": "Ignore",
-           "StandbyInstances": "Ignore"
-          }
-          }
-          EOF
-          cat config.json
-
-      - name: Configure AWS CLI
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_TEST_MIGRATE_SECURITY_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_TEST_MIGRATE_SECURITY_SECRET_KEY }}
-          aws-region: ap-northeast-2
-
-      - name: Trigger Instance Refresh
-        run: |
-          aws autoscaling start-instance-refresh --cli-input-json file://config.json

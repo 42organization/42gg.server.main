@@ -3,6 +3,6 @@ package gg.recruit.api;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages = {"gg.recruit.api", "gg.utils", "gg.data", "gg.repo",
-	"gg.admin.repo", "gg.auth", "gg.pingpong.api"})
+	"gg.admin.repo", "gg.auth", "gg.pingpong.api", "gg.calendar.api"})
 public class TestSpringBootApplication {
 }

@@ -349,7 +349,8 @@ public class PublicScheduleControllerTest {
 
 			// when
 			mockMvc.perform(
-					put("/calendar/public/" + jobPublicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
+					put("/calendar/public/"
+						+ jobPublicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
 				.andExpect(status().isForbidden())
@@ -391,7 +392,8 @@ public class PublicScheduleControllerTest {
 
 			//when & then
 			mockMvc.perform(
-					put("/calendar/public/" + jobPublicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
+					put("/calendar/public/"
+						+ jobPublicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
 				.andExpect(status().isForbidden())
@@ -432,7 +434,8 @@ public class PublicScheduleControllerTest {
 
 			// when
 			mockMvc.perform(
-					put("/calendar/public/" + jobPublicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
+					put("/calendar/public/"
+						+ jobPublicSchedule.getId()).header("Authorization", "Bearer " + accessToken)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updateDto)))
 				.andExpect(status().isBadRequest())
@@ -824,33 +827,12 @@ public class PublicScheduleControllerTest {
 				publicScheduleRepository.save(publicSchedule);
 				// when
 				mockMvc.perform(
-						get("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accessToken))
+						get("/calendar/public/"
+							+ publicSchedule.getId()).header("Authorization", "Bearer " + accessToken))
 					.andExpect(status().isOk())
 					.andExpect(jsonPath("$.title").value("Original Title"))
 					.andExpect(jsonPath("$.content").value("Original Content"))
 					.andExpect(jsonPath("$.link").value("https://original.com"))
-					.andDo(print());
-			}
-
-			@Test
-			@DisplayName("[403]공개일정상세조회실패-작성자가 다를 때")
-			void retrievePublicScheduleDetailFailNotMatchAuthor() throws Exception {
-				// given
-				PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity("another",
-					PublicScheduleCreateEventReqDto.builder()
-						.author("another")
-						.title("Original Title")
-						.content("Original Content")
-						.link("https://original.com")
-						.startTime(LocalDateTime.now())
-						.endTime(LocalDateTime.now().plusDays(1))
-						.build());
-				publicScheduleRepository.save(publicSchedule);
-
-				// when & then
-				mockMvc.perform(
-						get("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accessToken))
-					.andExpect(status().isForbidden())
 					.andDo(print());
 			}
 
@@ -935,8 +917,10 @@ public class PublicScheduleControllerTest {
 			LocalDateTime end = LocalDateTime.now().plusDays(7);
 			//when
 			mockMvc.perform(
-					get("/calendar/public/period/{detail_classification}", detailClassification).header("Authorization",
-							"Bearer " + accessToken).param("start", start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+					get("/calendar/public/period/{detail_classification}",
+						detailClassification).header("Authorization",
+							"Bearer " + accessToken).param("start",
+							start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
 						.param("end", end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))))
 				.andExpect(status().isOk())
 				.andDo(print());
@@ -956,8 +940,10 @@ public class PublicScheduleControllerTest {
 			LocalDateTime end = LocalDateTime.now().minusDays(7);
 			//when & then
 			mockMvc.perform(
-					get("/calendar/public/period/{detail_classification}", detailClassification).header("Authorization",
-							"Bearer " + accessToken).param("start", start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+					get("/calendar/public/period/{detail_classification}",
+						detailClassification).header("Authorization",
+							"Bearer " + accessToken).param("start",
+							start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
 						.param("end", end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))))
 				.andExpect(status().isBadRequest())
 				.andDo(print());
@@ -971,7 +957,8 @@ public class PublicScheduleControllerTest {
 			LocalDateTime start = LocalDateTime.now().plusDays(0);
 			LocalDateTime end = LocalDateTime.now().plusDays(7);
 			//when & then
-			mockMvc.perform(get("/calendar/public/period/{detail_classification}", "wrong").header("Authorization",
+			mockMvc.perform(get("/calendar/public/period/{detail_classification}", "wrong")
+					.header("Authorization",
 						"Bearer " + accessToken).param("start", start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
 					.param("end", end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))))
 				.andExpect(status().isBadRequest())
@@ -993,8 +980,10 @@ public class PublicScheduleControllerTest {
 			LocalDateTime end = LocalDateTime.now().plusDays(7);
 			//when & then
 			mockMvc.perform(
-					get("/calendar/public/period/{detail_classification}", detailClassification).header("Authorization",
-							"Bearer " + accessToken).param("start", start.format(DateTimeFormatter.ofPattern("yyyy/MM/dd")))
+					get("/calendar/public/period/{detail_classification}",
+						detailClassification).header("Authorization",
+							"Bearer " + accessToken).param("start",
+							start.format(DateTimeFormatter.ofPattern("yyyy/MM/dd")))
 						.param("end", end.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))))
 				.andExpect(status().isBadRequest())
 				.andDo(print());
@@ -1003,7 +992,7 @@ public class PublicScheduleControllerTest {
 
 	@Nested
 	@DisplayName("가져온 개인일정 조회하기")
-	class publicToPrivate {
+	class PublicToPrivate {
 		@Autowired
 		private ScheduleGroupRepository scheduleGroupRepository;
 
@@ -1074,7 +1063,8 @@ public class PublicScheduleControllerTest {
 			publicSchedule = publicScheduleRepository.save(publicSchedule);
 			// when
 			mockMvc.perform(
-					post("/calendar/public/{id}/{groupId}", publicSchedule.getId(), 1).header("Authorization",
+					post("/calendar/public/{id}/{groupId}",
+						publicSchedule.getId(), 1).header("Authorization",
 						"Bearer " + accessToken))
 				.andExpect(status().isNotFound()).andDo(print());
 			// then

@@ -1,8 +1,10 @@
 name: 👮Checkstyle validation
 
 on:
+  push:
+    branches: [ 1151-feature-42api-모니터링스레드에작업 ]
   pull_request:
-    branches: [ main, dev , recruit-dev]
+    branches: [ main, dev ]
 
 jobs:
   checkstyle:

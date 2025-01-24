@@ -82,6 +82,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testImplementation 'org.springframework.security:spring-security-oauth2-client'
+    testImplementation 'org.mockito:mockito-core'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 
     testFixturesImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
