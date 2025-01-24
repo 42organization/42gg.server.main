@@ -2,9 +2,9 @@ package gg.pingpong.api.global.scheduler;
 
 import org.springframework.stereotype.Component;
 
-import gg.calendar.api.user.fortytwoevent.service.FortyTwoEventService;
-import gg.calendar.api.user.fortytwoevent.service.ScheduleCheckService;
-import gg.calendar.api.user.fortytwoevent.service.ScheduleNotiService;
+import gg.calendar.api.user.utils.service.FortyTwoEventService;
+import gg.calendar.api.user.utils.service.ScheduleCheckService;
+import gg.calendar.api.user.utils.service.ScheduleNotiService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

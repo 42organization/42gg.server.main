@@ -2,14 +2,14 @@ name: 👮Checkstyle validation
 
 on:
   pull_request:
-    branches: [ main, dev , recruit-dev]
+    branches: [ main, dev , recruit-dev ]
 
 jobs:
   checkstyle:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 11
+      - name: Set up JDK 11m
         uses: actions/setup-java@v1
         with:
           java-version: 11

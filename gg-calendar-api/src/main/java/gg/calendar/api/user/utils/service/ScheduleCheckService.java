@@ -1,4 +1,4 @@
-package gg.calendar.api.user.fortytwoevent.service;
+package gg.calendar.api.user.utils.service;
 
 import java.time.LocalDateTime;
 

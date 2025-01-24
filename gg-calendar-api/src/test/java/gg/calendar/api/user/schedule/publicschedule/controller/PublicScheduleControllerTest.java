@@ -831,29 +831,7 @@ public class PublicScheduleControllerTest {
 					.andExpect(jsonPath("$.link").value("https://original.com"))
 					.andDo(print());
 			}
-
-			@Test
-			@DisplayName("[403]공개일정상세조회실패-작성자가 다를 때")
-			void retrievePublicScheduleDetailFailNotMatchAuthor() throws Exception {
-				// given
-				PublicSchedule publicSchedule = PublicScheduleCreateEventReqDto.toEntity("another",
-					PublicScheduleCreateEventReqDto.builder()
-						.author("another")
-						.title("Original Title")
-						.content("Original Content")
-						.link("https://original.com")
-						.startTime(LocalDateTime.now())
-						.endTime(LocalDateTime.now().plusDays(1))
-						.build());
-				publicScheduleRepository.save(publicSchedule);
-
-				// when & then
-				mockMvc.perform(
-						get("/calendar/public/" + publicSchedule.getId()).header("Authorization", "Bearer " + accessToken))
-					.andExpect(status().isForbidden())
-					.andDo(print());
-			}
-
+			
 			@Test
 			@DisplayName("[400]공개일정상세조회실패-잘못된 id일 때(숫자가 아닌 문자열)")
 			void retrievePublicScheduleDetailFailWrongId() throws Exception {

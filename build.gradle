@@ -92,6 +92,9 @@ subprojects {
         testImplementation "org.testcontainers:testcontainers:1.19.3"
         testImplementation "org.testcontainers:junit-jupiter:1.19.3"
 
+        //wireMock test 추가
+        testImplementation 'org.wiremock:wiremock-standalone:3.3.1'
+
         // mapstruct 추가
         implementation 'org.mapstruct:mapstruct:1.5.5.Final'
         annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'

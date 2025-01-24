@@ -1,4 +1,4 @@
-package gg.calendar.api.user.fortytwoevent.service;
+package gg.calendar.api.user.utils.service;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 
 import gg.auth.FortyTwoAuthUtil;
-import gg.calendar.api.user.fortytwoevent.controller.response.FortyTwoEventResponse;
+import gg.calendar.api.user.utils.controller.response.FortyTwoEventResponse;
 import gg.utils.external.ApiUtil;
 import lombok.RequiredArgsConstructor;
 

@@ -1,4 +1,4 @@
-package gg.calendar.api.user.fortytwoevent.service;
+package gg.calendar.api.user.utils.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import gg.calendar.api.user.fortytwoevent.controller.response.FortyTwoEventResponse;
+import gg.calendar.api.user.utils.controller.response.FortyTwoEventResponse;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
 import gg.data.calendar.type.EventTag;
