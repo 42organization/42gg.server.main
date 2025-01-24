@@ -27,7 +27,7 @@ public interface PublicScheduleRepository extends JpaRepository<PublicSchedule, 
 
 	boolean existsByTitleAndStartTime(String title, LocalDateTime beginAt);
 
-	@Modifying
+	@Modifying(clearAutomatically = true)
 	@Transactional
 	@Query("UPDATE PublicSchedule ps SET ps.status = :status WHERE ps.status = :currentStatus AND ps.endTime < :time")
 	void updateExpiredPublicSchedules(@Param("status") ScheduleStatus status,

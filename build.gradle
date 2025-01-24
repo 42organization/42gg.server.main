@@ -8,6 +8,11 @@ plugins {
     id 'checkstyle'
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
 editorconfig {
     excludes = ['build']
 }
@@ -91,9 +96,6 @@ subprojects {
         testImplementation "org.junit.jupiter:junit-jupiter:5.8.1"
         testImplementation "org.testcontainers:testcontainers:1.19.3"
         testImplementation "org.testcontainers:junit-jupiter:1.19.3"
-
-        //wireMock test 추가
-        testImplementation 'org.wiremock:wiremock-standalone:3.3.1'
 
         // mapstruct 추가
         implementation 'org.mapstruct:mapstruct:1.5.5.Final'

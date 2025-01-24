@@ -26,7 +26,7 @@ public interface PrivateScheduleRepository extends JpaRepository<PrivateSchedule
 		+ "AND pr.user = :user")
 	List<PrivateSchedule> findOverlappingSchedulesByUser(LocalDateTime startTime, LocalDateTime endTime, User user);
 
-	@Modifying
+	@Modifying(clearAutomatically = true)
 	@Transactional
 	@Query("UPDATE PrivateSchedule ps SET ps.status = :status WHERE ps.publicSchedule.id IN "
 		+ "(SELECT p.id FROM PublicSchedule p WHERE p.status = :publicStatus)")
