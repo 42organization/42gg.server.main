@@ -33,19 +33,16 @@ public class TotalScheduleAdminService {
 
 	private final PublicScheduleAdminRepository publicScheduleAdminRepository;
 
-	public PageResponseDto<TotalScheduleAdminResDto> findAllByClassification(DetailClassification detailClassification,
-		int page, int size) {
+	public TotalScheduleAdminSearchListResDto findAllByClassification(DetailClassification detailClassification) {
 
-		Pageable pageable = PageRequest.of(page - 1, size,
-			Sort.by(Sort.Order.asc("status"), Sort.Order.asc("startTime")));
+		List<PublicSchedule> scheduleList = publicScheduleAdminRepository.findAllByClassification(
+			detailClassification);
 
-		Page<PublicSchedule> publicSchedules = publicScheduleAdminRepository.findAllByClassification(
-			detailClassification, pageable);
-
-		List<TotalScheduleAdminResDto> publicScheduleList = publicSchedules.stream()
-			.map(TotalScheduleAdminResDto::new)
-			.collect(Collectors.toList());
-		return PageResponseDto.of(publicSchedules.getTotalElements(), publicScheduleList);
+		return TotalScheduleAdminSearchListResDto.builder()
+			.schedules(scheduleList.stream()
+				.map(TotalScheduleAdminResDto::new)
+				.collect(Collectors.toList()))
+			.build();
 	}
 
 	public PageResponseDto<TotalScheduleAdminResDto> findAll(int page, int size) {
@@ -92,6 +89,7 @@ public class TotalScheduleAdminService {
 
 	public TotalScheduleAdminSearchListResDto totalScheduleAdminList() {
 		List<PublicSchedule> schedules = publicScheduleAdminRepository.findAll();
+
 		return TotalScheduleAdminSearchListResDto.builder()
 			.schedules(schedules.stream()
 				.map(TotalScheduleAdminResDto::new)
