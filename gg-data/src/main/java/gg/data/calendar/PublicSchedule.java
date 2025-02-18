@@ -86,8 +86,8 @@ public class PublicSchedule extends BaseTimeEntity {
 		this.endTime = endTime;
 	}
 
-	public void update(DetailClassification classification, EventTag eventTag, JobTag jobTag,
-		TechTag techTag, String title, String content, String link, LocalDateTime startTime, LocalDateTime endTime) {
+	public void update(DetailClassification classification, EventTag eventTag, JobTag jobTag, TechTag techTag,
+		String title, String content, String link, LocalDateTime startTime, LocalDateTime endTime) {
 		this.classification = classification;
 		this.eventTag = eventTag;
 		this.jobTag = jobTag;
@@ -101,6 +101,10 @@ public class PublicSchedule extends BaseTimeEntity {
 
 	public void delete() {
 		this.status = ScheduleStatus.DELETE;
+	}
+
+	public void incrementSharedCount() {
+		this.sharedCount++;
 	}
 }
 

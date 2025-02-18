@@ -19,7 +19,7 @@ public class PublicScheduleUpdateResDtoTest {
 
 	@Test
 	@DisplayName("PublicSchedule Entity를 ResponseDto로 변환 성공")
-	void toDto_Success() {
+	void toDtoSuccess() {
 		// given
 		LocalDateTime startTime = LocalDateTime.now().plusDays(1);
 		LocalDateTime endTime = LocalDateTime.now().plusDays(2);

@@ -20,8 +20,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PublicScheduleCreateJobReqDto {
 
-	private DetailClassification classification;
-
 	@NotNull
 	private JobTag jobTag;
 
@@ -48,7 +46,6 @@ public class PublicScheduleCreateJobReqDto {
 	public PublicScheduleCreateJobReqDto(JobTag jobTag, TechTag techTag, String author, String title, String content,
 		String link,
 		LocalDateTime startTime, LocalDateTime endTime) {
-		this.classification = DetailClassification.JOB_NOTICE;
 		this.jobTag = jobTag;
 		this.techTag = techTag;
 		this.author = author;
@@ -58,11 +55,6 @@ public class PublicScheduleCreateJobReqDto {
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}
-
-	// @AssertTrue(message = "classfication must be job_notice type")
-	// private boolean isJobNotice() {
-	// 	return classification == DetailClassification.JOB_NOTICE;
-	// }
 
 	public static PublicSchedule toEntity(String intraId, PublicScheduleCreateJobReqDto dto) {
 		return PublicSchedule.builder()

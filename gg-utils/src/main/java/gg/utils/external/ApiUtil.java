@@ -90,4 +90,12 @@ public class ApiUtil {
 
 		return apiCall(url, responseType, headers, HttpMethod.GET);
 	}
+
+	public <T> T callApiWithAccessTokenEvent(String url, String accessToken,
+		ParameterizedTypeReference<T> responseType) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setBearerAuth(accessToken);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		return apiCall(url, responseType, headers, HttpMethod.GET);
+	}
 }

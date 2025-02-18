@@ -2,13 +2,16 @@ package gg.calendar.api.user.schedule.publicschedule.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import gg.auth.UserDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateEventReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateJobReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicSchedulePeriodRetrieveResDto;
 import gg.data.calendar.PrivateSchedule;
 import gg.data.calendar.PublicSchedule;
 import gg.data.calendar.type.DetailClassification;
@@ -18,6 +21,7 @@ import gg.data.calendar.type.TechTag;
 import gg.data.user.User;
 import gg.repo.calendar.PrivateScheduleRepository;
 import gg.repo.calendar.PublicScheduleRepository;
+import gg.repo.calendar.ScheduleGroupRepository;
 import gg.repo.user.UserRepository;
 import gg.utils.exception.ErrorCode;
 import gg.utils.exception.custom.ForbiddenException;
@@ -32,6 +36,7 @@ public class PublicScheduleService {
 	private final PublicScheduleRepository publicScheduleRepository;
 	private final UserRepository userRepository;
 	private final PrivateScheduleRepository privateScheduleRepository;
+	private final ScheduleGroupRepository scheduleGroupRepository;
 
 	@Transactional
 	public void createEventPublicSchedule(PublicScheduleCreateEventReqDto req, Long userId) {
@@ -85,8 +90,30 @@ public class PublicScheduleService {
 		User user = userRepository.getById(userId);
 		PublicSchedule publicRetrieveSchedule = publicScheduleRepository.findById(scheduleId)
 			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
-		checkAuthor(publicRetrieveSchedule.getAuthor(), user);
+		// checkAuthor(publicRetrieveSchedule.getAuthor(), user);
 		return publicRetrieveSchedule;
+	}
+
+	public List<PublicSchedulePeriodRetrieveResDto> retrievePublicSchedulePeriod(LocalDateTime start, LocalDateTime end,
+		DetailClassification classification) {
+		validateTimeRange(start, end);
+		List<PublicSchedule> classSchedules = publicScheduleRepository
+			.findByEndTimeGreaterThanEqualAndStartTimeLessThanEqualAndClassification(
+				start, end, classification);
+		return classSchedules.stream().map(PublicSchedulePeriodRetrieveResDto::toDto).collect(Collectors.toList());
+	}
+
+	@Transactional
+	public void addPublicScheduleToPrivateSchedule(Long scheduleId, Long groupId, UserDto userDto) {
+		User user = userRepository.getById(userDto.getId());
+		Long userId = userDto.getId();
+		PublicSchedule publicSchedule = publicScheduleRepository.findById(scheduleId)
+			.orElseThrow(() -> new NotExistException(ErrorCode.PUBLIC_SCHEDULE_NOT_FOUND));
+		scheduleGroupRepository.findByIdAndUserId(groupId, userId)
+			.orElseThrow(() -> new NotExistException(ErrorCode.SCHEDULE_GROUP_NOT_FOUND));
+		PrivateSchedule privateSchedule = new PrivateSchedule(user, publicSchedule, false, groupId);
+		privateScheduleRepository.save(privateSchedule);
+		publicSchedule.incrementSharedCount();
 	}
 
 	private void checkAuthor(String author, User user) {

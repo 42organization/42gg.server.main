@@ -11,8 +11,4 @@ public enum ScheduleStatus {
 	DELETE("삭제");
 
 	private final String value;
-
-	public boolean isDelete() {
-		return this == DELETE;
-	}
 }

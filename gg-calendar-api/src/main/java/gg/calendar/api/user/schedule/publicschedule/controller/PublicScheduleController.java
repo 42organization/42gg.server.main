@@ -1,7 +1,13 @@
 package gg.calendar.api.user.schedule.publicschedule.controller;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+
 import javax.validation.Valid;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import gg.auth.UserDto;
@@ -19,9 +26,12 @@ import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicSch
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleCreateJobReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.request.PublicScheduleUpdateReqDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicScheduleDetailRetrieveResDto;
+import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicSchedulePeriodRetrieveResDto;
 import gg.calendar.api.user.schedule.publicschedule.controller.response.PublicScheduleUpdateResDto;
 import gg.calendar.api.user.schedule.publicschedule.service.PublicScheduleService;
 import gg.data.calendar.PublicSchedule;
+import gg.data.calendar.type.DetailClassification;
+import gg.utils.dto.ListResponseDto;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 
@@ -66,5 +76,23 @@ public class PublicScheduleController {
 		return ResponseEntity.ok(PublicScheduleDetailRetrieveResDto.toDto(publicSchedule));
 	}
 
+	@GetMapping("/period/{detailClassification}")
+	public ResponseEntity<ListResponseDto<PublicSchedulePeriodRetrieveResDto>> publicSchedulePeriodRetrieveGet(
+		@PathVariable DetailClassification detailClassification,
+		@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
+		@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
+		LocalDateTime startTime = start.atStartOfDay();
+		LocalDateTime endTime = end.atTime(LocalTime.MAX);
+		List<PublicSchedulePeriodRetrieveResDto> res = publicScheduleService.retrievePublicSchedulePeriod(
+			startTime, endTime, detailClassification);
+		return ResponseEntity.ok(ListResponseDto.toDto(res));
+	}
+
+	@PostMapping("/{id}/{groupId}")
+	public ResponseEntity<Void> publicScheduleToPrivateScheduleAdd(@PathVariable Long id, @PathVariable Long groupId,
+		@Login @Parameter(hidden = true) UserDto userDto) {
+		publicScheduleService.addPublicScheduleToPrivateSchedule(id, groupId, userDto);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
 }
 

@@ -44,6 +44,8 @@ https://gg.42seoul.kr/
 
 - 7기 : 2024.06.03 ~ 2024.09.10
 
+- 8기 : 2024.12.03 ~ 2025.02.28
+
 ## ⚡️ 프로젝트 아키텍처
 
 ![AwsArchitecture](https://github.com/user-attachments/assets/54da941b-a8c4-4586-9489-5e1d1085d7b8)
@@ -52,29 +54,35 @@ https://gg.42seoul.kr/
 
 <details>
 <summary> 모듈 구조도</summary>
-  
+
 <img width="927" alt="모듈 구조도" src="https://github.com/user-attachments/assets/0012ada6-77eb-42d1-bb0a-ffbbc010ef36">
 </details>
 
 <details>
 <summary> 5기</summary>
-  
+
 ![5기ERD](https://github.com/user-attachments/assets/0f889aaa-a39d-4062-8063-a495d6cd8863)
 </details>
 <details>
 <summary> 6기</summary>
-  
+
 ![6기ERD](https://github.com/user-attachments/assets/4719ec57-64b3-42f8-8ada-a745f91c6444)
 </details>
 <details>
 <summary> Recurit</summary>
-  
+
 ![RecuritERD](https://github.com/user-attachments/assets/ad07f23e-2c99-4d21-b0b5-a5d47c28dcb1)
 </details>
 <details>
 <summary> 7기</summary>
-  
+
 ![7기ERD](https://github.com/user-attachments/assets/c5a147b6-107c-4524-b656-6183dc04ccf6)
+</details>
+
+<details>
+<summary>8기</summary>
+
+![8기ERD](https://github.com/user-attachments/assets/db8a3ee0-69bb-4a28-afe3-6917d0aacb9c)
 </details>
 
 ## ⚡️ 팀소개
@@ -348,16 +356,16 @@ https://gg.42seoul.kr/
 ### ⚡️⚡ 행사 서비스 개발
 
 - 42서울 내 행사를 진행할 수 있는 서비스 개발
-![인덱스](https://github.com/user-attachments/assets/48966d80-337f-42d9-9024-b1f5392a81ab)
+  ![인덱스](https://github.com/user-attachments/assets/48966d80-337f-42d9-9024-b1f5392a81ab)
 
 - 행사 개최, 참가, 결과 확인, 개인 프로필 등의 기능을 제공
-![대회목록](https://github.com/user-attachments/assets/cf5fb4b3-bcad-4e89-ab8b-3f798f3cba9f)
-![상세보기](https://github.com/user-attachments/assets/f6109e2c-3a93-462c-a899-cfc35989dc20)
-![대회 참가](https://github.com/user-attachments/assets/f11b5c89-ebc2-4d2d-91c7-25317d33ad2d)
-![프로필](https://github.com/user-attachments/assets/f9b31b71-76f6-4bf0-9b5c-d56446e292a0)
+  ![대회목록](https://github.com/user-attachments/assets/cf5fb4b3-bcad-4e89-ab8b-3f798f3cba9f)
+  ![상세보기](https://github.com/user-attachments/assets/f6109e2c-3a93-462c-a899-cfc35989dc20)
+  ![대회 참가](https://github.com/user-attachments/assets/f11b5c89-ebc2-4d2d-91c7-25317d33ad2d)
+  ![프로필](https://github.com/user-attachments/assets/f9b31b71-76f6-4bf0-9b5c-d56446e292a0)
 
 - 평가 포인트를 티켓으로 환전해 사용해 공식 대회를 참가해 칭호와 업적 등의 보상을 받을 수 있음(현재는 기부만 가능)
-![티켓 페이지](https://github.com/user-attachments/assets/fd76a962-1254-4354-a1ff-be93950d75a3)
+  ![티켓 페이지](https://github.com/user-attachments/assets/fd76a962-1254-4354-a1ff-be93950d75a3)
 
 ### ⚡️⚡ DataFlow
 
@@ -370,6 +378,7 @@ https://gg.42seoul.kr/
 ### ⚡️⚡ 테스트 커버리지
 
 ### 전체 75.9% -> 76.5%
+
 ![테스트 전체](https://github.com/user-attachments/assets/3c567a75-a897-483c-ba89-8c5e9caff210)
 
 </div>
@@ -395,6 +404,41 @@ https://gg.42seoul.kr/
     </tr>
 </table>
 
+### 8기
+
+<details>
+<summary> 8기 진행 사항</summary>
+<div markdown="1">
+
+### ⚡️⚡ 캘린더 서비스 개발
+
+- 42서울 내 행사를 달력으로 한눈에 볼 수 있는 서비스 개발
+
+
+- 개인일정, 공유일정, 행사일정 등을 등록하고 일정 관리 기능 제공
+
+</div>
+</details>
+
+<table>
+  <thead>
+    <tr>
+        <td align=center>🏓</td>
+        <td align=center>🏓</td>
+        <td align=center>🏓</td>
+    </tr>
+  </thead>
+    <tr>
+        <td align=center><a href="https://github.com/taehyeon3">김태현 @taehyeon</a></td>
+        <td align=center><a href="https://github.com/seyeon22222">김세연 @seykim</a></td>
+        <td align=center><a href="https://github.com/wonies">신원희 @wonhshin</a></td>
+    </tr>
+    <tr>
+        <td align=center>캘린더 개인 일정 개발 <br> 테스트 커버리지 개선</td>
+        <td align=center>팀장, 캘린더 Admin개발 <br> 테스트 커버리지 개선</td>
+        <td align=center>캘린더 공유 일정 개발 <br> 테스트 커버리지 개선</td>
+    </tr>
+</table>
 
 ## ⚡️ 필요 파일
 
