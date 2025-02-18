@@ -2,7 +2,7 @@ name: test-deploy
 
 on:
   push:
-    branches: [ dev, 1151-feature-42api-모니터링스레드에작업 ]
+    branches: [ dev ]
   workflow_dispatch:
 
 permissions:
